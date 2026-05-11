@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Humanly Style AI Review</title>
+  <meta name="description" content="Human-style feedback for essays, business documents, creative writing, legal-style drafts, presentations, and more." />
+
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --dark: #020617;
+      --dark2: #0f172a;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --soft: #f1f5f9;
+      --radius: 24px;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+
+    .container {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: var(--dark);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .nav {
+      display: flex;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .nav a:hover { color: var(--text); }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 18px;
+      background: var(--dark);
+      color: #fff;
+      font-weight: 850;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s ease;
+      text-align: center;
+    }
+
+    .btn:hover { background: var(--dark2); transform: translateY(-1px); }
+    .btn.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+    .btn.secondary:hover { background: var(--soft); }
+    .btn.full { width: 100%; }
+
+    .btn:disabled {
+      background: #cbd5e1;
+      color: #64748b;
+      cursor: not-allowed;
+      transform: none;
+      border: 0;
+    }
+
+    .hero {
+      padding: 72px 0 48px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 44px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    h1, h2, h3 { margin: 0; line-height: 1.06; letter-spacing: -0.04em; }
+    h1 { margin-top: 18px; font-size: clamp(42px, 6vw, 68px); }
+    h2 { font-size: clamp(30px, 4vw, 42px); }
+    h3 { font-size: 20px; }
+
+    .lead {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 19px;
+      max-width: 680px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+
+    .hero-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .hero-point {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      font-weight: 850;
+      font-size: 14px;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.05);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .preview-card { padding: 22px; }
+
+    .preview-box {
+      border-radius: 20px;
+      background: var(--dark);
+      color: white;
+      padding: 24px;
+      min-height: 340px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .preview-title { color: #cbd5e1; font-size: 14px; font-weight: 800; }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .preview-mini {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .preview-mini span { color: #94a3b8; font-size: 13px; font-weight: 850; }
+    .preview-mini p { margin: 12px 0 0; color: #e2e8f0; font-size: 14px; }
+
+    .preview-footer {
+      margin-top: 22px;
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.09);
+      color: #dbeafe;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    section { padding: 70px 0; }
+    .white { background: #fff; }
+
+    .section-head { max-width: 760px; margin-bottom: 32px; }
+    .section-head p { color: var(--muted); margin: 12px 0 0; font-size: 17px; }
+
+    .video-section-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .video-placeholder {
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--dark);
+      color: white;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .video-frame {
+      aspect-ratio: 16 / 9;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(59,130,246,0.28), transparent 30%),
+        radial-gradient(circle at 70% 60%, rgba(16,185,129,0.18), transparent 32%),
+        #020617;
+    }
+
+    .play-button {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      background: white;
+      color: var(--dark);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      margin: 0 auto 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+    }
+
+    .video-frame h3 { color: white; font-size: 24px; margin-bottom: 8px; }
+    .video-frame p { color: #cbd5e1; margin: 0; max-width: 440px; }
+
+    .video-caption {
+      padding: 18px 22px;
+      background: rgba(255,255,255,0.04);
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .review-category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .review-category-card {
+      padding: 22px;
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .review-category-card::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      right: -50px;
+      top: -50px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      z-index: 0;
+    }
+
+    .review-category-card > * { position: relative; z-index: 1; }
+
+    .category-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 18px;
+      background: var(--soft);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .category-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .category-list li { display: flex; gap: 8px; align-items: flex-start; }
+    .category-list li::before { content: "✓"; color: var(--success); font-weight: 950; flex: 0 0 auto; }
+
+    .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    .price-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 440px;
+    }
+
+    .price-card.active { outline: 3px solid var(--dark); }
+    .price { font-size: 42px; font-weight: 950; margin-top: 16px; letter-spacing: -0.05em; }
+    .naira { font-weight: 850; color: var(--muted); margin-top: 2px; }
+
+    .plan-note {
+      margin: 16px 0;
+      padding: 14px;
+      background: var(--soft);
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 22px;
+      display: grid;
+      gap: 11px;
+      font-size: 14px;
+    }
+
+    .feature-list li { display: flex; align-items: flex-start; gap: 9px; }
+    .check { color: var(--success); font-weight: 950; }
+    .price-card .btn { margin-top: auto; }
+
+    .form-layout { display: grid; grid-template-columns: 1fr 360px; gap: 26px; align-items: start; }
+    .form-card { padding: 28px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    label { display: block; font-size: 14px; font-weight: 850; }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 8px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--dark);
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+    }
+
+    textarea { min-height: 160px; resize: vertical; }
+
+    .field-note { margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .hidden { display: none !important; }
+
+    .error-text { color: var(--danger); font-size: 13px; font-weight: 750; margin-top: 6px; }
+    .success-text { color: var(--success); font-size: 13px; font-weight: 850; margin-top: 6px; }
+
+    .verify-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+
+    .verify-box {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .verify-box p { color: var(--muted); margin: 6px 0 12px; font-size: 13px; }
+
+    .free-box {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--soft);
+      border: 1px solid var(--border);
+    }
+
+    .free-box.blocked { background: var(--danger-bg); border-color: #fecaca; }
+
+    .word-box, .file-info {
+      margin-top: 14px;
+      padding: 15px;
+      border-radius: 18px;
+      background: var(--soft);
+      font-weight: 750;
+    }
+
+    .word-box.error { background: var(--danger-bg); color: var(--danger); }
+
+    .upload-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-top: 18px;
+      padding: 22px;
+      border: 2px dashed #94a3b8;
+      border-radius: 22px;
+      background: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+      min-height: 132px;
+    }
+
+    .upload-box:hover { border-color: var(--dark); background: #f8fafc; transform: translateY(-1px); }
+    .upload-box input { display: none; }
+
+    .upload-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: var(--soft);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      flex: 0 0 auto;
+    }
+
+    .click-hint {
+      display: inline-flex;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--dark);
+      color: white;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .limit-line { display: block; margin-top: 8px; color: var(--muted); font-size: 13px; font-weight: 750; }
+
+    .brief-upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 22px;
+      align-items: stretch;
+    }
+
+    .compact-upload { margin-top: 8px; min-height: 100%; }
+
+    .submit-area {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .side-card {
+      background: var(--dark);
+      color: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      position: sticky;
+      top: 94px;
+    }
+
+    .side-card ul {
+      padding-left: 20px;
+      color: #dbeafe;
+      display: grid;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .side-note {
+      background: rgba(255,255,255,0.09);
+      padding: 16px;
+      border-radius: 18px;
+      margin-top: 18px;
+    }
+
+    .side-note p { margin-bottom: 0; color: #cbd5e1; font-size: 14px; }
+
+    .form-warning { margin-top: 14px; display: flex; gap: 10px; color: var(--muted); font-size: 14px; font-weight: 700; }
+
+    .success-message {
+      display: none;
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: var(--success-bg);
+      color: #166534;
+      font-weight: 850;
+    }
+
+    .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .faq-card { padding: 22px; }
+    .faq-card p { color: var(--muted); margin-bottom: 0; }
+
+    .support-strip {
+      background: var(--dark);
+      color: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .support-strip p { color: #cbd5e1; margin: 8px 0 0; }
+
+    footer { background: var(--dark); color: #cbd5e1; text-align: center; padding: 34px 0; font-size: 14px; }
+
+    @media (max-width: 1020px) {
+      .hero, .form-layout, .video-section-grid { grid-template-columns: 1fr; }
+      .pricing-grid, .review-category-grid { grid-template-columns: repeat(2, 1fr); }
+      .side-card { position: static; }
+      .nav { display: none; }
+    }
+
+    @media (max-width: 700px) {
+      .header-inner { min-height: auto; padding: 14px 0; }
+      .header .btn { display: none; }
+      .hero-points, .preview-grid, .pricing-grid, .form-grid, .verify-grid, .faq-grid, .brief-upload-grid, .review-category-grid { grid-template-columns: 1fr; }
+      .support-strip { display: block; }
+      section { padding: 54px 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="#">
+        <span class="brand-mark">✓</span>
+        <span>Humanly Style AI Review</span>
+      </a>
+
+      <nav class="nav" aria-label="Main menu">
+        <a href="#content">Content</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#submit">Submit</a>
+        <a href="#faq">FAQ</a>
+        <a href="#support">Support</a>
+      </nav>
+
+      <a class="btn" href="#submit">Start Free Trial</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <div>
+        <span class="eyebrow">Fast, clear, human-style feedback</span>
+        <h1>Review any content before you submit, send, or publish.</h1>
+        <p class="lead">
+          Upload your document or paste your text. Get a detailed review report with clear feedback,
+          improvement points, and next steps.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn" href="#submit">Start Free Trial</a>
+          <a class="btn secondary" href="#pricing">View Pricing</a>
+        </div>
+
+        <div class="hero-points">
+          <div class="hero-point">Detailed feedback</div>
+          <div class="hero-point">All plans include report</div>
+          <div class="hero-point">Free Trial once only</div>
+        </div>
+      </div>
+
+      <div class="card preview-card">
+        <div class="preview-box">
+          <div>
+            <div class="preview-title">What you receive</div>
+            <div class="preview-grid">
+              <div class="preview-mini">
+                <span>Review</span>
+                <p>Strengths, weaknesses, clarity, structure, tone, and readiness.</p>
+              </div>
+              <div class="preview-mini">
+                <span>Feedback</span>
+                <p>Simple next steps that show what to improve before use.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-footer">
+            We give feedback only. We do not write, complete, falsify, or submit work for users.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container video-section-grid">
+        <div class="section-head" style="margin-bottom:0;">
+          <h2>See the difference before and after review</h2>
+          <p>
+            Add your own short video here later. It should show a simple example of a document before review,
+            then the clearer feedback report after review.
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="#submit">Submit your content</a>
+            <a class="btn secondary" href="#pricing">Choose a plan</a>
+          </div>
+        </div>
+
+        <div class="video-placeholder">
+          <div class="video-frame">
+            <div>
+              <div class="play-button">▶</div>
+              <h3>Before & After Review Video</h3>
+              <p>Upload your real video later. Recommended: 60–90 seconds, clear voice, simple document example.</p>
+            </div>
+          </div>
+          <div class="video-caption">
+            Video placeholder: replace this area later with your uploaded video or YouTube embed.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="white" id="content">
+      <div class="container">
+        <div class="section-head">
+          <h2>Content we can review</h2>
+          <p>We review many kinds of content. Choose the closest type in the form, or choose Other if your document is unique.</p>
+        </div>
+
+        <div class="review-category-grid">
+          <div class="card review-category-card">
+            <div class="category-icon">🎓</div>
+            <h3>Academic & research</h3>
+            <ul class="category-list">
+              <li>Essays and assignments</li>
+              <li>Dissertations and theses</li>
+              <li>Research papers and reports</li>
+              <li>Statements of purpose</li>
+              <li>Scholarship applications</li>
+            </ul>
+          </div>
+
+          <div class="card review-category-card">
+            <div class="category-icon">💼</div>
+            <h3>Business & professional</h3>
+            <ul class="category-list">
+              <li>Business proposals</li>
+              <li>Business plans</li>
+              <li>Client reports</li>
+              <li>CVs and cover letters</li>
+              <li>Professional emails</li>
+            </ul>
+          </div>
+
+          <div class="card review-category-card">
+            <div class="category-icon">✍️</div>
+            <h3>Creative & publishing</h3>
+            <ul class="category-list">
+              <li>Books and manuscripts</li>
+              <li>Scripts and screenplays</li>
+              <li>Articles and blog posts</li>
+              <li>Poetry and storytelling</li>
+              <li>Website content</li>
+            </ul>
+          </div>
+
+          <div class="card review-category-card">
+            <div class="category-icon">📊</div>
+            <h3>Presentation & training</h3>
+            <ul class="category-list">
+              <li>Slides and pitch decks</li>
+              <li>Speaker notes</li>
+              <li>Training materials</li>
+              <li>Workshop documents</li>
+              <li>Public speech drafts</li>
+            </ul>
+          </div>
+
+          <div class="card review-category-card">
+            <div class="category-icon">📣</div>
+            <h3>Marketing & public content</h3>
+            <ul class="category-list">
+              <li>Sales copy</li>
+              <li>Product descriptions</li>
+              <li>Social media content</li>
+              <li>Email campaigns</li>
+              <li>Brand messages</li>
+            </ul>
+          </div>
+
+          <div class="card review-category-card">
+            <div class="category-icon">⚖️</div>
+            <h3>Legal-style & formal drafts</h3>
+            <ul class="category-list">
+              <li>Contract drafts</li>
+              <li>Agreement drafts</li>
+              <li>Policy documents</li>
+              <li>Complaint-style drafts</li>
+              <li>Formal letters</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <h2>Pricing</h2>
+          <p>Every plan includes a detailed review report and feedback. The main difference is word count.</p>
+        </div>
+
+        <div class="pricing-grid" id="pricingGrid"></div>
+      </div>
+    </section>
+
+    <section class="white" id="submit">
+      <div class="container form-layout">
+        <form class="card form-card" id="reviewForm" novalidate>
+          <h2>Submit your content</h2>
+          <p class="small-muted">
+            Fill the form, verify your details, and submit. Your feedback will be sent through your selected contact method.
+          </p>
+
+          <div class="form-grid">
+            <label>
+              Email address *
+              <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+              <div class="error-text" id="emailError"></div>
+            </label>
+
+            <label>
+              Confirm email address *
+              <input id="confirmEmail" type="email" placeholder="Re-enter email" autocomplete="email" />
+              <div class="error-text" id="confirmEmailError"></div>
+            </label>
+
+            <label>
+              WhatsApp number *
+              <input id="phone" type="tel" placeholder="+234..." autocomplete="tel" />
+            </label>
+
+            <label>
+              Where should we send your feedback? *
+              <select id="preferredContact">
+                <option value="">Select one</option>
+                <option value="Email">Email</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="Telegram">Telegram</option>
+              </select>
+              <div class="field-note"><strong>Your final feedback report will be sent here.</strong></div>
+            </label>
+
+            <label>
+              Content type *
+              <select id="documentType">
+                <option value="">Select content type</option>
+              </select>
+            </label>
+
+            <label id="otherDocumentTypeWrap" class="hidden">
+              Type your content type *
+              <input id="otherDocumentType" type="text" placeholder="Example: church speech, policy draft, etc." maxlength="80" />
+            </label>
+
+            <label>
+              Purpose *
+              <select id="purpose">
+                <option value="">Select purpose</option>
+              </select>
+            </label>
+
+            <label id="otherPurposeWrap" class="hidden">
+              Type your purpose *
+              <input id="otherPurpose" type="text" placeholder="Example: client review, public speech, etc." maxlength="80" />
+            </label>
+
+            <label id="paymentProviderWrap" class="hidden">
+              Payment method *
+              <select id="paymentProvider">
+                <option value="paystack">Paystack</option>
+                <option value="flutterwave">Flutterwave</option>
+              </select>
+              <div class="field-note">Use either provider. Payment is verified before submission.</div>
+            </label>
+
+            <label id="currencyWrap" class="hidden">
+              Currency *
+              <select id="currency">
+                <option value="NGN">Naira (NGN)</option>
+                <option value="USD">Dollar (USD)</option>
+              </select>
+              <div class="field-note">USD only works if your payment account supports USD.</div>
+            </label>
+          </div>
+
+          <div class="verify-grid">
+            <div class="verify-box">
+              <strong>Email verification *</strong>
+              <p>Required before submission.</p>
+              <button type="button" class="btn secondary full" id="emailVerifyBtn">Verify email</button>
+            </div>
+
+            <div class="verify-box">
+              <strong>WhatsApp verification *</strong>
+              <p>Required before submission.</p>
+              <button type="button" class="btn secondary full" id="whatsappVerifyBtn">Verify WhatsApp</button>
+            </div>
+
+            <div class="verify-box">
+              <strong>Payment *</strong>
+              <p>Required for paid plans.</p>
+              <button type="button" class="btn secondary full" id="paymentBtn">Not required</button>
+              <div id="paymentStatus" class="field-note"></div>
+            </div>
+          </div>
+
+          <div class="free-box" id="freeEligibilityBox">
+            <strong>Free Trial check *</strong>
+            <p class="small-muted">Free Trial is one lifetime use only. If you have used it before, choose a paid plan.</p>
+            <button type="button" class="btn secondary" id="eligibilityBtn">Check Free Trial</button>
+            <div class="error-text" id="eligibilityMessage"></div>
+          </div>
+
+          <label style="margin-top:18px;">
+            Paste content to review
+            <textarea id="contentText" placeholder="Paste your content here for word count..."></textarea>
+          </label>
+
+          <div class="word-box" id="wordStatus">0 words counted.</div>
+
+          <label class="upload-box">
+            <span class="upload-icon">📎</span>
+            <span>
+              <strong>Upload document(s) to review</strong><br />
+              <span class="limit-line" id="uploadLimitText"></span>
+              <span class="click-hint">Click here to choose file</span>
+            </span>
+            <input id="fileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png" />
+          </label>
+
+          <div class="file-info" id="fileInfo" style="display:none;"></div>
+
+          <div class="brief-upload-grid">
+            <label>
+              Brief or instruction <span class="small-muted">(optional)</span>
+              <textarea id="brief" maxlength="800" placeholder="Optional: tell us anything important about the document. You can leave this empty."></textarea>
+              <div class="field-note">Optional. Maximum 800 characters.</div>
+            </label>
+
+            <label class="upload-box compact-upload">
+              <span class="upload-icon">📝</span>
+              <span>
+                <strong>Upload brief/supporting file</strong><br />
+                <span class="limit-line" id="briefUploadLimitText">
+                  Optional. Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG.
+                </span>
+                <span class="click-hint">Click here to choose file</span>
+              </span>
+              <input id="briefFileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png" />
+            </label>
+          </div>
+
+          <div class="file-info" id="briefFileInfo" style="display:none;"></div>
+
+          <div class="submit-area">
+            <button type="submit" class="btn full" id="submitBtn" disabled>Submit for Review</button>
+
+            <div class="form-warning" id="formWarning">
+              <span>⚠️</span>
+              <span>Complete required fields, verify details, stay within plan limits, and verify payment if needed.</span>
+            </div>
+
+            <div class="success-message" id="successMessage">
+              Submission received. Status: Processing. Your feedback will be sent through your selected contact method.
+            </div>
+          </div>
+        </form>
+
+        <aside class="side-card">
+          <h3>Your report includes</h3>
+          <ul>
+            <li>Overall review summary</li>
+            <li>Strengths and weaknesses</li>
+            <li>Clarity, structure, tone, and flow feedback</li>
+            <li>Important missing points</li>
+            <li>Improvement checklist</li>
+            <li>Next-step guidance</li>
+          </ul>
+
+          <div class="side-note">
+            <h3>Important</h3>
+            <p>We provide review and feedback only. We do not write, complete, falsify, or submit work for users.</p>
+          </div>
+
+          <div class="side-note">
+            <h3>File types</h3>
+            <p>PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <div class="section-head">
+          <h2>FAQ</h2>
+          <p>Simple answers before you submit.</p>
+        </div>
+
+        <div class="faq-grid">
+          <div class="card faq-card"><h3>What do I get?</h3><p>A detailed review report with clear feedback and improvement points.</p></div>
+          <div class="card faq-card"><h3>Do you write the work for me?</h3><p>No. We only review and give feedback. We do not complete or submit work for users.</p></div>
+          <div class="card faq-card"><h3>Can I use Free Trial more than once?</h3><p>No. Free Trial is one lifetime use only.</p></div>
+          <div class="card faq-card"><h3>Can you review legal documents?</h3><p>Yes, for clarity and structure. This is not legal advice and does not replace a lawyer.</p></div>
+          <div class="card faq-card"><h3>What if my file is too large?</h3><p>Use the Custom Large Review option and contact customer care.</p></div>
+          <div class="card faq-card"><h3>Where will I receive feedback?</h3><p>Through the contact method you select in the form.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="support" class="white">
+      <div class="container">
+        <div class="support-strip">
+          <div>
+            <h2>Need help or have a large file?</h2>
+            <p>Contact customer care for custom review requests, large files, or special instructions.</p>
+          </div>
+          <a class="btn" href="mailto:support@example.com">Contact Customer Care</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Humanly Style AI Review. Feedback only. Not legal, academic, financial, or professional advice.
+    </div>
+  </footer>
+
+  <script>
+    /*
+      STEP 1: Replace these three values.
+      - APPS_SCRIPT_URL: paste your Google Apps Script Web App URL ending in /exec.
+      - PAYSTACK_PUBLIC_KEY: paste your Paystack public key.
+      - FLUTTERWAVE_PUBLIC_KEY: paste your Flutterwave public key.
+    */
+    const APPS_SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+    const PAYSTACK_PUBLIC_KEY = "PASTE_YOUR_PAYSTACK_PUBLIC_KEY_HERE";
+    const FLUTTERWAVE_PUBLIC_KEY = "PASTE_YOUR_FLUTTERWAVE_PUBLIC_KEY_HERE";
+
+    const USD_NGN_RATE = 1500;
+
+    const plans = [
+      {
+        id: "free",
+        name: "Free Trial",
+        usd: 0,
+        ngn: 0,
+        wordLimit: 1000,
+        maxFiles: 1,
+        maxFileMB: 5,
+        totalMB: 5,
+        label: "Up to 1,000 words",
+        cta: "Start Free Trial",
+        selectable: true
+      },
+      {
+        id: "standard",
+        name: "Standard",
+        usd: 9,
+        ngn: 9 * USD_NGN_RATE,
+        wordLimit: 5000,
+        maxFiles: 3,
+        maxFileMB: 15,
+        totalMB: 30,
+        label: "Up to 5,000 words",
+        cta: "Choose Standard",
+        selectable: true
+      },
+      {
+        id: "premium",
+        name: "Premium",
+        usd: 29,
+        ngn: 29 * USD_NGN_RATE,
+        wordLimit: 999999999,
+        maxFiles: 8,
+        maxFileMB: 25,
+        totalMB: 100,
+        label: "Unlimited words",
+        cta: "Choose Premium",
+        selectable: true
+      },
+      {
+        id: "custom",
+        name: "Custom Large Review",
+        usd: null,
+        ngn: null,
+        wordLimit: null,
+        maxFiles: null,
+        maxFileMB: null,
+        totalMB: null,
+        label: "Large files or special review",
+        cta: "Contact Customer Care",
+        selectable: false
+      }
+    ];
+
+    const documentTypes = [
+      "Essay", "Assignment", "Dissertation", "Thesis", "Research paper", "Book / Manuscript",
+      "Script / Screenplay", "Presentation", "Business document", "CV / Resume", "Cover letter",
+      "Application document", "Marketing copy", "Legal-style draft", "Report", "Technical document", "Other"
+    ];
+
+    const purposes = [
+      "Submission", "Business use", "Client delivery", "Publishing", "Presentation", "Application",
+      "Personal improvement", "Before sending", "Other"
+    ];
+
+    const state = {
+      selectedPlanId: "free",
+      emailVerified: false,
+      whatsappVerified: false,
+      paymentVerified: false,
+      freeEligibilityChecked: false,
+      freeEligible: true,
+      paymentProvider: "paystack",
+      paymentReference: "",
+      flutterwaveTransactionId: "",
+      currency: "NGN",
+      lastVerifiedPayment: null
+    };
+
+    const els = {
+      pricingGrid: document.getElementById("pricingGrid"),
+      email: document.getElementById("email"),
+      confirmEmail: document.getElementById("confirmEmail"),
+      phone: document.getElementById("phone"),
+      preferredContact: document.getElementById("preferredContact"),
+      documentType: document.getElementById("documentType"),
+      otherDocumentTypeWrap: document.getElementById("otherDocumentTypeWrap"),
+      otherDocumentType: document.getElementById("otherDocumentType"),
+      purpose: document.getElementById("purpose"),
+      otherPurposeWrap: document.getElementById("otherPurposeWrap"),
+      otherPurpose: document.getElementById("otherPurpose"),
+      paymentProviderWrap: document.getElementById("paymentProviderWrap"),
+      paymentProvider: document.getElementById("paymentProvider"),
+      currencyWrap: document.getElementById("currencyWrap"),
+      currency: document.getElementById("currency"),
+      contentText: document.getElementById("contentText"),
+      brief: document.getElementById("brief"),
+      fileInput: document.getElementById("fileInput"),
+      fileInfo: document.getElementById("fileInfo"),
+      briefFileInput: document.getElementById("briefFileInput"),
+      briefFileInfo: document.getElementById("briefFileInfo"),
+      wordStatus: document.getElementById("wordStatus"),
+      uploadLimitText: document.getElementById("uploadLimitText"),
+      briefUploadLimitText: document.getElementById("briefUploadLimitText"),
+      emailVerifyBtn: document.getElementById("emailVerifyBtn"),
+      whatsappVerifyBtn: document.getElementById("whatsappVerifyBtn"),
+      paymentBtn: document.getElementById("paymentBtn"),
+      paymentStatus: document.getElementById("paymentStatus"),
+      freeEligibilityBox: document.getElementById("freeEligibilityBox"),
+      eligibilityBtn: document.getElementById("eligibilityBtn"),
+      eligibilityMessage: document.getElementById("eligibilityMessage"),
+      submitBtn: document.getElementById("submitBtn"),
+      emailError: document.getElementById("emailError"),
+      confirmEmailError: document.getElementById("confirmEmailError"),
+      formWarning: document.getElementById("formWarning"),
+      successMessage: document.getElementById("successMessage"),
+      reviewForm: document.getElementById("reviewForm")
+    };
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    function formatNaira(amount) {
+      if (amount === null) return "Contact us";
+      return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(amount);
+    }
+
+    function getPlan() {
+      return plans.find(plan => plan.id === state.selectedPlanId) || plans[0];
+    }
+
+    function getAmount(plan, currency) {
+      if (plan.id === "free") return 0;
+      return currency === "USD" ? plan.usd : plan.ngn;
+    }
+
+    function countWords(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return 0;
+      return trimmed.split(/\s+/).filter(Boolean).length;
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function getFileStats(input) {
+      const files = Array.from(input.files || []);
+      const totalMB = files.reduce((sum, file) => sum + file.size / 1024 / 1024, 0);
+      return { files, totalMB };
+    }
+
+    async function sha256(text) {
+      const msgBuffer = new TextEncoder().encode(text || "");
+      const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function fileToPayload(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const dataUrl = reader.result;
+          const base64 = String(dataUrl).split(",")[1] || "";
+          resolve({
+            name: file.name,
+            mimeType: file.type || "application/octet-stream",
+            size: file.size,
+            base64,
+            hash: await sha256(file.name + ":" + file.size + ":" + file.lastModified)
+          });
+        };
+        reader.onerror = () => reject(new Error("Could not read file: " + file.name));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function filesToPayload(input) {
+      const files = Array.from(input.files || []);
+      const output = [];
+      for (const file of files) output.push(await fileToPayload(file));
+      return output;
+    }
+
+    async function postToBackend(payload) {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("PASTE_YOUR")) {
+        throw new Error("Apps Script URL is not set yet.");
+      }
+
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        throw new Error("Backend did not return JSON. Check Apps Script deployment.");
+      }
+    }
+
+    function resetFreeEligibility() {
+      state.freeEligibilityChecked = false;
+      state.freeEligible = true;
+      els.eligibilityMessage.textContent = "";
+      els.freeEligibilityBox.classList.remove("blocked");
+      els.eligibilityBtn.textContent = "Check Free Trial";
+      els.eligibilityBtn.classList.add("secondary");
+    }
+
+    function resetPayment() {
+      state.paymentVerified = false;
+      state.paymentReference = "";
+      state.flutterwaveTransactionId = "";
+      state.lastVerifiedPayment = null;
+      els.paymentStatus.textContent = "";
+    }
+
+    function renderOptions() {
+      documentTypes.forEach(type => {
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = type;
+        els.documentType.appendChild(option);
+      });
+
+      purposes.forEach(purpose => {
+        const option = document.createElement("option");
+        option.value = purpose;
+        option.textContent = purpose;
+        els.purpose.appendChild(option);
+      });
+    }
+
+    function renderPricing() {
+      els.pricingGrid.innerHTML = "";
+
+      plans.forEach(plan => {
+        const card = document.createElement("div");
+        card.className = "card price-card" + (plan.id === state.selectedPlanId ? " active" : "");
+
+        const priceText = plan.usd === null ? "Contact" : "$" + plan.usd;
+        const nairaText = formatNaira(plan.ngn);
+        const limitText = plan.id === "custom"
+          ? "For bigger files, special requirements, or custom volume."
+          : `${plan.maxFiles} file${plan.maxFiles > 1 ? "s" : ""}, ${plan.maxFileMB}MB each, ${plan.totalMB}MB total`;
+
+        card.innerHTML = `
+          <h3>${plan.name}</h3>
+          <div class="price">${priceText}</div>
+          <div class="naira">${nairaText}</div>
+          <p>${plan.label}</p>
+          <div class="plan-note">${limitText}</div>
+          <ul class="feature-list">
+            <li><span class="check">✓</span><span>Detailed review report</span></li>
+            <li><span class="check">✓</span><span>Human-style feedback</span></li>
+            <li><span class="check">✓</span><span>Improvement checklist</span></li>
+            <li><span class="check">✓</span><span>Next-step guidance</span></li>
+          </ul>
+          <button type="button" class="btn ${plan.selectable && plan.id !== state.selectedPlanId ? "secondary" : ""} full">${plan.cta}</button>
+        `;
+
+        card.querySelector("button").addEventListener("click", () => {
+          if (!plan.selectable) {
+            location.hash = "#support";
+            return;
+          }
+
+          state.selectedPlanId = plan.id;
+          resetPayment();
+          resetFreeEligibility();
+          renderPricing();
+          updateUI();
+          location.hash = "#submit";
+        });
+
+        els.pricingGrid.appendChild(card);
+      });
+    }
+
+    function updateOtherFields() {
+      const docOther = els.documentType.value === "Other";
+      const purposeOther = els.purpose.value === "Other";
+
+      els.otherDocumentTypeWrap.classList.toggle("hidden", !docOther);
+      els.otherPurposeWrap.classList.toggle("hidden", !purposeOther);
+
+      if (!docOther) els.otherDocumentType.value = "";
+      if (!purposeOther) els.otherPurpose.value = "";
+    }
+
+    function updateUI() {
+      updateOtherFields();
+
+      const plan = getPlan();
+      const words = countWords(els.contentText.value);
+
+      const mainStats = getFileStats(els.fileInput);
+      const files = mainStats.files;
+      const totalMB = mainStats.totalMB;
+
+      const briefStats = getFileStats(els.briefFileInput);
+      const briefFiles = briefStats.files;
+      const briefTotalMB = briefStats.totalMB;
+
+      const overWordLimit = words > plan.wordLimit;
+      const tooManyFiles = files.length > plan.maxFiles;
+      const fileTooLarge = files.some(file => file.size / 1024 / 1024 > plan.maxFileMB);
+      const totalTooLarge = totalMB > plan.totalMB;
+
+      const briefTooManyFiles = briefFiles.length > plan.maxFiles;
+      const briefFileTooLarge = briefFiles.some(file => file.size / 1024 / 1024 > plan.maxFileMB);
+      const briefTotalTooLarge = briefTotalMB > plan.totalMB;
+
+      const planLimitText = `${plan.name} limit: ${plan.maxFiles} file${plan.maxFiles > 1 ? "s" : ""}, ${plan.maxFileMB}MB each, ${plan.totalMB}MB total.`;
+      els.uploadLimitText.textContent =
+        `Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG. ${planLimitText}`;
+      els.briefUploadLimitText.textContent =
+        `Optional brief/supporting file. Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG. ${planLimitText}`;
+
+      els.wordStatus.classList.toggle("error", overWordLimit);
+      els.wordStatus.textContent = `${words} words counted. Current plan: ${plan.name}. ${
+        plan.id === "premium" ? "Unlimited word count applies." : "Limit: " + plan.wordLimit.toLocaleString() + " words."
+      }${overWordLimit ? " Upgrade to continue." : ""}`;
+
+      if (files.length > 0) {
+        els.fileInfo.style.display = "block";
+        els.fileInfo.innerHTML = `
+          <strong>${files.length}</strong> file(s) selected. Total size: <strong>${totalMB.toFixed(2)}MB</strong>.
+          ${tooManyFiles ? '<p class="error-text">Too many files for this plan.</p>' : ""}
+          ${fileTooLarge ? '<p class="error-text">One or more files exceed the per-file MB limit.</p>' : ""}
+          ${totalTooLarge ? '<p class="error-text">Total file size exceeds this plan limit. Choose Custom Large Review.</p>' : ""}
+        `;
+      } else {
+        els.fileInfo.style.display = "none";
+      }
+
+      if (briefFiles.length > 0) {
+        els.briefFileInfo.style.display = "block";
+        els.briefFileInfo.innerHTML = `
+          <strong>${briefFiles.length}</strong> brief/supporting file(s) selected. Total size: <strong>${briefTotalMB.toFixed(2)}MB</strong>.
+          ${briefTooManyFiles ? '<p class="error-text">Too many brief/supporting files for this plan.</p>' : ""}
+          ${briefFileTooLarge ? '<p class="error-text">One or more brief/supporting files exceed the per-file MB limit.</p>' : ""}
+          ${briefTotalTooLarge ? '<p class="error-text">Brief/supporting files exceed this plan limit.</p>' : ""}
+        `;
+      } else {
+        els.briefFileInfo.style.display = "none";
+      }
+
+      els.emailError.textContent = els.email.value && !isValidEmail(els.email.value) ? "Enter a valid email address." : "";
+
+      const emailsMatch =
+        els.email.value &&
+        els.confirmEmail.value &&
+        els.email.value.toLowerCase() === els.confirmEmail.value.toLowerCase();
+
+      els.confirmEmailError.textContent =
+        els.confirmEmail.value && !emailsMatch ? "Email addresses must match." : "";
+
+      els.emailVerifyBtn.textContent = state.emailVerified ? "Email verified" : "Verify email";
+      els.emailVerifyBtn.classList.toggle("secondary", !state.emailVerified);
+
+      els.whatsappVerifyBtn.textContent = state.whatsappVerified ? "WhatsApp verified" : "Verify WhatsApp";
+      els.whatsappVerifyBtn.classList.toggle("secondary", !state.whatsappVerified);
+
+      const paidPlan = plan.id !== "free";
+      els.paymentProviderWrap.classList.toggle("hidden", !paidPlan);
+      els.currencyWrap.classList.toggle("hidden", !paidPlan);
+
+      if (!paidPlan) {
+        els.paymentBtn.textContent = "Not required";
+        els.paymentBtn.classList.remove("secondary");
+        els.freeEligibilityBox.style.display = "block";
+      } else {
+        const amount = getAmount(plan, state.currency);
+        els.paymentBtn.textContent = state.paymentVerified ? "Payment verified" : `Pay ${state.currency} ${amount}`;
+        els.paymentBtn.classList.toggle("secondary", !state.paymentVerified);
+        els.freeEligibilityBox.style.display = "none";
+      }
+
+      const hasContent = words > 0 || files.length > 0;
+      const paidReady = plan.id === "free" || state.paymentVerified;
+      const freeReady = plan.id !== "free" || (state.freeEligibilityChecked && state.freeEligible);
+
+      const otherDocReady = els.documentType.value !== "Other" || els.otherDocumentType.value.trim().length >= 2;
+      const otherPurposeReady = els.purpose.value !== "Other" || els.otherPurpose.value.trim().length >= 2;
+
+      const ready =
+        isValidEmail(els.email.value) &&
+        emailsMatch &&
+        els.phone.value.trim().length >= 8 &&
+        els.preferredContact.value &&
+        els.documentType.value &&
+        otherDocReady &&
+        els.purpose.value &&
+        otherPurposeReady &&
+        hasContent &&
+        !overWordLimit &&
+        !tooManyFiles &&
+        !fileTooLarge &&
+        !totalTooLarge &&
+        !briefTooManyFiles &&
+        !briefFileTooLarge &&
+        !briefTotalTooLarge &&
+        state.emailVerified &&
+        state.whatsappVerified &&
+        paidReady &&
+        freeReady;
+
+      els.submitBtn.disabled = !ready;
+      els.formWarning.style.display = ready ? "none" : "flex";
+    }
+
+    async function checkFreeTrial() {
+      try {
+        if (!isValidEmail(els.email.value) || els.phone.value.trim().length < 8) {
+          alert("Enter a valid email and WhatsApp number first.");
+          return;
+        }
+
+        els.eligibilityBtn.disabled = true;
+        els.eligibilityBtn.textContent = "Checking...";
+
+        const textHash = await sha256(els.contentText.value || "");
+        const response = await postToBackend({
+          action: "checkFreeEligibility",
+          email: els.email.value.trim().toLowerCase(),
+          phone: els.phone.value.trim(),
+          textHash
+        });
+
+        if (!response.ok) throw new Error(response.message || "Free Trial check failed.");
+
+        state.freeEligibilityChecked = true;
+        state.freeEligible = response.eligible;
+
+        if (response.eligible) {
+          els.eligibilityMessage.textContent = "";
+          els.freeEligibilityBox.classList.remove("blocked");
+          els.eligibilityBtn.textContent = "Free Trial confirmed";
+          els.eligibilityBtn.classList.remove("secondary");
+        } else {
+          els.eligibilityMessage.textContent = "Free Trial already used. Please choose Standard or Premium.";
+          els.freeEligibilityBox.classList.add("blocked");
+          els.eligibilityBtn.textContent = "Free Trial blocked";
+        }
+      } catch (error) {
+        alert(error.message);
+        els.eligibilityBtn.textContent = "Check Free Trial";
+      } finally {
+        els.eligibilityBtn.disabled = false;
+        updateUI();
+      }
+    }
+
+    async function verifyPaymentOnBackend(provider, paymentData) {
+      const plan = getPlan();
+      const amount = getAmount(plan, state.currency);
+
+      const response = await postToBackend({
+        action: "verifyPayment",
+        provider,
+        planId: plan.id,
+        email: els.email.value.trim().toLowerCase(),
+        amount,
+        currency: state.currency,
+        paymentData
+      });
+
+      if (!response.ok) throw new Error(response.message || "Payment verification failed.");
+
+      state.paymentVerified = true;
+      state.paymentProvider = provider;
+      state.paymentReference = response.reference || paymentData.reference || paymentData.tx_ref || "";
+      state.flutterwaveTransactionId = paymentData.transaction_id || "";
+      state.lastVerifiedPayment = response;
+      els.paymentStatus.innerHTML = '<span class="success-text">Payment verified successfully.</span>';
+      updateUI();
+    }
+
+    function startPaystackPayment() {
+      const plan = getPlan();
+      const amount = getAmount(plan, state.currency);
+
+      if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes("PASTE_YOUR")) {
+        alert("Paystack public key is not set yet.");
+        return;
+      }
+
+      const reference = "HSR_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
+      const handler = PaystackPop.setup({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: els.email.value.trim(),
+        amount: Math.round(amount * 100),
+        currency: state.currency,
+        ref: reference,
+        metadata: {
+          custom_fields: [
+            { display_name: "Plan", variable_name: "plan", value: plan.name },
+            { display_name: "WhatsApp", variable_name: "whatsapp", value: els.phone.value.trim() }
+          ]
+        },
+        callback: async function(response) {
+          try {
+            els.paymentStatus.textContent = "Verifying payment...";
+            await verifyPaymentOnBackend("paystack", { reference: response.reference });
+          } catch (error) {
+            alert(error.message);
+            els.paymentStatus.textContent = "Payment could not be verified.";
+          }
+        },
+        onClose: function() {
+          if (!state.paymentVerified) els.paymentStatus.textContent = "Payment window closed.";
+        }
+      });
+      handler.openIframe();
+    }
+
+    function startFlutterwavePayment() {
+      const plan = getPlan();
+      const amount = getAmount(plan, state.currency);
+
+      if (!FLUTTERWAVE_PUBLIC_KEY || FLUTTERWAVE_PUBLIC_KEY.includes("PASTE_YOUR")) {
+        alert("Flutterwave public key is not set yet.");
+        return;
+      }
+
+      const txRef = "HSR_FLW_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
+
+      FlutterwaveCheckout({
+        public_key: FLUTTERWAVE_PUBLIC_KEY,
+        tx_ref: txRef,
+        amount,
+        currency: state.currency,
+        payment_options: "card,banktransfer,ussd",
+        customer: {
+          email: els.email.value.trim(),
+          phone_number: els.phone.value.trim(),
+          name: els.email.value.trim()
+        },
+        customizations: {
+          title: "Humanly Style AI Review",
+          description: plan.name + " review payment",
+          logo: ""
+        },
+        callback: async function(response) {
+          try {
+            els.paymentStatus.textContent = "Verifying payment...";
+            if (typeof closePaymentModal === "function") closePaymentModal();
+            await verifyPaymentOnBackend("flutterwave", {
+              transaction_id: response.transaction_id,
+              tx_ref: response.tx_ref
+            });
+          } catch (error) {
+            alert(error.message);
+            els.paymentStatus.textContent = "Payment could not be verified.";
+          }
+        },
+        onclose: function() {
+          if (!state.paymentVerified) els.paymentStatus.textContent = "Payment window closed.";
+        }
+      });
+    }
+
+    function startPayment() {
+      const plan = getPlan();
+
+      if (plan.id === "free") return;
+
+      if (!isValidEmail(els.email.value) || els.phone.value.trim().length < 8) {
+        alert("Enter a valid email and WhatsApp number first.");
+        return;
+      }
+
+      if (els.paymentProvider.value === "flutterwave") startFlutterwavePayment();
+      else startPaystackPayment();
+    }
+
+    async function submitReview(event) {
+      event.preventDefault();
+      if (els.submitBtn.disabled) return;
+
+      try {
+        els.submitBtn.disabled = true;
+        els.submitBtn.textContent = "Submitting...";
+
+        const mainFiles = await filesToPayload(els.fileInput);
+        const briefFiles = await filesToPayload(els.briefFileInput);
+        const textHash = await sha256(els.contentText.value || "");
+        const plan = getPlan();
+
+        const payload = {
+          action: "submitReview",
+          submission: {
+            planId: plan.id,
+            planName: plan.name,
+            amount: getAmount(plan, state.currency),
+            currency: state.currency,
+            email: els.email.value.trim().toLowerCase(),
+            phone: els.phone.value.trim(),
+            preferredContact: els.preferredContact.value,
+            documentType: els.documentType.value === "Other" ? els.otherDocumentType.value.trim() : els.documentType.value,
+            purpose: els.purpose.value === "Other" ? els.otherPurpose.value.trim() : els.purpose.value,
+            contentText: els.contentText.value,
+            wordCount: countWords(els.contentText.value),
+            brief: els.brief.value,
+            textHash,
+            mainFiles,
+            briefFiles,
+            paymentProvider: plan.id === "free" ? "" : state.paymentProvider,
+            paymentReference: state.paymentReference,
+            flutterwaveTransactionId: state.flutterwaveTransactionId,
+            paymentVerified: state.paymentVerified
+          }
+        };
+
+        const response = await postToBackend(payload);
+        if (!response.ok) throw new Error(response.message || "Submission failed.");
+
+        els.successMessage.style.display = "block";
+        els.successMessage.innerHTML = `Submission received. Your ID is <strong>${response.submissionId}</strong>. Status: Processing.`;
+        els.successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+        els.reviewForm.reset();
+
+        state.emailVerified = false;
+        state.whatsappVerified = false;
+        state.paymentVerified = false;
+        state.freeEligibilityChecked = false;
+        state.freeEligible = true;
+        state.paymentReference = "";
+        state.flutterwaveTransactionId = "";
+        state.lastVerifiedPayment = null;
+
+        renderPricing();
+        updateUI();
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        els.submitBtn.textContent = "Submit for Review";
+        updateUI();
+      }
+    }
+
+    els.email.addEventListener("input", () => { state.emailVerified = false; resetPayment(); resetFreeEligibility(); updateUI(); });
+    els.confirmEmail.addEventListener("input", () => { state.emailVerified = false; resetFreeEligibility(); updateUI(); });
+    els.phone.addEventListener("input", () => { state.whatsappVerified = false; resetPayment(); resetFreeEligibility(); updateUI(); });
+    els.preferredContact.addEventListener("change", updateUI);
+    els.documentType.addEventListener("change", updateUI);
+    els.otherDocumentType.addEventListener("input", updateUI);
+    els.purpose.addEventListener("change", updateUI);
+    els.otherPurpose.addEventListener("input", updateUI);
+    els.paymentProvider.addEventListener("change", () => { resetPayment(); updateUI(); });
+    els.currency.addEventListener("change", () => { state.currency = els.currency.value; resetPayment(); updateUI(); });
+    els.contentText.addEventListener("input", () => { resetFreeEligibility(); updateUI(); });
+    els.fileInput.addEventListener("change", () => { resetFreeEligibility(); updateUI(); });
+    els.briefFileInput.addEventListener("change", updateUI);
+
+    els.emailVerifyBtn.addEventListener("click", () => {
+      const emailsMatch =
+        els.email.value &&
+        els.confirmEmail.value &&
+        els.email.value.toLowerCase() === els.confirmEmail.value.toLowerCase();
+
+      if (!isValidEmail(els.email.value) || !emailsMatch) {
+        alert("Enter a valid email and make sure both email fields match.");
+        return;
+      }
+
+      state.emailVerified = true;
+      updateUI();
+    });
+
+    els.whatsappVerifyBtn.addEventListener("click", () => {
+      if (els.phone.value.trim().length < 8) {
+        alert("Enter a valid WhatsApp number.");
+        return;
+      }
+
+      /*
+        This is a simple front-end confirmation.
+        Real WhatsApp OTP requires a paid WhatsApp provider, so this stays free.
+      */
+      state.whatsappVerified = true;
+      updateUI();
+    });
+
+    els.paymentBtn.addEventListener("click", startPayment);
+    els.eligibilityBtn.addEventListener("click", checkFreeTrial);
+    els.reviewForm.addEventListener("submit", submitReview);
+
+    renderOptions();
+    renderPricing();
+    updateUI();
+  </script>
+</body>
+</html>
