@@ -79,7 +79,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0
 .modal{position:fixed;inset:0;z-index:100;background:rgba(2,6,23,.62);display:none;align-items:center;justify-content:center;padding:18px} .modal.open{display:flex} .modal-panel{width:min(980px,100%);max-height:92vh;overflow:auto;border-radius:28px;background:white;padding:24px;box-shadow:var(--shadow)}
 .admin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px} .admin-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 footer{background:#07111f;color:#cbd5e1;padding:34px 0;text-align:center;font-size:14px}
-.trust-row{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}} .trust-card{{background:rgba(255,255,255,.96);border:1px solid rgba(228,231,236,.95);border-radius:24px;padding:18px;box-shadow:0 16px 42px rgba(16,24,40,.075);display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start;min-height:132px}} .trust-icon{{width:46px;height:46px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(124,58,237,.12));font-size:22px;border:1px solid rgba(228,231,236,.9)}} .trust-content h3{{margin:0;color:var(--text);font-size:16px;font-weight:950;line-height:1.18;letter-spacing:-.02em}} .trust-content p{{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.5;font-weight:750}} @media(max-width:1040px){.nav{display:none}.menu-btn{display:inline-flex}.hero-grid,.video-layout,.submit-layout{grid-template-columns:1fr}.pricing-grid,.grid-3,.flow{grid-template-columns:repeat(2,1fr)}.side-card{position:static}}
+.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px} .trust-card{background:rgba(255,255,255,.96);border:1px solid rgba(228,231,236,.95);border-radius:24px;padding:18px;box-shadow:0 16px 42px rgba(16,24,40,.075);display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start;min-height:132px} .trust-icon{width:46px;height:46px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(124,58,237,.12));font-size:22px;border:1px solid rgba(228,231,236,.9)} .trust-content h3{margin:0;color:var(--text);font-size:16px;font-weight:950;line-height:1.18;letter-spacing:-.02em} .trust-content p{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.5;font-weight:750} @media(max-width:1040px){.nav{display:none}.menu-btn{display:inline-flex}.hero-grid,.video-layout,.submit-layout{grid-template-columns:1fr}.pricing-grid,.grid-3,.flow{grid-template-columns:repeat(2,1fr)}.side-card{position:static}}
 @media(max-width:700px){.header-inner{min-height:auto;padding:14px 0}.header .btn.primary{display:none}.trust-row,.dashboard-grid,.pricing-grid,.grid-3,.flow,.form-grid,.auth-row,.otp-row,.brief-grid,.faq-grid,.admin-grid{grid-template-columns:1fr}.page{padding:42px 0 58px}.service-card,.price-card,.form-card{padding:20px}}
 /* mobile hero polish */
 
@@ -100,6 +100,26 @@ footer{background:#07111f;color:#cbd5e1;padding:34px 0;text-align:center;font-si
   .dash-card{padding:22px;border-radius:22px}
   .dash-card strong{font-size:42px}
   .panel-note{font-size:14px;margin-top:18px}
+}
+
+
+/* ---- HumanlyReview file-limit and payment polish ---- */
+.limit-line{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.limit-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:999px;background:#eef4ff;color:#1d4ed8;border:1px solid #c7d7fe;font-weight:950;font-size:12px;line-height:1}
+.limit-badge strong{font-weight:950}
+.limit-badge.warn{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+.limit-badge.good{background:#ecfdf3;color:#027a48;border-color:#abefc6}
+.upload-intro{display:block;color:#344054;font-weight:900;margin-bottom:2px}
+.payment-conversion{margin-top:12px;padding:14px;border-radius:18px;background:#f8fafc;border:1px solid var(--line);color:#475467;font-weight:800;font-size:13px;line-height:1.45}
+.payment-conversion strong{color:var(--text)}
+.form-warning{padding:14px 16px;border-radius:18px;background:#fffaeb;border:1px solid #fedf89;color:#93370d}
+.success-text{display:inline-block;padding:8px 10px;border-radius:999px;background:#ecfdf3;color:#027a48}
+.error-text{display:block;padding:10px 12px;border-radius:14px;background:#fef3f2;color:#b42318}
+.upload-box .field-note{display:block}
+@media(max-width:700px){
+  .limit-line{gap:7px}
+  .limit-badge{font-size:11.5px;padding:8px 9px}
+  .payment-conversion{font-size:12.5px}
 }
 
 </style>
@@ -261,12 +281,200 @@ function renderPlansSelect(){els.planSelect.innerHTML="";state.config.plans.forE
 function renderFaq(){els.faqGrid.innerHTML="";(state.config.faq||[]).forEach(item=>{const div=document.createElement("div");div.className="card faq-card";div.innerHTML=`<h3>${item.q}</h3><p>${item.a}</p>`;els.faqGrid.appendChild(div)})}
 function resetPayment(){state.paymentVerified=false;state.paymentReference="";els.paymentStatus.textContent=""}
 function updateOtherFields(){els.otherDocumentTypeWrap.classList.toggle("hidden",els.documentType.value!=="Other");els.otherPurposeWrap.classList.toggle("hidden",els.purpose.value!=="Other")}
-function updateUI(){updateOtherFields();const plan=selectedPlan();const words=countWords(els.contentText.value);const main=stats(els.fileInput);const brief=stats(els.briefFileInput);const overWords=words>plan.wordLimit;const mainTooMany=main.files.length>plan.maxFiles;const mainBig=main.files.some(f=>f.size/1024/1024>plan.maxFileMB);const mainTotalBig=main.totalMB>plan.totalMB;const briefTooMany=brief.files.length>plan.maxFiles;const briefBig=brief.files.some(f=>f.size/1024/1024>plan.maxFileMB);const briefTotalBig=brief.totalMB>plan.totalMB;const limit=`${plan.name}: ${plan.maxFiles} file${plan.maxFiles>1?"s":""}, ${plan.maxFileMB}MB each, ${plan.totalMB}MB total.`;els.uploadLimitText.textContent="PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG. "+limit;els.briefUploadLimitText.textContent="Optional supporting file. "+limit;els.wordStatus.classList.toggle("error",overWords);els.wordStatus.textContent=`${words} words counted. ${plan.wordLimit>900000000?"Extended word count applies.":"Limit: "+plan.wordLimit.toLocaleString()+" words."}${overWords?" Upgrade to continue.":""}`;if(main.files.length){els.fileInfo.style.display="block";els.fileInfo.innerHTML=`<strong>${main.files.length}</strong> file(s), <strong>${main.totalMB.toFixed(2)}MB</strong>.${mainTooMany?'<p class="error-text">Too many files for this plan.</p>':""}${mainBig?'<p class="error-text">One file exceeds the per-file limit.</p>':""}${mainTotalBig?'<p class="error-text">Total file size is above this plan.</p>':""}`}else els.fileInfo.style.display="none";if(brief.files.length){els.briefFileInfo.style.display="block";els.briefFileInfo.innerHTML=`<strong>${brief.files.length}</strong> supporting file(s), <strong>${brief.totalMB.toFixed(2)}MB</strong>.${briefTooMany?'<p class="error-text">Too many supporting files.</p>':""}${briefBig?'<p class="error-text">One supporting file is too large.</p>':""}${briefTotalBig?'<p class="error-text">Supporting file total is too large.</p>':""}`}else els.briefFileInfo.style.display="none";els.paymentSummary.textContent=`Selected plan: ${plan.name}. Amount: ${money(plan.priceUSD)}.`;els.payBtn.textContent=state.paymentVerified?"Payment verified":`Pay ${money(plan.priceUSD)} with Paystack`;els.payBtn.disabled=!state.authToken||state.paymentVerified;const hasContent=words>0||main.files.length>0;const docReady=els.documentType.value&&(els.documentType.value!=="Other"||els.otherDocumentType.value.trim().length>=2);const purposeReady=els.purpose.value&&(els.purpose.value!=="Other"||els.otherPurpose.value.trim().length>=2);const ready=Boolean(state.authToken&&state.paymentVerified&&docReady&&purposeReady&&hasContent&&!overWords&&!mainTooMany&&!mainBig&&!mainTotalBig&&!briefTooMany&&!briefBig&&!briefTotalBig);els.submitBtn.disabled=!ready;els.formWarning.style.display=ready?"none":"flex"}
+function updateUI(){
+  updateOtherFields();
+
+  const plan = selectedPlan();
+  const words = countWords(els.contentText.value);
+  const main = stats(els.fileInput);
+  const brief = stats(els.briefFileInput);
+
+  const overWords = words > plan.wordLimit;
+  const mainTooMany = main.files.length > plan.maxFiles;
+  const mainBig = main.files.some(f => f.size / 1024 / 1024 > plan.maxFileMB);
+  const mainTotalBig = main.totalMB > plan.totalMB;
+  const briefTooMany = brief.files.length > plan.maxFiles;
+  const briefBig = brief.files.some(f => f.size / 1024 / 1024 > plan.maxFileMB);
+  const briefTotalBig = brief.totalMB > plan.totalMB;
+
+  const limitHTML = `
+    <span class="upload-intro">Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG.</span>
+    <span class="limit-line">
+      <span class="limit-badge good"><strong>${plan.maxFiles}</strong> files max</span>
+      <span class="limit-badge"><strong>${plan.maxFileMB}MB</strong> each</span>
+      <span class="limit-badge warn"><strong>${plan.totalMB}MB</strong> total</span>
+    </span>
+  `;
+
+  els.uploadLimitText.innerHTML = limitHTML;
+  els.briefUploadLimitText.innerHTML = `
+    <span class="upload-intro">Optional supporting file.</span>
+    <span class="limit-line">
+      <span class="limit-badge good"><strong>${plan.maxFiles}</strong> files max</span>
+      <span class="limit-badge"><strong>${plan.maxFileMB}MB</strong> each</span>
+      <span class="limit-badge warn"><strong>${plan.totalMB}MB</strong> total</span>
+    </span>
+  `;
+
+  els.wordStatus.classList.toggle("error", overWords);
+  els.wordStatus.innerHTML = `<strong>${words.toLocaleString()}</strong> words counted. ${
+    plan.wordLimit > 900000000
+      ? "Extended word count applies."
+      : "Limit: <strong>" + plan.wordLimit.toLocaleString() + "</strong> words."
+  }${overWords ? " Upgrade to continue." : ""}`;
+
+  if (main.files.length) {
+    els.fileInfo.style.display = "block";
+    els.fileInfo.innerHTML = `<strong>${main.files.length}</strong> file(s), <strong>${main.totalMB.toFixed(2)}MB</strong>.${mainTooMany?'<p class="error-text">Too many files for this plan.</p>':""}${mainBig?'<p class="error-text">One file exceeds the per-file limit.</p>':""}${mainTotalBig?'<p class="error-text">Total file size is above this plan.</p>':""}`;
+  } else {
+    els.fileInfo.style.display = "none";
+  }
+
+  if (brief.files.length) {
+    els.briefFileInfo.style.display = "block";
+    els.briefFileInfo.innerHTML = `<strong>${brief.files.length}</strong> supporting file(s), <strong>${brief.totalMB.toFixed(2)}MB</strong>.${briefTooMany?'<p class="error-text">Too many supporting files.</p>':""}${briefBig?'<p class="error-text">One supporting file is too large.</p>':""}${briefTotalBig?'<p class="error-text">Supporting file total is too large.</p>':""}`;
+  } else {
+    els.briefFileInfo.style.display = "none";
+  }
+
+  const USD_TO_NGN = 1600;
+  const amountNGN = Number(plan.priceUSD) * USD_TO_NGN;
+
+  els.paymentSummary.innerHTML = `Selected plan: <strong>${plan.name}</strong>. Display price: <strong>${money(plan.priceUSD)}</strong>.<div class="payment-conversion">Secure checkout amount: <strong>₦${amountNGN.toLocaleString()}</strong>. Your website price remains in dollars while Paystack processes the local equivalent.</div>`;
+
+  els.payBtn.textContent = state.paymentVerified ? "Payment verified" : `Pay ${money(plan.priceUSD)} with Paystack`;
+  els.payBtn.disabled = !state.authToken || state.paymentVerified;
+
+  const hasContent = words > 0 || main.files.length > 0;
+  const docReady = els.documentType.value && (els.documentType.value !== "Other" || els.otherDocumentType.value.trim().length >= 2);
+  const purposeReady = els.purpose.value && (els.purpose.value !== "Other" || els.otherPurpose.value.trim().length >= 2);
+  const ready = Boolean(state.authToken && state.paymentVerified && docReady && purposeReady && hasContent && !overWords && !mainTooMany && !mainBig && !mainTotalBig && !briefTooMany && !briefBig && !briefTotalBig);
+
+  els.submitBtn.disabled = !ready;
+  els.formWarning.style.display = ready ? "none" : "flex";
+}
 async function loadConfig(){try{const res=await postBackend({action:"getConfig"});state.config={...defaultConfig,...(res.config||{})};if(!state.config.plans||!state.config.plans.length)state.config.plans=defaultConfig.plans;if(!state.config.faq||!state.config.faq.length)state.config.faq=defaultConfig.faq}catch(e){console.warn(e.message);state.config=defaultConfig}applyConfig()}
 async function requestOtp(){try{if(!isValidEmail(els.email.value)){els.emailMessage.innerHTML='<span class="error-text">Enter a valid email.</span>';return}els.sendOtpBtn.disabled=true;els.sendOtpBtn.textContent="Sending...";await postBackend({action:"requestOtp",email:els.email.value.trim().toLowerCase()});els.emailMessage.innerHTML='<span class="success-text">OTP sent. Check your email.</span>'}catch(e){els.emailMessage.innerHTML='<span class="error-text">'+e.message+'</span>'}finally{els.sendOtpBtn.disabled=false;els.sendOtpBtn.textContent="Send OTP";updateUI()}}
 async function verifyOtp(){try{els.verifyOtpBtn.disabled=true;els.verifyOtpBtn.textContent="Checking...";const res=await postBackend({action:"verifyOtp",email:els.email.value.trim().toLowerCase(),otp:els.otp.value.trim()});state.authToken=res.authToken;state.verifiedEmail=res.email;els.otpMessage.innerHTML='<span class="success-text">Email verified.</span>'}catch(e){els.otpMessage.innerHTML='<span class="error-text">'+e.message+'</span>'}finally{els.verifyOtpBtn.disabled=false;els.verifyOtpBtn.textContent="Verify OTP";updateUI()}}
-function payWithPaystack(){const plan=selectedPlan();if(!state.authToken){alert("Please verify your email first.");return}const reference="HR_"+Date.now()+"_"+Math.floor(Math.random()*1000000);const handler=PaystackPop.setup({key:PAYSTACK_PUBLIC_KEY,email:state.verifiedEmail,amount:Math.round(Number(plan.priceUSD)*100),currency:"USD",ref:reference,metadata:{custom_fields:[{display_name:"Plan",variable_name:"plan",value:plan.name},{display_name:"Email",variable_name:"email",value:state.verifiedEmail}]},callback:async function(response){try{els.paymentStatus.textContent="Verifying payment...";const res=await postBackend({action:"verifyPayment",authToken:state.authToken,reference:response.reference,planId:plan.id,expectedAmount:Number(plan.priceUSD),expectedCurrency:"USD"});state.paymentVerified=true;state.paymentReference=res.reference;els.paymentStatus.innerHTML='<span class="success-text">Payment verified.</span>';updateUI()}catch(e){els.paymentStatus.innerHTML='<span class="error-text">'+e.message+'</span>'}},onClose:function(){if(!state.paymentVerified)els.paymentStatus.textContent="Payment window closed."}});handler.openIframe()}
-async function submitReview(ev){ev.preventDefault();if(els.submitBtn.disabled)return;try{els.submitBtn.disabled=true;els.submitBtn.textContent="Submitting...";const plan=selectedPlan();const contentText=els.contentText.value;const res=await postBackend({action:"submitReview",authToken:state.authToken,submission:{planId:plan.id,planName:plan.name,amount:Number(plan.priceUSD),currency:"USD",email:state.verifiedEmail,documentType:els.documentType.value==="Other"?els.otherDocumentType.value.trim():els.documentType.value,purpose:els.purpose.value==="Other"?els.otherPurpose.value.trim():els.purpose.value,contentText,wordCount:countWords(contentText),brief:els.brief.value,textHash:await sha256(contentText),mainFiles:await filesToPayload(els.fileInput),briefFiles:await filesToPayload(els.briefFileInput),paymentReference:state.paymentReference}});els.successBox.style.display="block";els.successBox.innerHTML=`Submission received. Your ID is <strong>${res.submissionId}</strong>. Status: Processing.`;els.successBox.scrollIntoView({behavior:"smooth",block:"center"});els.reviewForm.reset();state.authToken="";state.verifiedEmail="";resetPayment();updateUI()}catch(e){alert(e.message)}finally{els.submitBtn.textContent="Submit for Review";updateUI()}}
+function payWithPaystack(){
+  const plan = selectedPlan();
+
+  if (!state.authToken) {
+    alert("Please verify your email first.");
+    return;
+  }
+
+  if (typeof PaystackPop === "undefined") {
+    els.paymentStatus.innerHTML = '<span class="error-text">Paystack did not load. Please refresh the page.</span>';
+    return;
+  }
+
+  const USD_TO_NGN = 1600;
+  const amountNGN = Number(plan.priceUSD) * USD_TO_NGN;
+  const reference = "HR_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
+
+  els.paymentStatus.textContent = "Opening secure Paystack checkout...";
+
+  try {
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: state.verifiedEmail,
+      amount: Math.round(amountNGN * 100),
+      currency: "NGN",
+      ref: reference,
+      metadata: {
+        custom_fields: [
+          { display_name: "Plan", variable_name: "plan", value: plan.name },
+          { display_name: "Displayed Price", variable_name: "displayed_price", value: "$" + plan.priceUSD },
+          { display_name: "Charged Amount", variable_name: "charged_amount", value: "NGN " + amountNGN },
+          { display_name: "Email", variable_name: "email", value: state.verifiedEmail }
+        ]
+      },
+      callback: async function(response) {
+        try {
+          els.paymentStatus.textContent = "Verifying payment...";
+
+          const res = await postBackend({
+            action: "verifyPayment",
+            authToken: state.authToken,
+            reference: response.reference,
+            planId: plan.id,
+            expectedAmount: amountNGN,
+            expectedCurrency: "NGN"
+          });
+
+          state.paymentVerified = true;
+          state.paymentReference = res.reference;
+          els.paymentStatus.innerHTML = '<span class="success-text">Payment verified. You can now submit.</span>';
+          updateUI();
+        } catch (e) {
+          els.paymentStatus.innerHTML = '<span class="error-text">' + e.message + '</span>';
+        }
+      },
+      onClose: function() {
+        if (!state.paymentVerified) {
+          els.paymentStatus.textContent = "Payment window closed. You can try again.";
+        }
+      }
+    });
+
+    handler.openIframe();
+  } catch (e) {
+    els.paymentStatus.innerHTML = '<span class="error-text">Paystack could not open. Refresh the page and try again.</span>';
+  }
+}
+async function submitReview(ev){
+  ev.preventDefault();
+
+  if (els.submitBtn.disabled) return;
+
+  try {
+    els.submitBtn.disabled = true;
+    els.submitBtn.textContent = "Submitting...";
+
+    const plan = selectedPlan();
+    const contentText = els.contentText.value;
+    const USD_TO_NGN = 1600;
+    const amountNGN = Number(plan.priceUSD) * USD_TO_NGN;
+
+    const res = await postBackend({
+      action: "submitReview",
+      authToken: state.authToken,
+      submission: {
+        planId: plan.id,
+        planName: plan.name,
+        amount: amountNGN,
+        currency: "NGN",
+        displayedPrice: money(plan.priceUSD),
+        email: state.verifiedEmail,
+        documentType: els.documentType.value === "Other" ? els.otherDocumentType.value.trim() : els.documentType.value,
+        purpose: els.purpose.value === "Other" ? els.otherPurpose.value.trim() : els.purpose.value,
+        contentText,
+        wordCount: countWords(contentText),
+        brief: els.brief.value,
+        textHash: await sha256(contentText),
+        mainFiles: await filesToPayload(els.fileInput),
+        briefFiles: await filesToPayload(els.briefFileInput),
+        paymentReference: state.paymentReference
+      }
+    });
+
+    els.successBox.style.display = "block";
+    els.successBox.innerHTML = `Submission received. Your ID is <strong>${res.submissionId}</strong>. Status: Processing.`;
+    els.successBox.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    els.reviewForm.reset();
+    state.authToken = "";
+    state.verifiedEmail = "";
+    resetPayment();
+    updateUI();
+  } catch (e) {
+    alert(e.message);
+  } finally {
+    els.submitBtn.textContent = "Submit for Review";
+    updateUI();
+  }
+}
 function openAdmin(){$("adminModal").classList.add("open")} function closeAdmin(){$("adminModal").classList.remove("open")}
 async function adminLogin(){try{$("adminLoginBtn").disabled=true;$("adminLoginBtn").textContent="Logging in...";const res=await postBackend({action:"adminLogin",pin:$("adminPin").value});state.adminToken=res.adminToken;$("adminLoginBox").classList.add("hidden");$("adminEditor").classList.remove("hidden");fillAdminFields()}catch(e){alert(e.message)}finally{$("adminLoginBtn").disabled=false;$("adminLoginBtn").textContent="Login"}}
 function fillAdminFields(){const c=state.config;$("adminBrandName").value=c.brandName||"";$("adminSupportEmail").value=c.supportEmail||"";$("adminPrimaryColor").value=c.primaryColor||"#1d4ed8";$("adminAccentColor").value=c.accentColor||"#7c3aed";$("adminHeroEyebrow").value=c.heroEyebrow||"";$("adminHeroCta").value=c.heroCta||"";$("adminHeroTitle").value=c.heroTitle||"";$("adminHeroSubtitle").value=c.heroSubtitle||"";$("adminStandardPrice").value=c.plans[0]?.priceUSD||0;$("adminPremiumPrice").value=c.plans[1]?.priceUSD||0;$("adminEnterprisePrice").value=c.plans[2]?.priceUSD||0;$("adminStandardWords").value=c.plans[0]?.wordLimit||5000;$("adminPremiumWords").value=c.plans[1]?.wordLimit||999999999;$("adminEnterpriseWords").value=c.plans[2]?.wordLimit||999999999;$("adminFaqJson").value=JSON.stringify(c.faq||[],null,2)}
