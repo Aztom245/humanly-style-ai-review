@@ -1,1690 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Humanly Style AI Review</title>
-  <meta name="description" content="Human-style feedback for essays, business documents, creative writing, legal-style drafts, presentations, and more." />
-
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-  <script src="https://checkout.flutterwave.com/v3.js"></script>
-
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --dark: #020617;
-      --dark2: #0f172a;
-      --danger: #dc2626;
-      --danger-bg: #fef2f2;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --soft: #f1f5f9;
-      --radius: 24px;
-      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    button, input, select, textarea { font: inherit; }
-
-    .container {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .header-inner {
-      min-height: 74px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-    }
-
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
-      background: var(--dark);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-    }
-
-    .nav {
-      display: flex;
-      gap: 22px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 750;
-    }
-
-    .nav a:hover { color: var(--text); }
-
-    .btn {
-      border: 0;
-      border-radius: 14px;
-      padding: 13px 18px;
-      background: var(--dark);
-      color: #fff;
-      font-weight: 850;
-      cursor: pointer;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      transition: 0.2s ease;
-      text-align: center;
-    }
-
-    .btn:hover { background: var(--dark2); transform: translateY(-1px); }
-    .btn.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
-    .btn.secondary:hover { background: var(--soft); }
-    .btn.full { width: 100%; }
-
-    .btn:disabled {
-      background: #cbd5e1;
-      color: #64748b;
-      cursor: not-allowed;
-      transform: none;
-      border: 0;
-    }
-
-    .hero {
-      padding: 72px 0 48px;
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 44px;
-      align-items: center;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 800;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-    }
-
-    h1, h2, h3 { margin: 0; line-height: 1.06; letter-spacing: -0.04em; }
-    h1 { margin-top: 18px; font-size: clamp(42px, 6vw, 68px); }
-    h2 { font-size: clamp(30px, 4vw, 42px); }
-    h3 { font-size: 20px; }
-
-    .lead {
-      margin: 20px 0 0;
-      color: var(--muted);
-      font-size: 19px;
-      max-width: 680px;
-    }
-
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
-
-    .hero-points {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .hero-point {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px;
-      font-weight: 850;
-      font-size: 14px;
-      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.05);
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .preview-card { padding: 22px; }
-
-    .preview-box {
-      border-radius: 20px;
-      background: var(--dark);
-      color: white;
-      padding: 24px;
-      min-height: 340px;
-      display: grid;
-      align-content: space-between;
-    }
-
-    .preview-title { color: #cbd5e1; font-size: 14px; font-weight: 800; }
-
-    .preview-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 20px;
-    }
-
-    .preview-mini {
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.09);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-
-    .preview-mini span { color: #94a3b8; font-size: 13px; font-weight: 850; }
-    .preview-mini p { margin: 12px 0 0; color: #e2e8f0; font-size: 14px; }
-
-    .preview-footer {
-      margin-top: 22px;
-      border-radius: 16px;
-      padding: 14px;
-      background: rgba(255,255,255,0.09);
-      color: #dbeafe;
-      font-size: 14px;
-      font-weight: 750;
-    }
-
-    section { padding: 70px 0; }
-    .white { background: #fff; }
-
-    .section-head { max-width: 760px; margin-bottom: 32px; }
-    .section-head p { color: var(--muted); margin: 12px 0 0; font-size: 17px; }
-
-    .video-section-grid {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 28px;
-      align-items: center;
-    }
-
-    .video-placeholder {
-      border-radius: var(--radius);
-      overflow: hidden;
-      background: var(--dark);
-      color: white;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .video-frame {
-      aspect-ratio: 16 / 9;
-      display: grid;
-      place-items: center;
-      padding: 28px;
-      text-align: center;
-      background:
-        radial-gradient(circle at 30% 20%, rgba(59,130,246,0.28), transparent 30%),
-        radial-gradient(circle at 70% 60%, rgba(16,185,129,0.18), transparent 32%),
-        #020617;
-    }
-
-    .play-button {
-      width: 72px;
-      height: 72px;
-      border-radius: 999px;
-      background: white;
-      color: var(--dark);
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      margin: 0 auto 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
-    }
-
-    .video-frame h3 { color: white; font-size: 24px; margin-bottom: 8px; }
-    .video-frame p { color: #cbd5e1; margin: 0; max-width: 440px; }
-
-    .video-caption {
-      padding: 18px 22px;
-      background: rgba(255,255,255,0.04);
-      color: #cbd5e1;
-      font-size: 14px;
-    }
-
-    .review-category-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .review-category-card {
-      padding: 22px;
-      min-height: 250px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .review-category-card::after {
-      content: "";
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      right: -50px;
-      top: -50px;
-      background: #f1f5f9;
-      border-radius: 999px;
-      z-index: 0;
-    }
-
-    .review-category-card > * { position: relative; z-index: 1; }
-
-    .category-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 18px;
-      background: var(--soft);
-      display: grid;
-      place-items: center;
-      font-size: 22px;
-      margin-bottom: 16px;
-    }
-
-    .category-list {
-      list-style: none;
-      padding: 0;
-      margin: 16px 0 0;
-      display: grid;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .category-list li { display: flex; gap: 8px; align-items: flex-start; }
-    .category-list li::before { content: "✓"; color: var(--success); font-weight: 950; flex: 0 0 auto; }
-
-    .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-    .price-card {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      min-height: 440px;
-    }
-
-    .price-card.active { outline: 3px solid var(--dark); }
-    .price { font-size: 42px; font-weight: 950; margin-top: 16px; letter-spacing: -0.05em; }
-    .naira { font-weight: 850; color: var(--muted); margin-top: 2px; }
-
-    .plan-note {
-      margin: 16px 0;
-      padding: 14px;
-      background: var(--soft);
-      border-radius: 18px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .feature-list {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 22px;
-      display: grid;
-      gap: 11px;
-      font-size: 14px;
-    }
-
-    .feature-list li { display: flex; align-items: flex-start; gap: 9px; }
-    .check { color: var(--success); font-weight: 950; }
-    .price-card .btn { margin-top: auto; }
-
-    .form-layout { display: grid; grid-template-columns: 1fr 360px; gap: 26px; align-items: start; }
-    .form-card { padding: 28px; }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    label { display: block; font-size: 14px; font-weight: 850; }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-      margin-top: 8px;
-      background: #fff;
-      color: var(--text);
-      outline: none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--dark);
-      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
-    }
-
-    textarea { min-height: 160px; resize: vertical; }
-
-    .field-note { margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
-    .hidden { display: none !important; }
-
-    .error-text { color: var(--danger); font-size: 13px; font-weight: 750; margin-top: 6px; }
-    .success-text { color: var(--success); font-size: 13px; font-weight: 850; margin-top: 6px; }
-
-    .verify-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
-
-    .verify-box {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 16px;
-      background: #fff;
-    }
-
-    .verify-box p { color: var(--muted); margin: 6px 0 12px; font-size: 13px; }
-
-    .free-box {
-      margin-top: 18px;
-      padding: 18px;
-      border-radius: 20px;
-      background: var(--soft);
-      border: 1px solid var(--border);
-    }
-
-    .free-box.blocked { background: var(--danger-bg); border-color: #fecaca; }
-
-    .word-box, .file-info {
-      margin-top: 14px;
-      padding: 15px;
-      border-radius: 18px;
-      background: var(--soft);
-      font-weight: 750;
-    }
-
-    .word-box.error { background: var(--danger-bg); color: var(--danger); }
-
-    .upload-box {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      margin-top: 18px;
-      padding: 22px;
-      border: 2px dashed #94a3b8;
-      border-radius: 22px;
-      background: #fff;
-      cursor: pointer;
-      transition: 0.2s ease;
-      min-height: 132px;
-    }
-
-    .upload-box:hover { border-color: var(--dark); background: #f8fafc; transform: translateY(-1px); }
-    .upload-box input { display: none; }
-
-    .upload-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      background: var(--soft);
-      display: grid;
-      place-items: center;
-      font-size: 24px;
-      flex: 0 0 auto;
-    }
-
-    .click-hint {
-      display: inline-flex;
-      margin-top: 10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--dark);
-      color: white;
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    .limit-line { display: block; margin-top: 8px; color: var(--muted); font-size: 13px; font-weight: 750; }
-
-    .brief-upload-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-top: 22px;
-      align-items: stretch;
-    }
-
-    .compact-upload { margin-top: 8px; min-height: 100%; }
-
-    .submit-area {
-      margin-top: 28px;
-      padding-top: 22px;
-      border-top: 1px solid var(--border);
-    }
-
-    .side-card {
-      background: var(--dark);
-      color: white;
-      border-radius: var(--radius);
-      padding: 24px;
-      position: sticky;
-      top: 94px;
-    }
-
-    .side-card ul {
-      padding-left: 20px;
-      color: #dbeafe;
-      display: grid;
-      gap: 10px;
-      font-size: 14px;
-    }
-
-    .side-note {
-      background: rgba(255,255,255,0.09);
-      padding: 16px;
-      border-radius: 18px;
-      margin-top: 18px;
-    }
-
-    .side-note p { margin-bottom: 0; color: #cbd5e1; font-size: 14px; }
-
-    .form-warning { margin-top: 14px; display: flex; gap: 10px; color: var(--muted); font-size: 14px; font-weight: 700; }
-
-    .success-message {
-      display: none;
-      margin-top: 18px;
-      padding: 18px;
-      border-radius: 18px;
-      background: var(--success-bg);
-      color: #166534;
-      font-weight: 850;
-    }
-
-    .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .faq-card { padding: 22px; }
-    .faq-card p { color: var(--muted); margin-bottom: 0; }
-
-    .support-strip {
-      background: var(--dark);
-      color: white;
-      border-radius: var(--radius);
-      padding: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .support-strip p { color: #cbd5e1; margin: 8px 0 0; }
-
-    footer { background: var(--dark); color: #cbd5e1; text-align: center; padding: 34px 0; font-size: 14px; }
-
-    @media (max-width: 1020px) {
-      .hero, .form-layout, .video-section-grid { grid-template-columns: 1fr; }
-      .pricing-grid, .review-category-grid { grid-template-columns: repeat(2, 1fr); }
-      .side-card { position: static; }
-      .nav { display: none; }
-    }
-
-    @media (max-width: 700px) {
-      .header-inner { min-height: auto; padding: 14px 0; }
-      .header .btn { display: none; }
-      .hero-points, .preview-grid, .pricing-grid, .form-grid, .verify-grid, .faq-grid, .brief-upload-grid, .review-category-grid { grid-template-columns: 1fr; }
-      .support-strip { display: block; }
-      section { padding: 54px 0; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HumanlyReview — Expert-Style Review Reports</title>
+<meta name="description" content="Expert-style review reports for documents, presentations, academic drafts, business content, creative writing, and formal drafts." />
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f6f8fb; --surface:#fff; --surface2:#f9fafb; --text:#101828; --muted:#667085;
+  --line:#e4e7ec; --soft:#f2f4f7; --dark:#07111f; --primary:#1d4ed8; --accent:#7c3aed;
+  --success:#039855; --danger:#d92d20; --radius:24px; --shadow:0 24px 70px rgba(16,24,40,.10);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Manrope,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(29,78,216,.11),transparent 35%),radial-gradient(circle at top right,rgba(124,58,237,.10),transparent 35%),var(--bg);line-height:1.55}
+a{color:inherit;text-decoration:none} button,input,select,textarea{font:inherit} button{cursor:pointer}
+.container{width:min(1180px,calc(100% - 32px));margin:0 auto}
+.header{position:sticky;top:0;z-index:80;background:rgba(255,255,255,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(228,231,236,.85)}
+.header-inner{min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:950;letter-spacing:-.035em;font-size:18px}
+.brand-logo{width:42px;height:42px;border-radius:16px;background:linear-gradient(135deg,var(--dark),var(--primary));color:white;display:grid;place-items:center;font-weight:950;overflow:hidden;flex:0 0 auto}
+.brand-logo img{width:100%;height:100%;object-fit:cover}
+.nav{display:flex;gap:7px;padding:6px;background:rgba(242,244,247,.8);border:1px solid var(--line);border-radius:18px}
+.nav-btn{border:0;background:transparent;color:var(--muted);border-radius:13px;padding:10px 12px;font-size:14px;font-weight:850}
+.nav-btn.active{background:white;color:var(--text);box-shadow:0 8px 18px rgba(16,24,40,.08)}
+.menu-btn{display:none;border:1px solid var(--line);background:white;border-radius:14px;padding:12px;font-weight:900}
+.mobile-nav{display:none;padding:0 0 16px} .mobile-nav.open{display:block}
+.mobile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.btn{border:0;border-radius:14px;min-height:46px;padding:13px 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:900;color:white;background:var(--dark);transition:.2s ease;text-align:center}
+.btn:hover{transform:translateY(-1px);filter:brightness(.96)} .btn.primary{background:linear-gradient(135deg,var(--primary),var(--accent))}
+.btn.secondary{background:white;color:var(--text);border:1px solid var(--line)} .btn.secondary:hover{background:var(--soft)} .btn.full{width:100%}
+.btn:disabled{background:#d0d5dd;color:#667085;cursor:not-allowed;transform:none;filter:none;border:0}
+.page{display:none;padding:58px 0 76px;min-height:calc(100vh - 154px)} .page.active{display:block;animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+h1,h2,h3{margin:0;line-height:1.06;letter-spacing:-.045em} h1{font-size:clamp(42px,7vw,76px);margin-top:18px} h2{font-size:clamp(30px,4vw,46px)} h3{font-size:20px}
+.lead{color:var(--muted);font-size:19px;max-width:720px;margin:22px 0 0} .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.eyebrow{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:9px 14px;background:rgba(255,255,255,.82);box-shadow:0 14px 38px rgba(16,24,40,.07);color:var(--muted);font-weight:850;font-size:14px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;padding:26px 0 24px}
+.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
+.trust-pill{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:18px;padding:14px;font-weight:900;box-shadow:0 14px 38px rgba(16,24,40,.07);font-size:14px}
+.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-card{padding:22px} .hero-inner{min-height:420px;border-radius:22px;padding:24px;color:white;display:grid;align-content:space-between;background:radial-gradient(circle at 20% 10%,rgba(29,78,216,.40),transparent 35%),radial-gradient(circle at 75% 45%,rgba(124,58,237,.32),transparent 38%),#061020;overflow:hidden}
+.dashboard-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:22px} .dash-card{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);border-radius:18px;padding:16px}
+.dash-card span{color:#cbd5e1;font-size:12px;font-weight:900} .dash-card strong{display:block;font-size:26px;margin-top:8px}
+.panel-note{border-radius:18px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);padding:16px;color:#dbeafe;font-weight:750}
+.section-head{max-width:780px;margin-bottom:34px} .section-head p{margin:12px 0 0;color:var(--muted);font-size:17px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px} .service-card{padding:22px;min-height:218px;position:relative;overflow:hidden}
+.service-card::after{content:"";position:absolute;top:-48px;right:-48px;width:126px;height:126px;border-radius:999px;background:#f2f4f7} .service-card>*{position:relative;z-index:1}
+.icon{width:48px;height:48px;border-radius:18px;background:var(--soft);display:grid;place-items:center;margin-bottom:16px;font-size:22px}
+.clean-list{padding:0;margin:16px 0 0;list-style:none;display:grid;gap:8px;color:var(--muted);font-weight:750;font-size:14px} .clean-list li::before{content:"✓ ";color:var(--success);font-weight:950}
+.video-layout{display:grid;grid-template-columns:.92fr 1.08fr;gap:28px;align-items:center;margin-top:42px} .video-card{border-radius:var(--radius);overflow:hidden;background:#061020;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.12)}
+.video-frame{aspect-ratio:16/9;display:grid;place-items:center;color:white;text-align:center;padding:28px;background:radial-gradient(circle at 25% 20%,rgba(29,78,216,.38),transparent 34%),radial-gradient(circle at 78% 55%,rgba(124,58,237,.28),transparent 38%),#061020}
+.video-frame iframe,.video-frame video{width:100%;height:100%;border:0;object-fit:cover} .play{width:76px;height:76px;background:white;color:#07111f;border-radius:999px;display:grid;place-items:center;font-size:30px;margin:0 auto 18px}
+.video-caption{padding:18px 22px;color:#cbd5e1;font-weight:750}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px} .price-card{padding:26px;display:flex;flex-direction:column;min-height:410px}
+.price-card.featured{outline:3px solid var(--primary);transform:translateY(-6px)} .price{font-size:42px;font-weight:950;letter-spacing:-.05em;margin-top:18px} .small-muted{color:var(--muted)}
+.plan-note{margin:16px 0;padding:14px;border-radius:18px;background:var(--soft);color:#344054;font-weight:800;font-size:14px}
+.feature-list{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:10px;color:#344054;font-size:14px;font-weight:750} .feature-list li::before{content:"✓ ";color:var(--success);font-weight:950} .price-card .btn{margin-top:auto}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px} .flow-card{padding:20px;box-shadow:0 14px 38px rgba(16,24,40,.07)} .step{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;color:white;font-weight:950;background:linear-gradient(135deg,var(--primary),var(--accent));margin-bottom:14px}
+.submit-layout{display:grid;grid-template-columns:1fr 350px;gap:26px;align-items:start} .form-card{padding:28px}
+.form-section{padding:18px;border:1px solid var(--line);border-radius:22px;background:var(--surface2);margin-top:18px} .form-section:first-of-type{margin-top:22px}
+.form-title{display:flex;gap:10px;align-items:center;margin-bottom:14px} .num{width:30px;height:30px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;display:grid;place-items:center;font-weight:950;flex:0 0 auto}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px} label{display:block;font-weight:900;font-size:14px}
+input,select,textarea{width:100%;margin-top:8px;padding:14px;border:1px solid var(--line);border-radius:16px;outline:none;background:white;color:var(--text)} textarea{min-height:150px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(29,78,216,.11)} .auth-row,.otp-row{display:grid;grid-template-columns:1fr 150px;gap:12px;align-items:end} .otp-row{margin-top:14px}
+.hidden{display:none!important} .field-note{color:var(--muted);font-weight:700;font-size:12px;margin-top:6px} .error-text{color:var(--danger);font-weight:800;font-size:13px;margin-top:6px} .success-text{color:var(--success);font-weight:850;font-size:13px;margin-top:6px}
+.word-box,.file-info{margin-top:14px;padding:15px;border-radius:18px;background:var(--soft);font-weight:800} .word-box.error{background:#fef3f2;color:var(--danger)}
+.upload-box{display:flex;gap:14px;padding:20px;margin-top:14px;border:2px dashed #98a2b3;border-radius:22px;cursor:pointer;background:white;transition:.2s ease;min-height:120px} .upload-box:hover{border-color:var(--primary);background:#f8fbff;transform:translateY(-1px)} .upload-box input{display:none}
+.upload-icon{width:44px;height:44px;border-radius:16px;background:var(--soft);display:grid;place-items:center;font-size:24px;flex:0 0 auto} .click-hint{display:inline-flex;margin-top:10px;padding:8px 12px;border-radius:999px;background:var(--dark);color:white;font-size:12px;font-weight:950}
+.brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px} .submit-area{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)} .form-warning{margin-top:14px;display:flex;gap:10px;color:var(--muted);font-weight:750;font-size:14px}
+.success-box{display:none;margin-top:18px;padding:18px;border-radius:18px;background:#ecfdf3;color:#027a48;font-weight:850} .side-card{background:#07111f;color:white;padding:24px;border-radius:var(--radius);position:sticky;top:96px} .side-card ul{padding-left:20px;display:grid;gap:10px;color:#dbeafe;font-size:14px;font-weight:700} .side-note{border-radius:18px;background:rgba(255,255,255,.09);padding:16px;margin-top:18px;color:#cbd5e1}
+.faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px} .faq-card{padding:22px;box-shadow:0 14px 38px rgba(16,24,40,.07)} .faq-card p{color:var(--muted);margin-bottom:0}
+.support-card{max-width:840px;margin:0 auto;text-align:center;padding:42px;background:#07111f;color:white;border-radius:var(--radius);box-shadow:var(--shadow)} .support-card p{color:#cbd5e1}
+.owner-link{opacity:.62;font-size:12px;display:inline-flex;margin-top:12px;text-decoration:underline;border:0;background:transparent;color:#cbd5e1;cursor:pointer}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(2,6,23,.62);display:none;align-items:center;justify-content:center;padding:18px} .modal.open{display:flex} .modal-panel{width:min(980px,100%);max-height:92vh;overflow:auto;border-radius:28px;background:white;padding:24px;box-shadow:var(--shadow)}
+.admin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px} .admin-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+footer{background:#07111f;color:#cbd5e1;padding:34px 0;text-align:center;font-size:14px}
+.trust-row{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}} .trust-card{{background:rgba(255,255,255,.96);border:1px solid rgba(228,231,236,.95);border-radius:24px;padding:18px;box-shadow:0 16px 42px rgba(16,24,40,.075);display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start;min-height:132px}} .trust-icon{{width:46px;height:46px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(124,58,237,.12));font-size:22px;border:1px solid rgba(228,231,236,.9)}} .trust-content h3{{margin:0;color:var(--text);font-size:16px;font-weight:950;line-height:1.18;letter-spacing:-.02em}} .trust-content p{{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.5;font-weight:750}} @media(max-width:1040px){.nav{display:none}.menu-btn{display:inline-flex}.hero-grid,.video-layout,.submit-layout{grid-template-columns:1fr}.pricing-grid,.grid-3,.flow{grid-template-columns:repeat(2,1fr)}.side-card{position:static}}
+@media(max-width:700px){.header-inner{min-height:auto;padding:14px 0}.header .btn.primary{display:none}.trust-row,.dashboard-grid,.pricing-grid,.grid-3,.flow,.form-grid,.auth-row,.otp-row,.brief-grid,.faq-grid,.admin-grid{grid-template-columns:1fr}.page{padding:42px 0 58px}.service-card,.price-card,.form-card{padding:20px}}
+/* mobile hero polish */
+
+@media(max-width:700px){
+  .hero-grid{gap:30px;padding-top:18px}
+  h1{font-size:42px;line-height:1.04}
+  .lead{font-size:17px;line-height:1.55}
+  .actions{gap:12px;margin-top:24px}
+  .actions .btn{flex:1 1 150px}
+  .trust-row{grid-template-columns:1fr!important;gap:14px;margin-top:28px}
+  .trust-card{grid-template-columns:50px 1fr;gap:15px;min-height:auto;padding:20px;border-radius:24px}
+  .trust-icon{width:50px;height:50px;border-radius:18px;font-size:23px}
+  .trust-content h3{font-size:18px;line-height:1.2}
+  .trust-content p{font-size:14px;line-height:1.5;margin-top:7px}
+  .hero-card{padding:16px;border-radius:28px}
+  .hero-inner{min-height:520px;padding:24px;border-radius:24px}
+  .dashboard-grid{gap:14px}
+  .dash-card{padding:22px;border-radius:22px}
+  .dash-card strong{font-size:42px}
+  .panel-note{font-size:14px;margin-top:18px}
+}
+
+</style>
 </head>
-
 <body>
-  <header class="header">
-    <div class="container header-inner">
-      <a class="brand" href="#">
-        <span class="brand-mark">✓</span>
-        <span>Humanly Style AI Review</span>
-      </a>
+<header class="header">
+  <div class="container header-inner">
+    <button class="brand" data-page-link="home" style="border:0;background:transparent;padding:0;">
+      <span class="brand-logo" id="brandLogo">HR</span><span id="brandName">HumanlyReview</span>
+    </button>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="nav-btn active" data-page-link="home">Home</button><button class="nav-btn" data-page-link="services">Services</button><button class="nav-btn" data-page-link="pricing">Pricing</button><button class="nav-btn" data-page-link="submit">Submit</button><button class="nav-btn" data-page-link="faq">FAQ</button><button class="nav-btn" data-page-link="support">Support</button>
+    </nav>
+    <button class="menu-btn" id="mobileMenuBtn" type="button">Menu</button>
+    <button class="btn primary" data-page-link="submit" id="headerCta">Start Review</button>
+  </div>
+  <div class="container mobile-nav" id="mobileNav"><div class="mobile-grid">
+    <button class="nav-btn active" data-page-link="home">Home</button><button class="nav-btn" data-page-link="services">Services</button><button class="nav-btn" data-page-link="pricing">Pricing</button><button class="nav-btn" data-page-link="submit">Submit</button><button class="nav-btn" data-page-link="faq">FAQ</button><button class="nav-btn" data-page-link="support">Support</button>
+  </div></div>
+</header>
 
-      <nav class="nav" aria-label="Main menu">
-        <a href="#content">Content</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#submit">Submit</a>
-        <a href="#faq">FAQ</a>
-        <a href="#support">Support</a>
-      </nav>
+<main>
+<section class="page active" id="page-home">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow" id="heroEyebrow">Premium review feedback for serious content</span>
+      <h1 id="heroTitle">Make your content clearer, stronger, and ready to use.</h1>
+      <p class="lead" id="heroSubtitle">Get a polished review report with clear strengths, improvement points, and practical next steps before you submit, send, or publish.</p>
+      <div class="actions"><button class="btn primary" data-page-link="submit" id="heroCta">Start Review</button><button class="btn secondary" data-page-link="pricing">View Pricing</button></div>
+      <div class="trust-row">
+        <article class="trust-card">
+          <div class="trust-icon">🔐</div>
+          <div class="trust-content">
+            <h3>Confidential Review</h3>
+            <p>Your content stays private and is handled with professional care.</p>
+          </div>
+        </article>
 
-      <a class="btn" href="#submit">Start Free Trial</a>
+        <article class="trust-card">
+          <div class="trust-icon">✨</div>
+          <div class="trust-content">
+            <h3>Premium Feedback</h3>
+            <p>Practical, human-style comments that make your next step clear.</p>
+          </div>
+        </article>
+
+        <article class="trust-card">
+          <div class="trust-icon">📩</div>
+          <div class="trust-content">
+            <h3>Report Delivered</h3>
+            <p>Receive a clean, easy-to-read review report in your email.</p>
+          </div>
+        </article>
+      </div>
     </div>
-  </header>
 
-  <main>
-    <section class="container hero">
-      <div>
-        <span class="eyebrow">Fast, clear, human-style feedback</span>
-        <h1>Review any content before you submit, send, or publish.</h1>
-        <p class="lead">
-          Upload your document or paste your text. Get a detailed review report with clear feedback,
-          improvement points, and next steps.
-        </p>
-
-        <div class="hero-actions">
-          <a class="btn" href="#submit">Start Free Trial</a>
-          <a class="btn secondary" href="#pricing">View Pricing</a>
-        </div>
-
-        <div class="hero-points">
-          <div class="hero-point">Detailed feedback</div>
-          <div class="hero-point">All plans include report</div>
-          <div class="hero-point">Free Trial once only</div>
-        </div>
-      </div>
-
-      <div class="card preview-card">
-        <div class="preview-box">
-          <div>
-            <div class="preview-title">What you receive</div>
-            <div class="preview-grid">
-              <div class="preview-mini">
-                <span>Review</span>
-                <p>Strengths, weaknesses, clarity, structure, tone, and readiness.</p>
-              </div>
-              <div class="preview-mini">
-                <span>Feedback</span>
-                <p>Simple next steps that show what to improve before use.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="preview-footer">
-            We give feedback only. We do not write, complete, falsify, or submit work for users.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="container video-section-grid">
-        <div class="section-head" style="margin-bottom:0;">
-          <h2>See the difference before and after review</h2>
-          <p>
-            Add your own short video here later. It should show a simple example of a document before review,
-            then the clearer feedback report after review.
-          </p>
-          <div class="hero-actions">
-            <a class="btn" href="#submit">Submit your content</a>
-            <a class="btn secondary" href="#pricing">Choose a plan</a>
-          </div>
-        </div>
-
-        <div class="video-placeholder">
-          <div class="video-frame">
-            <div>
-              <div class="play-button">▶</div>
-              <h3>Before & After Review Video</h3>
-              <p>Upload your real video later. Recommended: 60–90 seconds, clear voice, simple document example.</p>
-            </div>
-          </div>
-          <div class="video-caption">
-            Video placeholder: replace this area later with your uploaded video or YouTube embed.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="white" id="content">
-      <div class="container">
-        <div class="section-head">
-          <h2>Content we can review</h2>
-          <p>We review many kinds of content. Choose the closest type in the form, or choose Other if your document is unique.</p>
-        </div>
-
-        <div class="review-category-grid">
-          <div class="card review-category-card">
-            <div class="category-icon">🎓</div>
-            <h3>Academic & research</h3>
-            <ul class="category-list">
-              <li>Essays and assignments</li>
-              <li>Dissertations and theses</li>
-              <li>Research papers and reports</li>
-              <li>Statements of purpose</li>
-              <li>Scholarship applications</li>
-            </ul>
-          </div>
-
-          <div class="card review-category-card">
-            <div class="category-icon">💼</div>
-            <h3>Business & professional</h3>
-            <ul class="category-list">
-              <li>Business proposals</li>
-              <li>Business plans</li>
-              <li>Client reports</li>
-              <li>CVs and cover letters</li>
-              <li>Professional emails</li>
-            </ul>
-          </div>
-
-          <div class="card review-category-card">
-            <div class="category-icon">✍️</div>
-            <h3>Creative & publishing</h3>
-            <ul class="category-list">
-              <li>Books and manuscripts</li>
-              <li>Scripts and screenplays</li>
-              <li>Articles and blog posts</li>
-              <li>Poetry and storytelling</li>
-              <li>Website content</li>
-            </ul>
-          </div>
-
-          <div class="card review-category-card">
-            <div class="category-icon">📊</div>
-            <h3>Presentation & training</h3>
-            <ul class="category-list">
-              <li>Slides and pitch decks</li>
-              <li>Speaker notes</li>
-              <li>Training materials</li>
-              <li>Workshop documents</li>
-              <li>Public speech drafts</li>
-            </ul>
-          </div>
-
-          <div class="card review-category-card">
-            <div class="category-icon">📣</div>
-            <h3>Marketing & public content</h3>
-            <ul class="category-list">
-              <li>Sales copy</li>
-              <li>Product descriptions</li>
-              <li>Social media content</li>
-              <li>Email campaigns</li>
-              <li>Brand messages</li>
-            </ul>
-          </div>
-
-          <div class="card review-category-card">
-            <div class="category-icon">⚖️</div>
-            <h3>Legal-style & formal drafts</h3>
-            <ul class="category-list">
-              <li>Contract drafts</li>
-              <li>Agreement drafts</li>
-              <li>Policy documents</li>
-              <li>Complaint-style drafts</li>
-              <li>Formal letters</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing">
-      <div class="container">
-        <div class="section-head">
-          <h2>Pricing</h2>
-          <p>Every plan includes a detailed review report and feedback. The main difference is word count.</p>
-        </div>
-
-        <div class="pricing-grid" id="pricingGrid"></div>
-      </div>
-    </section>
-
-    <section class="white" id="submit">
-      <div class="container form-layout">
-        <form class="card form-card" id="reviewForm" novalidate>
-          <h2>Submit your content</h2>
-          <p class="small-muted">
-            Fill the form, verify your details, and submit. Your feedback will be sent through your selected contact method.
-          </p>
-
-          <div class="form-grid">
-            <label>
-              Email address *
-              <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
-              <div class="error-text" id="emailError"></div>
-            </label>
-
-            <label>
-              Confirm email address *
-              <input id="confirmEmail" type="email" placeholder="Re-enter email" autocomplete="email" />
-              <div class="error-text" id="confirmEmailError"></div>
-            </label>
-
-            <label>
-              WhatsApp number *
-              <input id="phone" type="tel" placeholder="+234..." autocomplete="tel" />
-            </label>
-
-            <label>
-              Where should we send your feedback? *
-              <select id="preferredContact">
-                <option value="">Select one</option>
-                <option value="Email">Email</option>
-                <option value="WhatsApp">WhatsApp</option>
-                <option value="Telegram">Telegram</option>
-              </select>
-              <div class="field-note"><strong>Your final feedback report will be sent here.</strong></div>
-            </label>
-
-            <label>
-              Content type *
-              <select id="documentType">
-                <option value="">Select content type</option>
-              </select>
-            </label>
-
-            <label id="otherDocumentTypeWrap" class="hidden">
-              Type your content type *
-              <input id="otherDocumentType" type="text" placeholder="Example: church speech, policy draft, etc." maxlength="80" />
-            </label>
-
-            <label>
-              Purpose *
-              <select id="purpose">
-                <option value="">Select purpose</option>
-              </select>
-            </label>
-
-            <label id="otherPurposeWrap" class="hidden">
-              Type your purpose *
-              <input id="otherPurpose" type="text" placeholder="Example: client review, public speech, etc." maxlength="80" />
-            </label>
-
-            <label id="paymentProviderWrap" class="hidden">
-              Payment method *
-              <select id="paymentProvider">
-                <option value="paystack">Paystack</option>
-                <option value="flutterwave">Flutterwave</option>
-              </select>
-              <div class="field-note">Use either provider. Payment is verified before submission.</div>
-            </label>
-
-            <label id="currencyWrap" class="hidden">
-              Currency *
-              <select id="currency">
-                <option value="NGN">Naira (NGN)</option>
-                <option value="USD">Dollar (USD)</option>
-              </select>
-              <div class="field-note">USD only works if your payment account supports USD.</div>
-            </label>
-          </div>
-
-          <div class="verify-grid">
-            <div class="verify-box">
-              <strong>Email verification *</strong>
-              <p>Required before submission.</p>
-              <button type="button" class="btn secondary full" id="emailVerifyBtn">Verify email</button>
-            </div>
-
-            <div class="verify-box">
-              <strong>WhatsApp verification *</strong>
-              <p>Required before submission.</p>
-              <button type="button" class="btn secondary full" id="whatsappVerifyBtn">Verify WhatsApp</button>
-            </div>
-
-            <div class="verify-box">
-              <strong>Payment *</strong>
-              <p>Required for paid plans.</p>
-              <button type="button" class="btn secondary full" id="paymentBtn">Not required</button>
-              <div id="paymentStatus" class="field-note"></div>
-            </div>
-          </div>
-
-          <div class="free-box" id="freeEligibilityBox">
-            <strong>Free Trial check *</strong>
-            <p class="small-muted">Free Trial is one lifetime use only. If you have used it before, choose a paid plan.</p>
-            <button type="button" class="btn secondary" id="eligibilityBtn">Check Free Trial</button>
-            <div class="error-text" id="eligibilityMessage"></div>
-          </div>
-
-          <label style="margin-top:18px;">
-            Paste content to review
-            <textarea id="contentText" placeholder="Paste your content here for word count..."></textarea>
-          </label>
-
-          <div class="word-box" id="wordStatus">0 words counted.</div>
-
-          <label class="upload-box">
-            <span class="upload-icon">📎</span>
-            <span>
-              <strong>Upload document(s) to review</strong><br />
-              <span class="limit-line" id="uploadLimitText"></span>
-              <span class="click-hint">Click here to choose file</span>
-            </span>
-            <input id="fileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png" />
-          </label>
-
-          <div class="file-info" id="fileInfo" style="display:none;"></div>
-
-          <div class="brief-upload-grid">
-            <label>
-              Brief or instruction <span class="small-muted">(optional)</span>
-              <textarea id="brief" maxlength="800" placeholder="Optional: tell us anything important about the document. You can leave this empty."></textarea>
-              <div class="field-note">Optional. Maximum 800 characters.</div>
-            </label>
-
-            <label class="upload-box compact-upload">
-              <span class="upload-icon">📝</span>
-              <span>
-                <strong>Upload brief/supporting file</strong><br />
-                <span class="limit-line" id="briefUploadLimitText">
-                  Optional. Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG.
-                </span>
-                <span class="click-hint">Click here to choose file</span>
-              </span>
-              <input id="briefFileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png" />
-            </label>
-          </div>
-
-          <div class="file-info" id="briefFileInfo" style="display:none;"></div>
-
-          <div class="submit-area">
-            <button type="submit" class="btn full" id="submitBtn" disabled>Submit for Review</button>
-
-            <div class="form-warning" id="formWarning">
-              <span>⚠️</span>
-              <span>Complete required fields, verify details, stay within plan limits, and verify payment if needed.</span>
-            </div>
-
-            <div class="success-message" id="successMessage">
-              Submission received. Status: Processing. Your feedback will be sent through your selected contact method.
-            </div>
-          </div>
-        </form>
-
-        <aside class="side-card">
-          <h3>Your report includes</h3>
-          <ul>
-            <li>Overall review summary</li>
-            <li>Strengths and weaknesses</li>
-            <li>Clarity, structure, tone, and flow feedback</li>
-            <li>Important missing points</li>
-            <li>Improvement checklist</li>
-            <li>Next-step guidance</li>
-          </ul>
-
-          <div class="side-note">
-            <h3>Important</h3>
-            <p>We provide review and feedback only. We do not write, complete, falsify, or submit work for users.</p>
-          </div>
-
-          <div class="side-note">
-            <h3>File types</h3>
-            <p>PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.</p>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section id="faq">
-      <div class="container">
-        <div class="section-head">
-          <h2>FAQ</h2>
-          <p>Simple answers before you submit.</p>
-        </div>
-
-        <div class="faq-grid">
-          <div class="card faq-card"><h3>What do I get?</h3><p>A detailed review report with clear feedback and improvement points.</p></div>
-          <div class="card faq-card"><h3>Do you write the work for me?</h3><p>No. We only review and give feedback. We do not complete or submit work for users.</p></div>
-          <div class="card faq-card"><h3>Can I use Free Trial more than once?</h3><p>No. Free Trial is one lifetime use only.</p></div>
-          <div class="card faq-card"><h3>Can you review legal documents?</h3><p>Yes, for clarity and structure. This is not legal advice and does not replace a lawyer.</p></div>
-          <div class="card faq-card"><h3>What if my file is too large?</h3><p>Use the Custom Large Review option and contact customer care.</p></div>
-          <div class="card faq-card"><h3>Where will I receive feedback?</h3><p>Through the contact method you select in the form.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="support" class="white">
-      <div class="container">
-        <div class="support-strip">
-          <div>
-            <h2>Need help or have a large file?</h2>
-            <p>Contact customer care for custom review requests, large files, or special instructions.</p>
-          </div>
-          <a class="btn" href="mailto:support@example.com">Contact Customer Care</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      © <span id="year"></span> Humanly Style AI Review. Feedback only. Not legal, academic, financial, or professional advice.
+    <div class="card hero-card"><div class="hero-inner">
+      <div><div class="small-muted" style="color:#cbd5e1;font-weight:900;">Review workflow</div><div class="dashboard-grid"><div class="dash-card"><span>Start</span><strong>Access</strong></div><div class="dash-card"><span>Next</span><strong>Upload</strong></div><div class="dash-card"><span>Then</span><strong>Review</strong></div><div class="dash-card"><span>Finally</span><strong>Report</strong></div></div></div>
+      <div class="panel-note">Professional feedback only. We help you improve your content while keeping the final work yours.</div>
+    </div></div>
+  </div>
+  <div class="container">
+    <div class="video-layout">
+      <div class="section-head" style="margin-bottom:0;"><h2 id="videoTitle">See the before-and-after review experience</h2><p id="videoText">Watch how rough content becomes easier to understand after structured review feedback.</p><div class="actions"><button class="btn primary" data-page-link="submit">Submit Content</button><button class="btn secondary" data-page-link="services">Explore Services</button></div></div>
+      <div class="video-card"><div class="video-frame" id="videoFrame"><div><div class="play">▶</div><h3>Before → Review → Better Direction</h3><p>A clear demo of the review process and result.</p></div></div><div class="video-caption">A short demo helps users understand the value before they submit.</div></div>
     </div>
-  </footer>
-
-  <script>
-    /*
-      STEP 1: Replace these three values.
-      - APPS_SCRIPT_URL: paste your Google Apps Script Web App URL ending in /exec.
-      - PAYSTACK_PUBLIC_KEY: paste your Paystack public key.
-      - FLUTTERWAVE_PUBLIC_KEY: paste your Flutterwave public key.
-    */
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6kjiHsPxrYWiZAiGJVCrTtT0Dgf3AJWeX_J25JhfQcu0sOzO8jwPTKDtsZMv6hvJAg/exec";
-    const PAYSTACK_PUBLIC_KEY = "pk_test_cdfaa0f13a49b0597573a5e336405a64dc634e4e";
-    const FLUTTERWAVE_PUBLIC_KEY = "PASTE_YOUR_FLUTTERWAVE_PUBLIC_KEY_HERE";
-
-    const USD_NGN_RATE = 1500;
-
-    const plans = [
-      {
-        id: "free",
-        name: "Free Trial",
-        usd: 0,
-        ngn: 0,
-        wordLimit: 1000,
-        maxFiles: 1,
-        maxFileMB: 5,
-        totalMB: 5,
-        label: "Up to 1,000 words",
-        cta: "Start Free Trial",
-        selectable: true
-      },
-      {
-        id: "standard",
-        name: "Standard",
-        usd: 9,
-        ngn: 9 * USD_NGN_RATE,
-        wordLimit: 5000,
-        maxFiles: 3,
-        maxFileMB: 15,
-        totalMB: 30,
-        label: "Up to 5,000 words",
-        cta: "Choose Standard",
-        selectable: true
-      },
-      {
-        id: "premium",
-        name: "Premium",
-        usd: 29,
-        ngn: 29 * USD_NGN_RATE,
-        wordLimit: 999999999,
-        maxFiles: 8,
-        maxFileMB: 25,
-        totalMB: 100,
-        label: "Unlimited words",
-        cta: "Choose Premium",
-        selectable: true
-      },
-      {
-        id: "custom",
-        name: "Custom Large Review",
-        usd: null,
-        ngn: null,
-        wordLimit: null,
-        maxFiles: null,
-        maxFileMB: null,
-        totalMB: null,
-        label: "Large files or special review",
-        cta: "Contact Customer Care",
-        selectable: false
-      }
-    ];
-
-    const documentTypes = [
-      "Essay", "Assignment", "Dissertation", "Thesis", "Research paper", "Book / Manuscript",
-      "Script / Screenplay", "Presentation", "Business document", "CV / Resume", "Cover letter",
-      "Application document", "Marketing copy", "Legal-style draft", "Report", "Technical document", "Other"
-    ];
-
-    const purposes = [
-      "Submission", "Business use", "Client delivery", "Publishing", "Presentation", "Application",
-      "Personal improvement", "Before sending", "Other"
-    ];
-
-    const state = {
-      selectedPlanId: "free",
-      emailVerified: false,
-      whatsappVerified: false,
-      paymentVerified: false,
-      freeEligibilityChecked: false,
-      freeEligible: true,
-      paymentProvider: "paystack",
-      paymentReference: "",
-      flutterwaveTransactionId: "",
-      currency: "NGN",
-      lastVerifiedPayment: null
-    };
-
-    const els = {
-      pricingGrid: document.getElementById("pricingGrid"),
-      email: document.getElementById("email"),
-      confirmEmail: document.getElementById("confirmEmail"),
-      phone: document.getElementById("phone"),
-      preferredContact: document.getElementById("preferredContact"),
-      documentType: document.getElementById("documentType"),
-      otherDocumentTypeWrap: document.getElementById("otherDocumentTypeWrap"),
-      otherDocumentType: document.getElementById("otherDocumentType"),
-      purpose: document.getElementById("purpose"),
-      otherPurposeWrap: document.getElementById("otherPurposeWrap"),
-      otherPurpose: document.getElementById("otherPurpose"),
-      paymentProviderWrap: document.getElementById("paymentProviderWrap"),
-      paymentProvider: document.getElementById("paymentProvider"),
-      currencyWrap: document.getElementById("currencyWrap"),
-      currency: document.getElementById("currency"),
-      contentText: document.getElementById("contentText"),
-      brief: document.getElementById("brief"),
-      fileInput: document.getElementById("fileInput"),
-      fileInfo: document.getElementById("fileInfo"),
-      briefFileInput: document.getElementById("briefFileInput"),
-      briefFileInfo: document.getElementById("briefFileInfo"),
-      wordStatus: document.getElementById("wordStatus"),
-      uploadLimitText: document.getElementById("uploadLimitText"),
-      briefUploadLimitText: document.getElementById("briefUploadLimitText"),
-      emailVerifyBtn: document.getElementById("emailVerifyBtn"),
-      whatsappVerifyBtn: document.getElementById("whatsappVerifyBtn"),
-      paymentBtn: document.getElementById("paymentBtn"),
-      paymentStatus: document.getElementById("paymentStatus"),
-      freeEligibilityBox: document.getElementById("freeEligibilityBox"),
-      eligibilityBtn: document.getElementById("eligibilityBtn"),
-      eligibilityMessage: document.getElementById("eligibilityMessage"),
-      submitBtn: document.getElementById("submitBtn"),
-      emailError: document.getElementById("emailError"),
-      confirmEmailError: document.getElementById("confirmEmailError"),
-      formWarning: document.getElementById("formWarning"),
-      successMessage: document.getElementById("successMessage"),
-      reviewForm: document.getElementById("reviewForm")
-    };
-
-    document.getElementById("year").textContent = new Date().getFullYear();
-
-    function formatNaira(amount) {
-      if (amount === null) return "Contact us";
-      return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(amount);
-    }
-
-    function getPlan() {
-      return plans.find(plan => plan.id === state.selectedPlanId) || plans[0];
-    }
-
-    function getAmount(plan, currency) {
-      if (plan.id === "free") return 0;
-      return currency === "USD" ? plan.usd : plan.ngn;
-    }
-
-    function countWords(text) {
-      const trimmed = text.trim();
-      if (!trimmed) return 0;
-      return trimmed.split(/\s+/).filter(Boolean).length;
-    }
-
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function getFileStats(input) {
-      const files = Array.from(input.files || []);
-      const totalMB = files.reduce((sum, file) => sum + file.size / 1024 / 1024, 0);
-      return { files, totalMB };
-    }
-
-    async function sha256(text) {
-      const msgBuffer = new TextEncoder().encode(text || "");
-      const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-
-    async function fileToPayload(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const dataUrl = reader.result;
-          const base64 = String(dataUrl).split(",")[1] || "";
-          resolve({
-            name: file.name,
-            mimeType: file.type || "application/octet-stream",
-            size: file.size,
-            base64,
-            hash: await sha256(file.name + ":" + file.size + ":" + file.lastModified)
-          });
-        };
-        reader.onerror = () => reject(new Error("Could not read file: " + file.name));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function filesToPayload(input) {
-      const files = Array.from(input.files || []);
-      const output = [];
-      for (const file of files) output.push(await fileToPayload(file));
-      return output;
-    }
-
-    async function postToBackend(payload) {
-      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("PASTE_YOUR")) {
-        throw new Error("Apps Script URL is not set yet.");
-      }
-
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
-
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch (err) {
-        throw new Error("Backend did not return JSON. Check Apps Script deployment.");
-      }
-    }
-
-    function resetFreeEligibility() {
-      state.freeEligibilityChecked = false;
-      state.freeEligible = true;
-      els.eligibilityMessage.textContent = "";
-      els.freeEligibilityBox.classList.remove("blocked");
-      els.eligibilityBtn.textContent = "Check Free Trial";
-      els.eligibilityBtn.classList.add("secondary");
-    }
-
-    function resetPayment() {
-      state.paymentVerified = false;
-      state.paymentReference = "";
-      state.flutterwaveTransactionId = "";
-      state.lastVerifiedPayment = null;
-      els.paymentStatus.textContent = "";
-    }
-
-    function renderOptions() {
-      documentTypes.forEach(type => {
-        const option = document.createElement("option");
-        option.value = type;
-        option.textContent = type;
-        els.documentType.appendChild(option);
-      });
-
-      purposes.forEach(purpose => {
-        const option = document.createElement("option");
-        option.value = purpose;
-        option.textContent = purpose;
-        els.purpose.appendChild(option);
-      });
-    }
-
-    function renderPricing() {
-      els.pricingGrid.innerHTML = "";
-
-      plans.forEach(plan => {
-        const card = document.createElement("div");
-        card.className = "card price-card" + (plan.id === state.selectedPlanId ? " active" : "");
-
-        const priceText = plan.usd === null ? "Contact" : "$" + plan.usd;
-        const nairaText = formatNaira(plan.ngn);
-        const limitText = plan.id === "custom"
-          ? "For bigger files, special requirements, or custom volume."
-          : `${plan.maxFiles} file${plan.maxFiles > 1 ? "s" : ""}, ${plan.maxFileMB}MB each, ${plan.totalMB}MB total`;
-
-        card.innerHTML = `
-          <h3>${plan.name}</h3>
-          <div class="price">${priceText}</div>
-          <div class="naira">${nairaText}</div>
-          <p>${plan.label}</p>
-          <div class="plan-note">${limitText}</div>
-          <ul class="feature-list">
-            <li><span class="check">✓</span><span>Detailed review report</span></li>
-            <li><span class="check">✓</span><span>Human-style feedback</span></li>
-            <li><span class="check">✓</span><span>Improvement checklist</span></li>
-            <li><span class="check">✓</span><span>Next-step guidance</span></li>
-          </ul>
-          <button type="button" class="btn ${plan.selectable && plan.id !== state.selectedPlanId ? "secondary" : ""} full">${plan.cta}</button>
-        `;
-
-        card.querySelector("button").addEventListener("click", () => {
-          if (!plan.selectable) {
-            location.hash = "#support";
-            return;
-          }
-
-          state.selectedPlanId = plan.id;
-          resetPayment();
-          resetFreeEligibility();
-          renderPricing();
-          updateUI();
-          location.hash = "#submit";
-        });
-
-        els.pricingGrid.appendChild(card);
-      });
-    }
-
-    function updateOtherFields() {
-      const docOther = els.documentType.value === "Other";
-      const purposeOther = els.purpose.value === "Other";
-
-      els.otherDocumentTypeWrap.classList.toggle("hidden", !docOther);
-      els.otherPurposeWrap.classList.toggle("hidden", !purposeOther);
-
-      if (!docOther) els.otherDocumentType.value = "";
-      if (!purposeOther) els.otherPurpose.value = "";
-    }
-
-    function updateUI() {
-      updateOtherFields();
-
-      const plan = getPlan();
-      const words = countWords(els.contentText.value);
-
-      const mainStats = getFileStats(els.fileInput);
-      const files = mainStats.files;
-      const totalMB = mainStats.totalMB;
-
-      const briefStats = getFileStats(els.briefFileInput);
-      const briefFiles = briefStats.files;
-      const briefTotalMB = briefStats.totalMB;
-
-      const overWordLimit = words > plan.wordLimit;
-      const tooManyFiles = files.length > plan.maxFiles;
-      const fileTooLarge = files.some(file => file.size / 1024 / 1024 > plan.maxFileMB);
-      const totalTooLarge = totalMB > plan.totalMB;
-
-      const briefTooManyFiles = briefFiles.length > plan.maxFiles;
-      const briefFileTooLarge = briefFiles.some(file => file.size / 1024 / 1024 > plan.maxFileMB);
-      const briefTotalTooLarge = briefTotalMB > plan.totalMB;
-
-      const planLimitText = `${plan.name} limit: ${plan.maxFiles} file${plan.maxFiles > 1 ? "s" : ""}, ${plan.maxFileMB}MB each, ${plan.totalMB}MB total.`;
-      els.uploadLimitText.textContent =
-        `Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG. ${planLimitText}`;
-      els.briefUploadLimitText.textContent =
-        `Optional brief/supporting file. Accepted: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG. ${planLimitText}`;
-
-      els.wordStatus.classList.toggle("error", overWordLimit);
-      els.wordStatus.textContent = `${words} words counted. Current plan: ${plan.name}. ${
-        plan.id === "premium" ? "Unlimited word count applies." : "Limit: " + plan.wordLimit.toLocaleString() + " words."
-      }${overWordLimit ? " Upgrade to continue." : ""}`;
-
-      if (files.length > 0) {
-        els.fileInfo.style.display = "block";
-        els.fileInfo.innerHTML = `
-          <strong>${files.length}</strong> file(s) selected. Total size: <strong>${totalMB.toFixed(2)}MB</strong>.
-          ${tooManyFiles ? '<p class="error-text">Too many files for this plan.</p>' : ""}
-          ${fileTooLarge ? '<p class="error-text">One or more files exceed the per-file MB limit.</p>' : ""}
-          ${totalTooLarge ? '<p class="error-text">Total file size exceeds this plan limit. Choose Custom Large Review.</p>' : ""}
-        `;
-      } else {
-        els.fileInfo.style.display = "none";
-      }
-
-      if (briefFiles.length > 0) {
-        els.briefFileInfo.style.display = "block";
-        els.briefFileInfo.innerHTML = `
-          <strong>${briefFiles.length}</strong> brief/supporting file(s) selected. Total size: <strong>${briefTotalMB.toFixed(2)}MB</strong>.
-          ${briefTooManyFiles ? '<p class="error-text">Too many brief/supporting files for this plan.</p>' : ""}
-          ${briefFileTooLarge ? '<p class="error-text">One or more brief/supporting files exceed the per-file MB limit.</p>' : ""}
-          ${briefTotalTooLarge ? '<p class="error-text">Brief/supporting files exceed this plan limit.</p>' : ""}
-        `;
-      } else {
-        els.briefFileInfo.style.display = "none";
-      }
-
-      els.emailError.textContent = els.email.value && !isValidEmail(els.email.value) ? "Enter a valid email address." : "";
-
-      const emailsMatch =
-        els.email.value &&
-        els.confirmEmail.value &&
-        els.email.value.toLowerCase() === els.confirmEmail.value.toLowerCase();
-
-      els.confirmEmailError.textContent =
-        els.confirmEmail.value && !emailsMatch ? "Email addresses must match." : "";
-
-      els.emailVerifyBtn.textContent = state.emailVerified ? "Email verified" : "Verify email";
-      els.emailVerifyBtn.classList.toggle("secondary", !state.emailVerified);
-
-      els.whatsappVerifyBtn.textContent = state.whatsappVerified ? "WhatsApp verified" : "Verify WhatsApp";
-      els.whatsappVerifyBtn.classList.toggle("secondary", !state.whatsappVerified);
-
-      const paidPlan = plan.id !== "free";
-      els.paymentProviderWrap.classList.toggle("hidden", !paidPlan);
-      els.currencyWrap.classList.toggle("hidden", !paidPlan);
-
-      if (!paidPlan) {
-        els.paymentBtn.textContent = "Not required";
-        els.paymentBtn.classList.remove("secondary");
-        els.freeEligibilityBox.style.display = "block";
-      } else {
-        const amount = getAmount(plan, state.currency);
-        els.paymentBtn.textContent = state.paymentVerified ? "Payment verified" : `Pay ${state.currency} ${amount}`;
-        els.paymentBtn.classList.toggle("secondary", !state.paymentVerified);
-        els.freeEligibilityBox.style.display = "none";
-      }
-
-      const hasContent = words > 0 || files.length > 0;
-      const paidReady = plan.id === "free" || state.paymentVerified;
-      const freeReady = plan.id !== "free" || (state.freeEligibilityChecked && state.freeEligible);
-
-      const otherDocReady = els.documentType.value !== "Other" || els.otherDocumentType.value.trim().length >= 2;
-      const otherPurposeReady = els.purpose.value !== "Other" || els.otherPurpose.value.trim().length >= 2;
-
-      const ready =
-        isValidEmail(els.email.value) &&
-        emailsMatch &&
-        els.phone.value.trim().length >= 8 &&
-        els.preferredContact.value &&
-        els.documentType.value &&
-        otherDocReady &&
-        els.purpose.value &&
-        otherPurposeReady &&
-        hasContent &&
-        !overWordLimit &&
-        !tooManyFiles &&
-        !fileTooLarge &&
-        !totalTooLarge &&
-        !briefTooManyFiles &&
-        !briefFileTooLarge &&
-        !briefTotalTooLarge &&
-        state.emailVerified &&
-        state.whatsappVerified &&
-        paidReady &&
-        freeReady;
-
-      els.submitBtn.disabled = !ready;
-      els.formWarning.style.display = ready ? "none" : "flex";
-    }
-
-    async function checkFreeTrial() {
-      try {
-        if (!isValidEmail(els.email.value) || els.phone.value.trim().length < 8) {
-          alert("Enter a valid email and WhatsApp number first.");
-          return;
-        }
-
-        els.eligibilityBtn.disabled = true;
-        els.eligibilityBtn.textContent = "Checking...";
-
-        const textHash = await sha256(els.contentText.value || "");
-        const response = await postToBackend({
-          action: "checkFreeEligibility",
-          email: els.email.value.trim().toLowerCase(),
-          phone: els.phone.value.trim(),
-          textHash
-        });
-
-        if (!response.ok) throw new Error(response.message || "Free Trial check failed.");
-
-        state.freeEligibilityChecked = true;
-        state.freeEligible = response.eligible;
-
-        if (response.eligible) {
-          els.eligibilityMessage.textContent = "";
-          els.freeEligibilityBox.classList.remove("blocked");
-          els.eligibilityBtn.textContent = "Free Trial confirmed";
-          els.eligibilityBtn.classList.remove("secondary");
-        } else {
-          els.eligibilityMessage.textContent = "Free Trial already used. Please choose Standard or Premium.";
-          els.freeEligibilityBox.classList.add("blocked");
-          els.eligibilityBtn.textContent = "Free Trial blocked";
-        }
-      } catch (error) {
-        alert(error.message);
-        els.eligibilityBtn.textContent = "Check Free Trial";
-      } finally {
-        els.eligibilityBtn.disabled = false;
-        updateUI();
-      }
-    }
-
-    async function verifyPaymentOnBackend(provider, paymentData) {
-      const plan = getPlan();
-      const amount = getAmount(plan, state.currency);
-
-      const response = await postToBackend({
-        action: "verifyPayment",
-        provider,
-        planId: plan.id,
-        email: els.email.value.trim().toLowerCase(),
-        amount,
-        currency: state.currency,
-        paymentData
-      });
-
-      if (!response.ok) throw new Error(response.message || "Payment verification failed.");
-
-      state.paymentVerified = true;
-      state.paymentProvider = provider;
-      state.paymentReference = response.reference || paymentData.reference || paymentData.tx_ref || "";
-      state.flutterwaveTransactionId = paymentData.transaction_id || "";
-      state.lastVerifiedPayment = response;
-      els.paymentStatus.innerHTML = '<span class="success-text">Payment verified successfully.</span>';
-      updateUI();
-    }
-
-    function startPaystackPayment() {
-      const plan = getPlan();
-      const amount = getAmount(plan, state.currency);
-
-      if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes("PASTE_YOUR")) {
-        alert("Paystack public key is not set yet.");
-        return;
-      }
-
-      const reference = "HSR_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
-      const handler = PaystackPop.setup({
-        key: PAYSTACK_PUBLIC_KEY,
-        email: els.email.value.trim(),
-        amount: Math.round(amount * 100),
-        currency: state.currency,
-        ref: reference,
-        metadata: {
-          custom_fields: [
-            { display_name: "Plan", variable_name: "plan", value: plan.name },
-            { display_name: "WhatsApp", variable_name: "whatsapp", value: els.phone.value.trim() }
-          ]
-        },
-        callback: async function(response) {
-          try {
-            els.paymentStatus.textContent = "Verifying payment...";
-            await verifyPaymentOnBackend("paystack", { reference: response.reference });
-          } catch (error) {
-            alert(error.message);
-            els.paymentStatus.textContent = "Payment could not be verified.";
-          }
-        },
-        onClose: function() {
-          if (!state.paymentVerified) els.paymentStatus.textContent = "Payment window closed.";
-        }
-      });
-      handler.openIframe();
-    }
-
-    function startFlutterwavePayment() {
-      const plan = getPlan();
-      const amount = getAmount(plan, state.currency);
-
-      if (!FLUTTERWAVE_PUBLIC_KEY || FLUTTERWAVE_PUBLIC_KEY.includes("PASTE_YOUR")) {
-        alert("Flutterwave public key is not set yet.");
-        return;
-      }
-
-      const txRef = "HSR_FLW_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
-
-      FlutterwaveCheckout({
-        public_key: FLUTTERWAVE_PUBLIC_KEY,
-        tx_ref: txRef,
-        amount,
-        currency: state.currency,
-        payment_options: "card,banktransfer,ussd",
-        customer: {
-          email: els.email.value.trim(),
-          phone_number: els.phone.value.trim(),
-          name: els.email.value.trim()
-        },
-        customizations: {
-          title: "Humanly Style AI Review",
-          description: plan.name + " review payment",
-          logo: ""
-        },
-        callback: async function(response) {
-          try {
-            els.paymentStatus.textContent = "Verifying payment...";
-            if (typeof closePaymentModal === "function") closePaymentModal();
-            await verifyPaymentOnBackend("flutterwave", {
-              transaction_id: response.transaction_id,
-              tx_ref: response.tx_ref
-            });
-          } catch (error) {
-            alert(error.message);
-            els.paymentStatus.textContent = "Payment could not be verified.";
-          }
-        },
-        onclose: function() {
-          if (!state.paymentVerified) els.paymentStatus.textContent = "Payment window closed.";
-        }
-      });
-    }
-
-    function startPayment() {
-      const plan = getPlan();
-
-      if (plan.id === "free") return;
-
-      if (!isValidEmail(els.email.value) || els.phone.value.trim().length < 8) {
-        alert("Enter a valid email and WhatsApp number first.");
-        return;
-      }
-
-      if (els.paymentProvider.value === "flutterwave") startFlutterwavePayment();
-      else startPaystackPayment();
-    }
-
-    async function submitReview(event) {
-      event.preventDefault();
-      if (els.submitBtn.disabled) return;
-
-      try {
-        els.submitBtn.disabled = true;
-        els.submitBtn.textContent = "Submitting...";
-
-        const mainFiles = await filesToPayload(els.fileInput);
-        const briefFiles = await filesToPayload(els.briefFileInput);
-        const textHash = await sha256(els.contentText.value || "");
-        const plan = getPlan();
-
-        const payload = {
-          action: "submitReview",
-          submission: {
-            planId: plan.id,
-            planName: plan.name,
-            amount: getAmount(plan, state.currency),
-            currency: state.currency,
-            email: els.email.value.trim().toLowerCase(),
-            phone: els.phone.value.trim(),
-            preferredContact: els.preferredContact.value,
-            documentType: els.documentType.value === "Other" ? els.otherDocumentType.value.trim() : els.documentType.value,
-            purpose: els.purpose.value === "Other" ? els.otherPurpose.value.trim() : els.purpose.value,
-            contentText: els.contentText.value,
-            wordCount: countWords(els.contentText.value),
-            brief: els.brief.value,
-            textHash,
-            mainFiles,
-            briefFiles,
-            paymentProvider: plan.id === "free" ? "" : state.paymentProvider,
-            paymentReference: state.paymentReference,
-            flutterwaveTransactionId: state.flutterwaveTransactionId,
-            paymentVerified: state.paymentVerified
-          }
-        };
-
-        const response = await postToBackend(payload);
-        if (!response.ok) throw new Error(response.message || "Submission failed.");
-
-        els.successMessage.style.display = "block";
-        els.successMessage.innerHTML = `Submission received. Your ID is <strong>${response.submissionId}</strong>. Status: Processing.`;
-        els.successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
-        els.reviewForm.reset();
-
-        state.emailVerified = false;
-        state.whatsappVerified = false;
-        state.paymentVerified = false;
-        state.freeEligibilityChecked = false;
-        state.freeEligible = true;
-        state.paymentReference = "";
-        state.flutterwaveTransactionId = "";
-        state.lastVerifiedPayment = null;
-
-        renderPricing();
-        updateUI();
-      } catch (error) {
-        alert(error.message);
-      } finally {
-        els.submitBtn.textContent = "Submit for Review";
-        updateUI();
-      }
-    }
-
-    els.email.addEventListener("input", () => { state.emailVerified = false; resetPayment(); resetFreeEligibility(); updateUI(); });
-    els.confirmEmail.addEventListener("input", () => { state.emailVerified = false; resetFreeEligibility(); updateUI(); });
-    els.phone.addEventListener("input", () => { state.whatsappVerified = false; resetPayment(); resetFreeEligibility(); updateUI(); });
-    els.preferredContact.addEventListener("change", updateUI);
-    els.documentType.addEventListener("change", updateUI);
-    els.otherDocumentType.addEventListener("input", updateUI);
-    els.purpose.addEventListener("change", updateUI);
-    els.otherPurpose.addEventListener("input", updateUI);
-    els.paymentProvider.addEventListener("change", () => { resetPayment(); updateUI(); });
-    els.currency.addEventListener("change", () => { state.currency = els.currency.value; resetPayment(); updateUI(); });
-    els.contentText.addEventListener("input", () => { resetFreeEligibility(); updateUI(); });
-    els.fileInput.addEventListener("change", () => { resetFreeEligibility(); updateUI(); });
-    els.briefFileInput.addEventListener("change", updateUI);
-
-    els.emailVerifyBtn.addEventListener("click", () => {
-      const emailsMatch =
-        els.email.value &&
-        els.confirmEmail.value &&
-        els.email.value.toLowerCase() === els.confirmEmail.value.toLowerCase();
-
-      if (!isValidEmail(els.email.value) || !emailsMatch) {
-        alert("Enter a valid email and make sure both email fields match.");
-        return;
-      }
-
-      state.emailVerified = true;
-      updateUI();
-    });
-
-    els.whatsappVerifyBtn.addEventListener("click", () => {
-      if (els.phone.value.trim().length < 8) {
-        alert("Enter a valid WhatsApp number.");
-        return;
-      }
-
-      /*
-        This is a simple front-end confirmation.
-        Real WhatsApp OTP requires a paid WhatsApp provider, so this stays free.
-      */
-      state.whatsappVerified = true;
-      updateUI();
-    });
-
-    els.paymentBtn.addEventListener("click", startPayment);
-    els.eligibilityBtn.addEventListener("click", checkFreeTrial);
-    els.reviewForm.addEventListener("submit", submitReview);
-
-    renderOptions();
-    renderPricing();
-    updateUI();
-  </script>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="container">
+    <div class="section-head"><span class="page-kicker">What we review</span><h2>Services we provide</h2><p>We review many types of content and provide practical feedback for clarity, structure, tone, flow, completeness, and readiness.</p></div>
+    <div class="grid-3">
+      <div class="card service-card"><div class="icon">🎓</div><h3>Academic & research</h3><ul class="clean-list"><li>Essays and assignments</li><li>Projects and reports</li><li>Research drafts</li><li>Statements and applications</li></ul></div>
+      <div class="card service-card"><div class="icon">💼</div><h3>Business & career</h3><ul class="clean-list"><li>Proposals and plans</li><li>Reports and briefs</li><li>CVs and cover letters</li><li>Professional communication</li></ul></div>
+      <div class="card service-card"><div class="icon">✍️</div><h3>Creative & publishing</h3><ul class="clean-list"><li>Books and manuscripts</li><li>Scripts and screenplays</li><li>Articles and blogs</li><li>Stories and speeches</li></ul></div>
+      <div class="card service-card"><div class="icon">📊</div><h3>Slides & presentations</h3><ul class="clean-list"><li>Slides and pitch decks</li><li>Speaker notes</li><li>Training material</li><li>Workshop content</li></ul></div>
+      <div class="card service-card"><div class="icon">📣</div><h3>Marketing & web copy</h3><ul class="clean-list"><li>Sales copy</li><li>Product descriptions</li><li>Email campaigns</li><li>Landing page content</li></ul></div>
+      <div class="card service-card"><div class="icon">⚖️</div><h3>Formal documents</h3><ul class="clean-list"><li>Agreement-style drafts</li><li>Policy documents</li><li>Formal letters</li><li>Official communication</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-pricing"><div class="container"><div class="section-head"><span class="page-kicker">Plans</span><h2>Pricing</h2><p>Choose the review size that fits your content. Prices are shown in US dollars for international clients.</p></div><div class="pricing-grid" id="pricingGrid"></div></div></section>
+
+<section class="page" id="page-submit">
+  <div class="container submit-layout">
+    <form class="card form-card" id="reviewForm">
+      <h2>Submit your content</h2><p class="small-muted">Complete the short form and send your content for review.</p>
+
+      <div class="form-section"><div class="form-title"><span class="num">1</span><h3>Email confirmation</h3></div>
+        <div class="auth-row"><label>Email address *<input id="email" type="email" placeholder="you@example.com" autocomplete="email"><div id="emailMessage" class="field-note"></div></label><button type="button" class="btn full" id="sendOtpBtn">Send OTP</button></div>
+        <div class="otp-row"><label>Enter OTP *<input id="otp" inputmode="numeric" maxlength="6" placeholder="123456"><div id="otpMessage" class="field-note"></div></label><button type="button" class="btn secondary full" id="verifyOtpBtn">Verify OTP</button></div>
+      </div>
+
+      <div class="form-section"><div class="form-title"><span class="num">2</span><h3>Review details</h3></div>
+        <div class="form-grid"><label>Plan *<select id="planSelect"></select></label><label>Purpose *<select id="purpose"></select></label><label>Content type *<select id="documentType"></select></label><label id="otherDocumentTypeWrap" class="hidden">Type content type *<input id="otherDocumentType" maxlength="80" placeholder="Example: policy draft"></label><label id="otherPurposeWrap" class="hidden">Type purpose *<input id="otherPurpose" maxlength="80" placeholder="Example: investor review"></label></div>
+      </div>
+
+      <div class="form-section"><div class="form-title"><span class="num">3</span><h3>Content</h3></div>
+        <label>Paste content<textarea id="contentText" placeholder="Paste your content here..."></textarea></label><div class="word-box" id="wordStatus">0 words counted.</div>
+        <label class="upload-box"><span class="upload-icon">📎</span><span><strong>Upload document(s)</strong><br><span class="field-note" id="uploadLimitText"></span><span class="click-hint">Click here to choose file</span></span><input id="fileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png"></label><div class="file-info" id="fileInfo" style="display:none;"></div>
+        <div class="brief-grid" style="margin-top:18px;"><label>Brief <span class="small-muted">(optional)</span><textarea id="brief" maxlength="800" placeholder="Optional instruction for the review."></textarea><div class="field-note">Maximum 800 characters.</div></label><label class="upload-box"><span class="upload-icon">📝</span><span><strong>Supporting file</strong><br><span class="field-note" id="briefUploadLimitText"></span><span class="click-hint">Click here to choose file</span></span><input id="briefFileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png"></label></div><div class="file-info" id="briefFileInfo" style="display:none;"></div>
+      </div>
+
+      <div class="form-section"><div class="form-title"><span class="num">4</span><h3>Payment</h3></div><p class="small-muted" id="paymentSummary">Choose a plan to see payment amount.</p><button type="button" class="btn primary full" id="payBtn">Pay with Paystack</button><div id="paymentStatus" class="field-note"></div></div>
+      <div class="submit-area"><button type="submit" class="btn full" id="submitBtn" disabled>Submit for Review</button><div class="form-warning" id="formWarning"><span>⚠️</span><span>Complete the required steps before submitting.</span></div><div class="success-box" id="successBox"></div></div>
+    </form>
+    <aside class="side-card"><h3>Your report includes</h3><ul><li>Review summary</li><li>Strengths and weaknesses</li><li>Clarity, tone, structure, and flow feedback</li><li>Missing points and risk signals</li><li>Improvement checklist</li><li>Next-step guidance</li></ul><div class="side-note"><strong>Important</strong><br>Professional feedback only. We help you improve your content while keeping the final work yours.</div></aside>
+  </div>
+</section>
+
+<section class="page" id="page-faq"><div class="container"><div class="section-head"><span class="page-kicker">Questions</span><h2>FAQ</h2><p>Short answers before you submit.</p></div><div class="faq-grid" id="faqGrid"></div></div></section>
+<section class="page" id="page-support"><div class="container"><div class="support-card"><h2>Need help?</h2><p>Contact support for enterprise review, large files, or special requests.</p><div class="actions" style="justify-content:center;"><a class="btn primary" id="supportEmailLink" href="mailto:support@humanlyreview.com">Contact Support</a><button class="btn secondary" data-page-link="submit">Start Review</button></div></div></div></section>
+</main>
+
+<div class="modal" id="adminModal"><div class="modal-panel">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;"><div><h2>Owner editor</h2><p class="small-muted">Edit brand, colors, logo, demo video, prices, word limits, and FAQ without touching code.</p></div><button class="btn secondary" type="button" id="closeAdminBtn">Close</button></div>
+  <div id="adminLoginBox"><label>Admin PIN<input id="adminPin" type="password" placeholder="Enter admin PIN"></label><button class="btn primary" type="button" id="adminLoginBtn" style="margin-top:12px;">Login</button></div>
+  <div id="adminEditor" class="hidden"><div class="admin-grid">
+    <label>Brand name <input id="adminBrandName"></label><label>Support email <input id="adminSupportEmail"></label><label>Primary color <input id="adminPrimaryColor" type="color"></label><label>Accent color <input id="adminAccentColor" type="color"></label><label>Hero eyebrow <input id="adminHeroEyebrow"></label><label>Hero CTA <input id="adminHeroCta"></label><label style="grid-column:1/-1;">Hero title <input id="adminHeroTitle"></label><label style="grid-column:1/-1;">Hero subtitle <textarea id="adminHeroSubtitle"></textarea></label><label>Standard price $ <input id="adminStandardPrice" type="number"></label><label>Premium price $ <input id="adminPremiumPrice" type="number"></label><label>Enterprise price $ <input id="adminEnterprisePrice" type="number"></label><label>Standard words <input id="adminStandardWords" type="number"></label><label>Premium words <input id="adminPremiumWords" type="number"></label><label>Enterprise words <input id="adminEnterpriseWords" type="number"></label><label style="grid-column:1/-1;">Logo upload <input id="adminLogoFile" type="file" accept=".png,.jpg,.jpeg,.webp,.svg"></label><label style="grid-column:1/-1;">Demo video upload <input id="adminVideoFile" type="file" accept=".mp4,.webm,.mov"></label><label style="grid-column:1/-1;">FAQ JSON <textarea id="adminFaqJson" style="min-height:220px;"></textarea></label>
+  </div><div class="admin-actions"><button class="btn primary" type="button" id="saveAdminBtn">Save changes</button><button class="btn secondary" type="button" id="refreshConfigBtn">Refresh</button></div><div id="adminMessage" class="field-note"></div></div>
+</div></div>
+
+<footer><div class="container">© <span id="year"></span> <span id="footerBrand">HumanlyReview</span>. Feedback only.<br><button class="owner-link" id="openAdminBtn" type="button">Owner login</button></div></footer>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6kjiHsPxrYWiZAiGJVCrTtT0Dgf3AJWeX_J25JhfQcu0sOzO8jwPTKDtsZMv6hvJAg/exec";
+const PAYSTACK_PUBLIC_KEY = "pk_test_cdfaa0f13a49b0597573a5e336405a64dc634e4e";
+const defaultConfig = {
+  brandName:"HumanlyReview",supportEmail:"support@humanlyreview.com",logoUrl:"",videoUrl:"",primaryColor:"#1d4ed8",accentColor:"#7c3aed",
+  heroEyebrow:"Expert-style review reports",heroTitle:"Review any content before you submit, send, or publish.",heroSubtitle:"Upload your content, pay securely, and receive a clear review report by email.",heroCta:"Start Review",
+  plans:[{id:"standard",name:"Standard",priceUSD:9,wordLimit:5000,maxFiles:3,maxFileMB:5,totalMB:15,label:"Up to 5,000 words",featured:false},{id:"premium",name:"Premium",priceUSD:29,wordLimit:999999999,maxFiles:5,maxFileMB:10,totalMB:40,label:"Unlimited words",featured:true},{id:"enterprise",name:"Enterprise",priceUSD:99,wordLimit:999999999,maxFiles:8,maxFileMB:20,totalMB:80,label:"Enterprise review",featured:false}],
+  faq:[{q:"What do I get?",a:"A clear review report with feedback, strengths, weaknesses, and improvement points."},{q:"Do you write the work for me?",a:"No. We only review and give feedback. We do not complete or submit work."},{q:"How do I receive my report?",a:"Your report is sent to your verified email address."},{q:"Can you review formal documents?",a:"Yes, for clarity, structure, flow, and readability. This does not replace professional legal advice."},{q:"What if my file is large?",a:"Choose Enterprise or contact support for special handling."},{q:"Is payment secure?",a:"Payment is processed through Paystack and verified before submission."}]
+};
+const documentTypes=["Essay","Assignment","Dissertation","Thesis","Research paper","Book / Manuscript","Script / Screenplay","Presentation","Business document","CV / Resume","Cover letter","Application document","Marketing copy","Legal-style draft","Report","Technical document","Other"];
+const purposes=["Submission","Business use","Client delivery","Publishing","Presentation","Application","Personal improvement","Before sending","Other"];
+const state={config:defaultConfig,currentPage:"home",authToken:"",verifiedEmail:"",paymentVerified:false,paymentReference:"",adminToken:""};
+const $=id=>document.getElementById(id);
+const els={brandLogo:$("brandLogo"),brandName:$("brandName"),footerBrand:$("footerBrand"),heroEyebrow:$("heroEyebrow"),heroTitle:$("heroTitle"),heroSubtitle:$("heroSubtitle"),heroCta:$("heroCta"),headerCta:$("headerCta"),videoFrame:$("videoFrame"),pricingGrid:$("pricingGrid"),planSelect:$("planSelect"),faqGrid:$("faqGrid"),supportEmailLink:$("supportEmailLink"),email:$("email"),otp:$("otp"),emailMessage:$("emailMessage"),otpMessage:$("otpMessage"),sendOtpBtn:$("sendOtpBtn"),verifyOtpBtn:$("verifyOtpBtn"),purpose:$("purpose"),otherPurposeWrap:$("otherPurposeWrap"),otherPurpose:$("otherPurpose"),documentType:$("documentType"),otherDocumentTypeWrap:$("otherDocumentTypeWrap"),otherDocumentType:$("otherDocumentType"),contentText:$("contentText"),brief:$("brief"),fileInput:$("fileInput"),briefFileInput:$("briefFileInput"),fileInfo:$("fileInfo"),briefFileInfo:$("briefFileInfo"),uploadLimitText:$("uploadLimitText"),briefUploadLimitText:$("briefUploadLimitText"),wordStatus:$("wordStatus"),paymentSummary:$("paymentSummary"),payBtn:$("payBtn"),paymentStatus:$("paymentStatus"),submitBtn:$("submitBtn"),formWarning:$("formWarning"),successBox:$("successBox"),reviewForm:$("reviewForm")};
+$("year").textContent=new Date().getFullYear();
+
+function setPage(page){if(!document.getElementById("page-"+page))page="home";state.currentPage=page;document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById("page-"+page).classList.add("active");document.querySelectorAll("[data-page-link]").forEach(btn=>btn.classList.toggle("active",btn.dataset.pageLink===page));$("mobileNav").classList.remove("open");history.replaceState(null,"","#"+page);window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll("[data-page-link]").forEach(el=>el.addEventListener("click",()=>setPage(el.dataset.pageLink)));
+$("mobileMenuBtn").onclick=()=>$("mobileNav").classList.toggle("open");
+function money(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Number(n||0))}
+function isValidEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||""))}
+function selectedPlan(){return state.config.plans.find(p=>p.id===els.planSelect.value)||state.config.plans[0]}
+function countWords(text){const t=String(text||"").trim();return t?t.split(/\s+/).filter(Boolean).length:0}
+async function sha256(text){const b=new TextEncoder().encode(text||"");const h=await crypto.subtle.digest("SHA-256",b);return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,"0")).join("")}
+async function postBackend(payload){const res=await fetch(APPS_SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});const text=await res.text();let json;try{json=JSON.parse(text)}catch(e){throw new Error("Backend response error. Check Apps Script deployment URL.")}if(!json.ok)throw new Error(json.message||"Request failed.");return json}
+async function fileToPayload(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=async()=>resolve({name:file.name,mimeType:file.type||"application/octet-stream",size:file.size,base64:String(r.result).split(",")[1]||"",hash:await sha256(file.name+":"+file.size+":"+file.lastModified)});r.onerror=()=>reject(new Error("Could not read file: "+file.name));r.readAsDataURL(file)})}
+async function filesToPayload(input){const out=[];for(const f of Array.from(input.files||[]))out.push(await fileToPayload(f));return out}
+function stats(input){const files=Array.from(input.files||[]);return{files,totalMB:files.reduce((s,f)=>s+f.size/1024/1024,0)}}
+function renderOptions(){documentTypes.forEach(v=>els.documentType.add(new Option(v,v)));purposes.forEach(v=>els.purpose.add(new Option(v,v)))}
+function applyConfig(){const c=state.config;document.documentElement.style.setProperty("--primary",c.primaryColor||defaultConfig.primaryColor);document.documentElement.style.setProperty("--accent",c.accentColor||defaultConfig.accentColor);els.brandName.textContent=c.brandName||"HumanlyReview";els.footerBrand.textContent=c.brandName||"HumanlyReview";document.title=(c.brandName||"HumanlyReview")+" — Expert-Style Review Reports";els.brandLogo.innerHTML=c.logoUrl?`<img src="${c.logoUrl}" alt="${c.brandName||"Logo"}">`:"HR";els.heroEyebrow.textContent=c.heroEyebrow||defaultConfig.heroEyebrow;els.heroTitle.textContent=c.heroTitle||defaultConfig.heroTitle;els.heroSubtitle.textContent=c.heroSubtitle||defaultConfig.heroSubtitle;els.heroCta.textContent=c.heroCta||"Start Review";els.headerCta.textContent=c.heroCta||"Start Review";els.supportEmailLink.href="mailto:"+(c.supportEmail||"support@humanlyreview.com");if(c.videoUrl)els.videoFrame.innerHTML=`<iframe src="${c.videoUrl}" allow="autoplay; fullscreen" allowfullscreen title="Review demo"></iframe>`;renderPricing();renderPlansSelect();renderFaq();updateUI()}
+function renderPricing(){els.pricingGrid.innerHTML="";state.config.plans.forEach(p=>{const div=document.createElement("div");div.className="card price-card"+(p.featured?" featured":"");const wordText=p.wordLimit>900000000?(p.id==="premium"?"Unlimited words":"Enterprise content review"):("Up to "+Number(p.wordLimit).toLocaleString()+" words");div.innerHTML=`<h3>${p.name}</h3><div class="price">${money(p.priceUSD)}</div><p class="small-muted">${p.label}</p><div class="plan-note">${wordText}</div><ul class="feature-list"><li>Detailed review report</li><li>Human-style feedback</li><li>Improvement checklist</li><li>Next-step guidance</li></ul><button type="button" class="btn ${p.featured?"primary":"secondary"} full">Choose ${p.name}</button>`;div.querySelector("button").onclick=()=>{els.planSelect.value=p.id;resetPayment();updateUI();setPage("submit")};els.pricingGrid.appendChild(div)})}
+function renderPlansSelect(){els.planSelect.innerHTML="";state.config.plans.forEach(p=>els.planSelect.add(new Option(`${p.name} — ${money(p.priceUSD)}`,p.id)))}
+function renderFaq(){els.faqGrid.innerHTML="";(state.config.faq||[]).forEach(item=>{const div=document.createElement("div");div.className="card faq-card";div.innerHTML=`<h3>${item.q}</h3><p>${item.a}</p>`;els.faqGrid.appendChild(div)})}
+function resetPayment(){state.paymentVerified=false;state.paymentReference="";els.paymentStatus.textContent=""}
+function updateOtherFields(){els.otherDocumentTypeWrap.classList.toggle("hidden",els.documentType.value!=="Other");els.otherPurposeWrap.classList.toggle("hidden",els.purpose.value!=="Other")}
+function updateUI(){updateOtherFields();const plan=selectedPlan();const words=countWords(els.contentText.value);const main=stats(els.fileInput);const brief=stats(els.briefFileInput);const overWords=words>plan.wordLimit;const mainTooMany=main.files.length>plan.maxFiles;const mainBig=main.files.some(f=>f.size/1024/1024>plan.maxFileMB);const mainTotalBig=main.totalMB>plan.totalMB;const briefTooMany=brief.files.length>plan.maxFiles;const briefBig=brief.files.some(f=>f.size/1024/1024>plan.maxFileMB);const briefTotalBig=brief.totalMB>plan.totalMB;const limit=`${plan.name}: ${plan.maxFiles} file${plan.maxFiles>1?"s":""}, ${plan.maxFileMB}MB each, ${plan.totalMB}MB total.`;els.uploadLimitText.textContent="PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, PNG. "+limit;els.briefUploadLimitText.textContent="Optional supporting file. "+limit;els.wordStatus.classList.toggle("error",overWords);els.wordStatus.textContent=`${words} words counted. ${plan.wordLimit>900000000?"Extended word count applies.":"Limit: "+plan.wordLimit.toLocaleString()+" words."}${overWords?" Upgrade to continue.":""}`;if(main.files.length){els.fileInfo.style.display="block";els.fileInfo.innerHTML=`<strong>${main.files.length}</strong> file(s), <strong>${main.totalMB.toFixed(2)}MB</strong>.${mainTooMany?'<p class="error-text">Too many files for this plan.</p>':""}${mainBig?'<p class="error-text">One file exceeds the per-file limit.</p>':""}${mainTotalBig?'<p class="error-text">Total file size is above this plan.</p>':""}`}else els.fileInfo.style.display="none";if(brief.files.length){els.briefFileInfo.style.display="block";els.briefFileInfo.innerHTML=`<strong>${brief.files.length}</strong> supporting file(s), <strong>${brief.totalMB.toFixed(2)}MB</strong>.${briefTooMany?'<p class="error-text">Too many supporting files.</p>':""}${briefBig?'<p class="error-text">One supporting file is too large.</p>':""}${briefTotalBig?'<p class="error-text">Supporting file total is too large.</p>':""}`}else els.briefFileInfo.style.display="none";els.paymentSummary.textContent=`Selected plan: ${plan.name}. Amount: ${money(plan.priceUSD)}.`;els.payBtn.textContent=state.paymentVerified?"Payment verified":`Pay ${money(plan.priceUSD)} with Paystack`;els.payBtn.disabled=!state.authToken||state.paymentVerified;const hasContent=words>0||main.files.length>0;const docReady=els.documentType.value&&(els.documentType.value!=="Other"||els.otherDocumentType.value.trim().length>=2);const purposeReady=els.purpose.value&&(els.purpose.value!=="Other"||els.otherPurpose.value.trim().length>=2);const ready=Boolean(state.authToken&&state.paymentVerified&&docReady&&purposeReady&&hasContent&&!overWords&&!mainTooMany&&!mainBig&&!mainTotalBig&&!briefTooMany&&!briefBig&&!briefTotalBig);els.submitBtn.disabled=!ready;els.formWarning.style.display=ready?"none":"flex"}
+async function loadConfig(){try{const res=await postBackend({action:"getConfig"});state.config={...defaultConfig,...(res.config||{})};if(!state.config.plans||!state.config.plans.length)state.config.plans=defaultConfig.plans;if(!state.config.faq||!state.config.faq.length)state.config.faq=defaultConfig.faq}catch(e){console.warn(e.message);state.config=defaultConfig}applyConfig()}
+async function requestOtp(){try{if(!isValidEmail(els.email.value)){els.emailMessage.innerHTML='<span class="error-text">Enter a valid email.</span>';return}els.sendOtpBtn.disabled=true;els.sendOtpBtn.textContent="Sending...";await postBackend({action:"requestOtp",email:els.email.value.trim().toLowerCase()});els.emailMessage.innerHTML='<span class="success-text">OTP sent. Check your email.</span>'}catch(e){els.emailMessage.innerHTML='<span class="error-text">'+e.message+'</span>'}finally{els.sendOtpBtn.disabled=false;els.sendOtpBtn.textContent="Send OTP";updateUI()}}
+async function verifyOtp(){try{els.verifyOtpBtn.disabled=true;els.verifyOtpBtn.textContent="Checking...";const res=await postBackend({action:"verifyOtp",email:els.email.value.trim().toLowerCase(),otp:els.otp.value.trim()});state.authToken=res.authToken;state.verifiedEmail=res.email;els.otpMessage.innerHTML='<span class="success-text">Email verified.</span>'}catch(e){els.otpMessage.innerHTML='<span class="error-text">'+e.message+'</span>'}finally{els.verifyOtpBtn.disabled=false;els.verifyOtpBtn.textContent="Verify OTP";updateUI()}}
+function payWithPaystack(){const plan=selectedPlan();if(!state.authToken){alert("Please verify your email first.");return}const reference="HR_"+Date.now()+"_"+Math.floor(Math.random()*1000000);const handler=PaystackPop.setup({key:PAYSTACK_PUBLIC_KEY,email:state.verifiedEmail,amount:Math.round(Number(plan.priceUSD)*100),currency:"USD",ref:reference,metadata:{custom_fields:[{display_name:"Plan",variable_name:"plan",value:plan.name},{display_name:"Email",variable_name:"email",value:state.verifiedEmail}]},callback:async function(response){try{els.paymentStatus.textContent="Verifying payment...";const res=await postBackend({action:"verifyPayment",authToken:state.authToken,reference:response.reference,planId:plan.id,expectedAmount:Number(plan.priceUSD),expectedCurrency:"USD"});state.paymentVerified=true;state.paymentReference=res.reference;els.paymentStatus.innerHTML='<span class="success-text">Payment verified.</span>';updateUI()}catch(e){els.paymentStatus.innerHTML='<span class="error-text">'+e.message+'</span>'}},onClose:function(){if(!state.paymentVerified)els.paymentStatus.textContent="Payment window closed."}});handler.openIframe()}
+async function submitReview(ev){ev.preventDefault();if(els.submitBtn.disabled)return;try{els.submitBtn.disabled=true;els.submitBtn.textContent="Submitting...";const plan=selectedPlan();const contentText=els.contentText.value;const res=await postBackend({action:"submitReview",authToken:state.authToken,submission:{planId:plan.id,planName:plan.name,amount:Number(plan.priceUSD),currency:"USD",email:state.verifiedEmail,documentType:els.documentType.value==="Other"?els.otherDocumentType.value.trim():els.documentType.value,purpose:els.purpose.value==="Other"?els.otherPurpose.value.trim():els.purpose.value,contentText,wordCount:countWords(contentText),brief:els.brief.value,textHash:await sha256(contentText),mainFiles:await filesToPayload(els.fileInput),briefFiles:await filesToPayload(els.briefFileInput),paymentReference:state.paymentReference}});els.successBox.style.display="block";els.successBox.innerHTML=`Submission received. Your ID is <strong>${res.submissionId}</strong>. Status: Processing.`;els.successBox.scrollIntoView({behavior:"smooth",block:"center"});els.reviewForm.reset();state.authToken="";state.verifiedEmail="";resetPayment();updateUI()}catch(e){alert(e.message)}finally{els.submitBtn.textContent="Submit for Review";updateUI()}}
+function openAdmin(){$("adminModal").classList.add("open")} function closeAdmin(){$("adminModal").classList.remove("open")}
+async function adminLogin(){try{$("adminLoginBtn").disabled=true;$("adminLoginBtn").textContent="Logging in...";const res=await postBackend({action:"adminLogin",pin:$("adminPin").value});state.adminToken=res.adminToken;$("adminLoginBox").classList.add("hidden");$("adminEditor").classList.remove("hidden");fillAdminFields()}catch(e){alert(e.message)}finally{$("adminLoginBtn").disabled=false;$("adminLoginBtn").textContent="Login"}}
+function fillAdminFields(){const c=state.config;$("adminBrandName").value=c.brandName||"";$("adminSupportEmail").value=c.supportEmail||"";$("adminPrimaryColor").value=c.primaryColor||"#1d4ed8";$("adminAccentColor").value=c.accentColor||"#7c3aed";$("adminHeroEyebrow").value=c.heroEyebrow||"";$("adminHeroCta").value=c.heroCta||"";$("adminHeroTitle").value=c.heroTitle||"";$("adminHeroSubtitle").value=c.heroSubtitle||"";$("adminStandardPrice").value=c.plans[0]?.priceUSD||0;$("adminPremiumPrice").value=c.plans[1]?.priceUSD||0;$("adminEnterprisePrice").value=c.plans[2]?.priceUSD||0;$("adminStandardWords").value=c.plans[0]?.wordLimit||5000;$("adminPremiumWords").value=c.plans[1]?.wordLimit||999999999;$("adminEnterpriseWords").value=c.plans[2]?.wordLimit||999999999;$("adminFaqJson").value=JSON.stringify(c.faq||[],null,2)}
+async function optionalAdminFile(input){const file=input.files&&input.files[0];return file?await fileToPayload(file):null}
+async function saveAdmin(){try{$("saveAdminBtn").disabled=true;$("saveAdminBtn").textContent="Saving...";const plans=JSON.parse(JSON.stringify(state.config.plans));plans[0].priceUSD=Number($("adminStandardPrice").value||0);plans[1].priceUSD=Number($("adminPremiumPrice").value||0);plans[2].priceUSD=Number($("adminEnterprisePrice").value||0);plans[0].wordLimit=Number($("adminStandardWords").value||5000);plans[1].wordLimit=Number($("adminPremiumWords").value||999999999);plans[2].wordLimit=Number($("adminEnterpriseWords").value||999999999);const cfg={brandName:$("adminBrandName").value.trim(),supportEmail:$("adminSupportEmail").value.trim(),primaryColor:$("adminPrimaryColor").value,accentColor:$("adminAccentColor").value,heroEyebrow:$("adminHeroEyebrow").value.trim(),heroCta:$("adminHeroCta").value.trim(),heroTitle:$("adminHeroTitle").value.trim(),heroSubtitle:$("adminHeroSubtitle").value.trim(),plans,faq:JSON.parse($("adminFaqJson").value||"[]")};const res=await postBackend({action:"adminUpdateConfig",adminToken:state.adminToken,config:cfg,logoFile:await optionalAdminFile($("adminLogoFile")),videoFile:await optionalAdminFile($("adminVideoFile"))});state.config={...defaultConfig,...(res.config||cfg)};applyConfig();$("adminMessage").innerHTML='<span class="success-text">Saved successfully.</span>'}catch(e){$("adminMessage").innerHTML='<span class="error-text">'+e.message+'</span>'}finally{$("saveAdminBtn").disabled=false;$("saveAdminBtn").textContent="Save changes"}}
+els.sendOtpBtn.onclick=requestOtp;els.verifyOtpBtn.onclick=verifyOtp;els.payBtn.onclick=payWithPaystack;els.reviewForm.onsubmit=submitReview;els.planSelect.onchange=()=>{resetPayment();updateUI()};els.documentType.onchange=updateUI;els.purpose.onchange=updateUI;els.otherDocumentType.oninput=updateUI;els.otherPurpose.oninput=updateUI;els.contentText.oninput=updateUI;els.fileInput.onchange=updateUI;els.briefFileInput.onchange=updateUI;$("openAdminBtn").onclick=openAdmin;$("closeAdminBtn").onclick=closeAdmin;$("adminLoginBtn").onclick=adminLogin;$("saveAdminBtn").onclick=saveAdmin;$("refreshConfigBtn").onclick=loadConfig;
+renderOptions();loadConfig();setPage(location.hash.replace("#","")||"home");
+</script>
 </body>
 </html>
