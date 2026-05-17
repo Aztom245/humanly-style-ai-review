@@ -628,31 +628,352 @@
 
 
 
-/* ---- 100k Q&A Indexed Live Chat Search ---- */
+
+
+
+/* ---- Guided tick live chat override ---- */
 (function(){
-  const HR_QA={manifest:null,cache:{},loading:{},stop:new Set("the and for you your are can how what when where why who will with this that have from into about does did do not our we it is to in on of a an be as if or by at please kindly want need".split(" ")),
-    synonyms:{price:["cost","fee","charge","amount","how much","pricing","plan"],payment:["pay","paid","card","paystack","checkout","transaction","reference","charged"],report:["pdf","feedback","result","review","email","gmail","inbox"],upload:["file","attach","submit","document","paste","send"],fast:["quick","urgent","asap","immediately","soon"],design:["logo","flyer","poster","banner","visual","infographic","layout","cover"],writing:["essay","article","grammar","paragraph","manuscript","story","cv","resume"],support:["help","contact","agent","human","complaint","problem","issue"],greeting:["hello","hi","hey","good morning","good afternoon","good evening","how are you"]}};
-  function norm(t){return String(t||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();}
-  function tokens(t){return norm(t).split(" ").filter(w=>w.length>2&&!HR_QA.stop.has(w));}
-  function expand(t){let out=norm(t),low=out;Object.keys(HR_QA.synonyms).forEach(main=>HR_QA.synonyms[main].forEach(s=>{if(low.includes(s))out+=" "+main}));return out;}
-  function detectCats(text){const t=expand(text),cats=[];function add(c){if(!cats.includes(c))cats.push(c)}
-    if(/\b(hello|hi|hey|greeting|morning|afternoon|evening)\b/.test(t))add("greeting");
-    if(/\b(price|pricing|cost|fee|charge|amount|plan|trial|demo|free)\b/.test(t))add("pricing");
-    if(/\b(payment|pay|paid|paystack|card|checkout|transaction|reference|refund|charged|verify)\b/.test(t))add("payment");
-    if(/\b(report|pdf|feedback|result|delivery|time|hour|email|gmail|inbox|status|submission)\b/.test(t))add("delivery");
-    if(/\b(upload|file|attach|document|paste|submit|doc|ppt|jpg|png|image)\b/.test(t))add("upload");
-    if(/\b(service|review|writing|essay|design|logo|book|cover|architecture|slide|presentation|cv|business|poster|flyer|infographic)\b/.test(t))add("services");
-    if(/\b(privacy|private|secure|security|safe|confidential|data)\b/.test(t))add("privacy");
-    if(/\b(do my work|complete my work|write for me|submit for me|fake|cheat|plagiarism|falsify)\b/.test(t))add("ethics");
-    if(/\b(support|help|contact|agent|human|complaint|problem|issue|urgent)\b/.test(t))add("support");
-    add("general");return cats;}
-  async function loadManifest(){if(HR_QA.manifest)return HR_QA.manifest;try{const r=await fetch("manifest.json",{cache:"force-cache"}).catch(()=>fetch("manifest.json",{cache:"force-cache"}).catch(()=>fetch("chat-data/manifest.json",{cache:"force-cache"})));HR_QA.manifest=r.ok?await r.json():{categories:{},total:0}}catch(e){HR_QA.manifest={categories:{},total:0}}return HR_QA.manifest;}
-  async function loadCat(cat){await loadManifest();const files=(HR_QA.manifest.categories&&HR_QA.manifest.categories[cat])||[];if(!files.length)return[];if(HR_QA.cache[cat])return HR_QA.cache[cat];if(HR_QA.loading[cat])return HR_QA.loading[cat];HR_QA.loading[cat]=Promise.all(files.map(f=>fetch(f,{cache:"force-cache"}).then(r=>r.ok?r.json():fetch("chat-data/"+f,{cache:"force-cache"}).then(rr=>rr.ok?rr.json():[])).catch(()=>fetch("chat-data/"+f,{cache:"force-cache"}).then(rr=>rr.ok?rr.json():[]).catch(()=>[])))).then(parts=>{const arr=parts.flat();HR_QA.cache[cat]=arr;return arr});return HR_QA.loading[cat];}
-  function score(rec,expanded,userTokens,cats){let s=0;const q=norm(rec.q+" "+(rec.k||[]).join(" ")+" "+rec.c);if(cats.includes(rec.c))s+=6;userTokens.forEach(w=>{if(q.includes(w))s+=3;if((rec.k||[]).includes(w))s+=4});return s;}
-  function fallbackGreeting(message){const t=norm(message);if(/\b(hello|hi|hey)\b/.test(t))return "Hello 👋 Welcome to HumanlyReview. I can help with services, pricing, payment, file upload, PDF report delivery, or support. What would you like to know?";if(t.includes("how are you"))return "I’m doing great, thank you for asking 😊 How can I help you with HumanlyReview today?";return null;}
-  window.hrFindIndexedAnswer=async function(message){const greet=fallbackGreeting(message);if(greet)return greet;const expanded=expand(message), userTokens=tokens(expanded), cats=detectCats(expanded);const pools=await Promise.all(cats.slice(0,4).map(loadCat));const candidates=pools.flat();if(!candidates.length)return null;let best=null,bestScore=0;candidates.forEach(rec=>{const sc=score(rec,expanded,userTokens,cats);if(sc>bestScore){bestScore=sc;best=rec}});return best&&bestScore>=7?best.a:null;};
-  const oldSend=window.sendChatMessage;
-  window.sendChatMessage=async function(){const emailInput=document.getElementById("chatEmail"),input=document.getElementById("chatMessage");const email=emailInput?emailInput.value.trim():"",message=input?input.value.trim():"";if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){if(emailInput)emailInput.classList.add("invalid");const body=document.getElementById("liveChatBody");if(body){const div=document.createElement("div");div.className="chat-error-note";div.textContent="Please enter a valid email address first. Support needs it to contact you about your message.";body.appendChild(div);body.scrollTop=body.scrollHeight;}return;}if(!message)return;if(input)input.value="";const body=document.getElementById("liveChatBody");function add(text,type){if(!body)return;const div=document.createElement("div");div.className="chat-msg "+(type==="user"?"chat-user":"chat-bot");div.textContent=text;body.appendChild(div);body.scrollTop=body.scrollHeight;try{localStorage.setItem("hr_live_chat_history_v2",body.innerHTML)}catch(e){}}add(message,"user");let answer=null;try{answer=await window.hrFindIndexedAnswer(message)}catch(e){}if(answer){add(answer,"bot");try{postBackend({action:"liveChatMessage",email,message,page:location.href,clientAnswer:answer});}catch(e){}return;}if(typeof oldSend==="function"){if(input)input.value=message;return oldSend();}};
+  function byId(id){return document.getElementById(id);}
+  const GUIDE={
+    main:{title:"Hello 👋 Please choose what you need help with:",options:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts, and more"],
+      ["pricing","💳 Pricing and plans","Plans, demo, free trial"],
+      ["submit","📤 How to submit content","Email OTP, paste/upload, file limits"],
+      ["payment","🔐 Payment help","Paystack, failed payment, manual verification"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour"],
+      ["status","🧾 Submission status","Submission ID, waiting timer, report sent"],
+      ["privacy","🛡️ Privacy and safety","Confidentiality and secure use"],
+      ["policy","⚖️ Feedback-only policy","What we can and cannot do"],
+      ["support","👤 Contact support","Send a message to support"]]},
+    services:{title:"What type of work do you want reviewed?",options:[
+      ["writing","✍️ Writing review","Essays, reports, CV, letters, articles"],
+      ["design","🎨 Design / visual review","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides / presentation review","Pitch deck, PowerPoint, training slides"],
+      ["concepts","🏗️ Concept review","Architecture, product, packaging, creative concepts"],
+      ["business","💼 Business/formal review","Proposals, profiles, business documents"],
+      ["custom","✨ Custom request","Anything reviewable that is not listed"]],back:"main"},
+    pricing:{title:"Pricing and access help:",options:[
+      ["price_list","💵 What are the plans?","Choose a plan that fits your content size"],
+      ["free_trial","🎬 Is there a free trial?","No free trial; demo is provided instead"],
+      ["dollar","🌍 Why prices show in dollars?","International-friendly display"],
+      ["choose_plan","🧭 Which plan should I choose?","Quick guidance"]],back:"main"},
+    submit:{title:"Submission help:",options:[
+      ["otp","📧 Email verification / OTP","Why OTP is needed"],
+      ["paste_upload","📝 Paste or upload?","Why only one method is active"],
+      ["file_types","📎 Accepted file types","PDF, DOCX, PPTX, images, etc."],
+      ["file_limits","📦 File limits","Depends on selected plan"],
+      ["refresh_save","🔄 Page refresh / saved progress","Why progress remains"]],back:"main"},
+    payment:{title:"Payment support:",options:[
+      ["paystack","🔐 How payment works","Secure checkout through Paystack"],
+      ["failed_payment","⚠️ Payment failed","What to do next"],
+      ["paid_not_verified","✅ Paid but not verified","Admin can manually verify"],
+      ["refund","↩️ Refund/payment issue","What details to send support"]],back:"main"},
+    delivery:{title:"Report delivery:",options:[
+      ["delivery_time","⏱️ How long does it take?","Expected less than 1 hour"],
+      ["pdf_only","📄 Is the report PDF?","Yes, PDF only"],
+      ["not_received","📭 I did not receive report","Check inbox/spam, then contact support"],
+      ["report_contains","📋 What report includes","Score, strengths, weaknesses, checklist"]],back:"main"},
+    status:{title:"Submission status help:",options:[
+      ["submission_id","🧾 What is Submission ID?","Your tracking reference"],
+      ["timer","⏳ What does the timer mean?","Waiting countdown"],
+      ["sent_status","✅ What happens when report is sent?","Timer stops and success message appears"]],back:"main"},
+    privacy:{title:"Privacy and safety:",options:[
+      ["confidential","🔒 Is my content private?","Handled carefully for review"],
+      ["sensitive","🚫 What should I not upload?","Avoid passwords/private secrets"],
+      ["email_required","📧 Why email is required?","For delivery and support contact"]],back:"main"},
+    policy:{title:"Feedback-only policy:",options:[
+      ["feedback_only","✅ What does feedback-only mean?","We guide; final work remains yours"],
+      ["no_completion","🚫 Can you do my work for me?","No completion/falsification/submission"],
+      ["ai_human","🧠 Is it AI or human?","AI-based, guided by expert knowledge"]],back:"main"},
+    support:{title:"Contact support:",options:[
+      ["support_hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["send_support","✉️ Send support message","Type a message with your email"],
+      ["urgent_help","🚨 Urgent issue","What to include"]],back:"main"}
+  };
+  const ANSWERS={
+    writing:"For writing, HumanlyReview checks clarity, grammar, tone, structure, flow, readability, missing points, weak sections, and improvement steps. You receive feedback, not rewritten work.",
+    design:"For design or visual work, the report checks layout, spacing, alignment, hierarchy, color, contrast, brand impression, and professional quality.",
+    slides:"For slides and presentations, the report checks message flow, slide clarity, audience understanding, design consistency, pitch strength, and key-point arrangement.",
+    concepts:"For architecture, product, packaging, or creative concepts, the report checks idea clarity, presentation quality, practical impression, missing details, weak areas, and suggestions.",
+    business:"For business/formal work, the report checks professional tone, credibility, structure, completeness, risk signals, and reader confidence.",
+    custom:"If your work is not listed, you can still submit it as a custom request if it is reviewable. Add a clear brief so the system understands what type of feedback you want.",
+    price_list:"Plans are shown on the Pricing page. Standard is for normal review needs, Premium is for larger or more detailed work, and Enterprise is for bigger files or special requests.",
+    free_trial:"We do not offer a free trial. Instead, the website includes a demo so you can understand how the review process works before submitting.",
+    dollar:"Prices are displayed in USD for a more international and professional experience. Secure checkout is handled through Paystack.",
+    choose_plan:"Choose Standard for smaller/simple reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files, or special review needs.",
+    otp:"Email OTP confirms that the report will be delivered to the correct email. If the OTP expires, request a new code.",
+    paste_upload:"To keep the submission clean, use one main method: paste content OR upload files. If you paste, upload locks. If you upload, paste locks.",
+    file_types:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.",
+    file_limits:"File limits depend on the selected plan. The plan card shows the allowed file number and size before payment.",
+    refresh_save:"If the browser refreshes, progress is saved on that device where possible, so the user can continue instead of starting again.",
+    paystack:"Payment is processed securely through Paystack. Keep your payment reference after payment.",
+    failed_payment:"If payment fails, try again with a valid card or refresh the page. If money was deducted, contact support with your email and payment reference.",
+    paid_not_verified:"If payment succeeds but the website does not recognize it, admin can manually verify it after checking the payment reference/proof.",
+    refund:"For payment/refund issues, contact support with your email, payment reference, and Submission ID if available.",
+    delivery_time:"The review report is expected to be ready in less than 1 hour after successful submission.",
+    pdf_only:"Yes. The final feedback report is sent to the verified email as a PDF only. PDF keeps it neat, professional, and easy to open.",
+    not_received:"Check your inbox and spam/junk folder first. If it is still missing after 1 hour, contact support with your Submission ID.",
+    report_contains:"The report can include an overall score over 100, review summary, strengths, weak points, risks, improvement checklist, and next-step guidance.",
+    submission_id:"Submission ID is your tracking reference. Keep it safe and include it whenever you contact support.",
+    timer:"The timer shows the expected waiting period for your report. When admin marks the report as sent, the timer stops and the sent message appears.",
+    sent_status:"When the report is sent, the website shows a green success message that is different from the normal waiting screen.",
+    confidential:"Your content is handled carefully for review purposes. Use your verified email and avoid unnecessary sensitive information.",
+    sensitive:"Do not upload passwords, bank PINs, private keys, or unnecessary confidential secrets.",
+    email_required:"Email is needed for OTP verification, report delivery, and support follow-up.",
+    feedback_only:"Feedback-only means HumanlyReview helps you understand what to improve. The final work remains yours.",
+    no_completion:"No. HumanlyReview does not complete, falsify, or submit work for users. It provides review feedback only.",
+    ai_human:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge to give clear, practical feedback.",
+    support_hours:"Support is monitored between 07:00 and 22:00 GMT. Outside that time, messages are recorded and support follows up by email.",
+    urgent_help:"For urgent help, include your email, Submission ID, payment reference if any, and a short explanation of the issue.",
+    send_support:"Please type your message below and enter a valid email so support can contact you. Your message will also be sent to Telegram."
+  };
+  function body(){return byId("liveChatBody");}
+  function save(){try{localStorage.setItem("hr_guided_chat_v1",body().innerHTML)}catch(e){}}
+  function clearBody(){if(body())body().innerHTML="";}
+  function addBot(text){const d=document.createElement("div");d.className="chat-msg chat-bot";d.textContent=text;body().appendChild(d);body().scrollTop=body().scrollHeight;save();}
+  function addUser(text){const d=document.createElement("div");d.className="chat-msg chat-user";d.textContent=text;body().appendChild(d);body().scrollTop=body().scrollHeight;save();}
+  function renderMenu(id){
+    const menu=GUIDE[id]||GUIDE.main; addBot(menu.title);
+    const wrap=document.createElement("div"); wrap.className="guided-chat-menu";
+    menu.options.forEach(([next,label,mini])=>{
+      const b=document.createElement("button"); b.type="button"; b.className="guided-chat-btn"; b.innerHTML=label+(mini?`<span class="mini">${mini}</span>`:"");
+      b.onclick=()=>handleChoice(next,label); wrap.appendChild(b);
+    });
+    body().appendChild(wrap);
+    if(menu.back){
+      const nav=document.createElement("div"); nav.className="guided-back-row";
+      [["← Back",()=>renderMenu(menu.back)],["Main menu",()=>renderMenu("main")]].forEach(([t,fn])=>{const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);});
+      body().appendChild(nav);
+    }
+    body().scrollTop=body().scrollHeight; save();
+  }
+  function handleChoice(key,label){
+    addUser(label.replace(/^[^A-Za-z0-9]+/,""));
+    if(GUIDE[key]){renderMenu(key);return;}
+    addBot(ANSWERS[key]||"Thank you. Please choose a related option or contact support for help.");
+    if(key==="send_support"||key==="urgent_help"){const box=document.createElement("div");box.className="guided-contact-box";box.textContent="Use the email box and custom question box below. Support will reply through your email.";body().appendChild(box);showManualMode();}
+    const nav=document.createElement("div");nav.className="guided-back-row";
+    [["Main menu",()=>renderMenu("main")],["Contact support",()=>handleChoice("send_support","Contact support")]].forEach(([t,fn])=>{const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);});
+    body().appendChild(nav);body().scrollTop=body().scrollHeight;save();
+  }
+  function hideManualMode(){const form=document.querySelector(".live-chat-form");if(form)form.classList.add("manual-mode-hidden");}
+  function showManualMode(){const form=document.querySelector(".live-chat-form");if(form)form.classList.remove("manual-mode-hidden");const msg=byId("chatMessage");if(msg)msg.focus();}
+  window.openGuidedChat=function(){const panel=byId("liveChatPanel");if(panel)panel.classList.add("open");clearBody();hideManualMode();renderMenu("main");};
+  function bindGuided(){if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=window.openGuidedChat;if(byId("manualChatToggle"))byId("manualChatToggle").onclick=function(){showManualMode();addBot("No problem. Type your question below. Please enter a valid email first so support can contact you if needed.");};}
+  bindGuided();document.addEventListener("DOMContentLoaded",bindGuided);setTimeout(bindGuided,500);
+})();
+
+
+/* ---- FINAL guided-only live chat, no custom typing, email required ---- */
+(function(){
+  function byId(id){return document.getElementById(id);}
+  function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim());}
+  function email(){const el=byId("chatEmail");return el?el.value.trim():"";}
+  function emailReady(){return isEmail(email());}
+  function body(){return byId("liveChatBody");}
+  function save(){try{localStorage.setItem("hr_guided_only_chat_v1",body().innerHTML)}catch(e){}}
+  function setEmailStatus(type,msg){
+    const el=byId("guidedEmailStatus");
+    if(!el)return;
+    el.className=type==="ok"?"guided-email-ok":"guided-email-error";
+    el.textContent=msg;
+  }
+  function addBot(text){
+    const d=document.createElement("div");
+    d.className="chat-msg chat-bot";
+    d.textContent=text;
+    body().appendChild(d);
+    body().scrollTop=body().scrollHeight;
+    save();
+  }
+  function addUser(text){
+    const d=document.createElement("div");
+    d.className="chat-msg chat-user";
+    d.textContent=text;
+    body().appendChild(d);
+    body().scrollTop=body().scrollHeight;
+    save();
+  }
+  function logChoice(question,answer){
+    try{
+      postBackend({
+        action:"liveChatMessage",
+        email:email(),
+        message:"Guided option selected: "+question,
+        page:location.href,
+        clientAnswer:answer
+      });
+    }catch(e){}
+  }
+
+  const GUIDE={
+    main:{title:"Hello 👋 Please enter your email, then choose what you need help with:",options:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts, and more"],
+      ["pricing","💳 Pricing and plans","Plans, demo, free trial"],
+      ["submit","📤 How to submit content","Email OTP, paste/upload, file limits"],
+      ["payment","🔐 Payment help","Paystack, failed payment, manual verification"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour"],
+      ["status","🧾 Submission status","Submission ID, waiting timer, report sent"],
+      ["privacy","🛡️ Privacy and safety","Confidentiality and secure use"],
+      ["policy","⚖️ Feedback-only policy","What we can and cannot do"],
+      ["support","👤 Support information","Support hours and urgent help"]
+    ]},
+    services:{title:"What type of work do you want reviewed?",options:[
+      ["writing","✍️ Writing review","Essays, reports, CV, letters, articles"],
+      ["design","🎨 Design / visual review","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides / presentation review","Pitch deck, PowerPoint, training slides"],
+      ["concepts","🏗️ Concept review","Architecture, product, packaging, creative concepts"],
+      ["business","💼 Business/formal review","Proposals, profiles, business documents"],
+      ["custom","✨ Custom request","Anything reviewable that is not listed"]],back:"main"},
+    pricing:{title:"Pricing and access help:",options:[
+      ["price_list","💵 What are the plans?","Choose a plan that fits your content size"],
+      ["free_trial","🎬 Is there a free trial?","No free trial; demo is provided instead"],
+      ["dollar","🌍 Why prices show in dollars?","International-friendly display"],
+      ["choose_plan","🧭 Which plan should I choose?","Quick guidance"]],back:"main"},
+    submit:{title:"Submission help:",options:[
+      ["otp","📧 Email verification / OTP","Why OTP is needed"],
+      ["paste_upload","📝 Paste or upload?","Why only one method is active"],
+      ["file_types","📎 Accepted file types","PDF, DOCX, PPTX, images, etc."],
+      ["file_limits","📦 File limits","Depends on selected plan"],
+      ["refresh_save","🔄 Page refresh / saved progress","Why progress remains"]],back:"main"},
+    payment:{title:"Payment support:",options:[
+      ["paystack","🔐 How payment works","Secure checkout through Paystack"],
+      ["failed_payment","⚠️ Payment failed","What to do next"],
+      ["paid_not_verified","✅ Paid but not verified","Admin can manually verify"],
+      ["refund","↩️ Refund/payment issue","What details are needed"]],back:"main"},
+    delivery:{title:"Report delivery:",options:[
+      ["delivery_time","⏱️ How long does it take?","Expected less than 1 hour"],
+      ["pdf_only","📄 Is the report PDF?","Yes, PDF only"],
+      ["not_received","📭 I did not receive report","Check inbox/spam, then contact support"],
+      ["report_contains","📋 What report includes","Score, strengths, weaknesses, checklist"]],back:"main"},
+    status:{title:"Submission status help:",options:[
+      ["submission_id","🧾 What is Submission ID?","Your tracking reference"],
+      ["timer","⏳ What does the timer mean?","Waiting countdown"],
+      ["sent_status","✅ What happens when report is sent?","Timer stops and success message appears"]],back:"main"},
+    privacy:{title:"Privacy and safety:",options:[
+      ["confidential","🔒 Is my content private?","Handled carefully for review"],
+      ["sensitive","🚫 What should I not upload?","Avoid passwords/private secrets"],
+      ["email_required","📧 Why email is required?","For delivery and support contact"]],back:"main"},
+    policy:{title:"Feedback-only policy:",options:[
+      ["feedback_only","✅ What does feedback-only mean?","We guide; final work remains yours"],
+      ["no_completion","🚫 Can you do my work for me?","No completion/falsification/submission"],
+      ["ai_human","🧠 Is it AI or human?","AI-based, guided by expert knowledge"]],back:"main"},
+    support:{title:"Support information:",options:[
+      ["support_hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["urgent_help","🚨 Urgent issue","What details to prepare"],
+      ["not_received","📭 Report not received","What to check first"],
+      ["paid_not_verified","✅ Payment not verified","What to do next"]],back:"main"}
+  };
+
+  const ANSWERS={
+    writing:"For writing, HumanlyReview checks clarity, grammar, tone, structure, flow, readability, missing points, weak sections, and improvement steps. You receive feedback, not rewritten work.",
+    design:"For design or visual work, the report checks layout, spacing, alignment, hierarchy, color, contrast, brand impression, and professional quality.",
+    slides:"For slides and presentations, the report checks message flow, slide clarity, audience understanding, design consistency, pitch strength, and key-point arrangement.",
+    concepts:"For architecture, product, packaging, or creative concepts, the report checks idea clarity, presentation quality, practical impression, missing details, weak areas, and suggestions.",
+    business:"For business/formal work, the report checks professional tone, credibility, structure, completeness, risk signals, and reader confidence.",
+    custom:"If your work is not listed, you can still submit it as a custom request if it is reviewable. Choose the closest plan, upload or paste the content, and add a clear brief.",
+    price_list:"Plans are shown on the Pricing page. Standard is for normal review needs, Premium is for larger or more detailed work, and Enterprise is for bigger files or special requests.",
+    free_trial:"We do not offer a free trial. Instead, the website includes a demo so you can understand how the review process works before submitting.",
+    dollar:"Prices are displayed in USD for a more international and professional experience. Secure checkout is handled through Paystack.",
+    choose_plan:"Choose Standard for smaller/simple reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files, or special review needs.",
+    otp:"Email OTP confirms that the report will be delivered to the correct email. If the OTP expires, request a new code.",
+    paste_upload:"To keep the submission clean, use one main method: paste content OR upload files. If you paste, upload locks. If you upload, paste locks.",
+    file_types:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.",
+    file_limits:"File limits depend on the selected plan. The plan card shows the allowed file number and size before payment.",
+    refresh_save:"If the browser refreshes, progress is saved on that device where possible, so the user can continue instead of starting again.",
+    paystack:"Payment is processed securely through Paystack. Keep your payment reference after payment.",
+    failed_payment:"If payment fails, try again with a valid card or refresh the page. If money was deducted, use your payment reference when contacting support.",
+    paid_not_verified:"If payment succeeds but the website does not recognize it, admin can manually verify it after checking the payment reference/proof.",
+    refund:"For payment/refund issues, prepare your email, payment reference, and Submission ID if available.",
+    delivery_time:"The review report is expected to be ready in less than 1 hour after successful submission.",
+    pdf_only:"Yes. The final feedback report is sent to the verified email as a PDF only. PDF keeps it neat, professional, and easy to open.",
+    not_received:"Check your inbox and spam/junk folder first. If it is still missing after 1 hour, use your Submission ID when contacting support.",
+    report_contains:"The report can include an overall score over 100, review summary, strengths, weak points, risks, improvement checklist, and next-step guidance.",
+    submission_id:"Submission ID is your tracking reference. Keep it safe and include it whenever you contact support.",
+    timer:"The timer shows the expected waiting period for your report. When admin marks the report as sent, the timer stops and the sent message appears.",
+    sent_status:"When the report is sent, the website shows a green success message that is different from the normal waiting screen.",
+    confidential:"Your content is handled carefully for review purposes. Use your verified email and avoid unnecessary sensitive information.",
+    sensitive:"Do not upload passwords, bank PINs, private keys, or unnecessary confidential secrets.",
+    email_required:"Email is needed for OTP verification, report delivery, and support follow-up.",
+    feedback_only:"Feedback-only means HumanlyReview helps you understand what to improve. The final work remains yours.",
+    no_completion:"No. HumanlyReview does not complete, falsify, or submit work for users. It provides review feedback only.",
+    ai_human:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge to give clear, practical feedback.",
+    support_hours:"Support is monitored between 07:00 and 22:00 GMT. Outside that time, messages are recorded and support follows up by email.",
+    urgent_help:"For urgent help, keep your email, Submission ID, payment reference if any, and a short explanation of the issue ready."
+  };
+
+  function requireEmail(){
+    const input=byId("chatEmail");
+    if(emailReady()){
+      if(input)input.classList.remove("invalid");
+      setEmailStatus("ok","Email confirmed. You can now use the guided options.");
+      return true;
+    }
+    if(input)input.classList.add("invalid");
+    setEmailStatus("error","Please enter a valid email first. It is required before using live chat.");
+    return false;
+  }
+  function renderMenu(id){
+    if(!requireEmail())return;
+    const menu=GUIDE[id]||GUIDE.main;
+    addBot(menu.title);
+    const wrap=document.createElement("div");
+    wrap.className="guided-chat-menu";
+    menu.options.forEach(([next,label,mini])=>{
+      const b=document.createElement("button");
+      b.type="button";b.className="guided-chat-btn";
+      b.innerHTML=label+(mini?`<span class="mini">${mini}</span>`:"");
+      b.onclick=()=>handleChoice(next,label);
+      wrap.appendChild(b);
+    });
+    body().appendChild(wrap);
+    if(menu.back){
+      const nav=document.createElement("div");
+      nav.className="guided-back-row";
+      [["← Back",()=>renderMenu(menu.back)],["Main menu",()=>renderMenu("main")]].forEach(([t,fn])=>{
+        const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);
+      });
+      body().appendChild(nav);
+    }
+    body().scrollTop=body().scrollHeight;save();
+  }
+  function handleChoice(key,label){
+    if(!requireEmail())return;
+    const clean=label.replace(/^[^A-Za-z0-9]+/,"");
+    addUser(clean);
+    if(GUIDE[key]){renderMenu(key);return;}
+    const ans=ANSWERS[key]||"Thank you. Please choose a related option for more help.";
+    addBot(ans);
+    logChoice(clean,ans);
+    const nav=document.createElement("div");
+    nav.className="guided-back-row";
+    [["Main menu",()=>renderMenu("main")],["Support info",()=>renderMenu("support")]].forEach(([t,fn])=>{
+      const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);
+    });
+    body().appendChild(nav);body().scrollTop=body().scrollHeight;save();
+  }
+  window.openGuidedOnlyChat=function(){
+    const panel=byId("liveChatPanel");
+    if(panel)panel.classList.add("open");
+    if(body())body().innerHTML="";
+    addBot("Welcome to HumanlyReview 👋 Enter your email below first, then tap the option you need. No typing is required.");
+    if(emailReady())renderMenu("main");
+    else setEmailStatus("error","Enter a valid email to unlock the guided chat options.");
+  };
+  function bind(){
+    if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=window.openGuidedOnlyChat;
+    if(byId("liveChatClose"))byId("liveChatClose").onclick=function(){byId("liveChatPanel").classList.remove("open")};
+    if(byId("chatEmail"))byId("chatEmail").oninput=function(){
+      if(emailReady()){
+        this.classList.remove("invalid");
+        setEmailStatus("ok","Email confirmed. Guided options are ready.");
+        if(body() && !body().querySelector(".guided-chat-menu"))renderMenu("main");
+      }
+    };
+  }
+  bind();
+  document.addEventListener("DOMContentLoaded",bind);
+  setTimeout(bind,500);
 })();
 
 </script>
@@ -1577,31 +1898,352 @@ document.addEventListener("DOMContentLoaded",function(){
 
 
 
-/* ---- 100k Q&A Indexed Live Chat Search ---- */
+
+
+
+/* ---- Guided tick live chat override ---- */
 (function(){
-  const HR_QA={manifest:null,cache:{},loading:{},stop:new Set("the and for you your are can how what when where why who will with this that have from into about does did do not our we it is to in on of a an be as if or by at please kindly want need".split(" ")),
-    synonyms:{price:["cost","fee","charge","amount","how much","pricing","plan"],payment:["pay","paid","card","paystack","checkout","transaction","reference","charged"],report:["pdf","feedback","result","review","email","gmail","inbox"],upload:["file","attach","submit","document","paste","send"],fast:["quick","urgent","asap","immediately","soon"],design:["logo","flyer","poster","banner","visual","infographic","layout","cover"],writing:["essay","article","grammar","paragraph","manuscript","story","cv","resume"],support:["help","contact","agent","human","complaint","problem","issue"],greeting:["hello","hi","hey","good morning","good afternoon","good evening","how are you"]}};
-  function norm(t){return String(t||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();}
-  function tokens(t){return norm(t).split(" ").filter(w=>w.length>2&&!HR_QA.stop.has(w));}
-  function expand(t){let out=norm(t),low=out;Object.keys(HR_QA.synonyms).forEach(main=>HR_QA.synonyms[main].forEach(s=>{if(low.includes(s))out+=" "+main}));return out;}
-  function detectCats(text){const t=expand(text),cats=[];function add(c){if(!cats.includes(c))cats.push(c)}
-    if(/\b(hello|hi|hey|greeting|morning|afternoon|evening)\b/.test(t))add("greeting");
-    if(/\b(price|pricing|cost|fee|charge|amount|plan|trial|demo|free)\b/.test(t))add("pricing");
-    if(/\b(payment|pay|paid|paystack|card|checkout|transaction|reference|refund|charged|verify)\b/.test(t))add("payment");
-    if(/\b(report|pdf|feedback|result|delivery|time|hour|email|gmail|inbox|status|submission)\b/.test(t))add("delivery");
-    if(/\b(upload|file|attach|document|paste|submit|doc|ppt|jpg|png|image)\b/.test(t))add("upload");
-    if(/\b(service|review|writing|essay|design|logo|book|cover|architecture|slide|presentation|cv|business|poster|flyer|infographic)\b/.test(t))add("services");
-    if(/\b(privacy|private|secure|security|safe|confidential|data)\b/.test(t))add("privacy");
-    if(/\b(do my work|complete my work|write for me|submit for me|fake|cheat|plagiarism|falsify)\b/.test(t))add("ethics");
-    if(/\b(support|help|contact|agent|human|complaint|problem|issue|urgent)\b/.test(t))add("support");
-    add("general");return cats;}
-  async function loadManifest(){if(HR_QA.manifest)return HR_QA.manifest;try{const r=await fetch("manifest.json",{cache:"force-cache"}).catch(()=>fetch("manifest.json",{cache:"force-cache"}).catch(()=>fetch("chat-data/manifest.json",{cache:"force-cache"})));HR_QA.manifest=r.ok?await r.json():{categories:{},total:0}}catch(e){HR_QA.manifest={categories:{},total:0}}return HR_QA.manifest;}
-  async function loadCat(cat){await loadManifest();const files=(HR_QA.manifest.categories&&HR_QA.manifest.categories[cat])||[];if(!files.length)return[];if(HR_QA.cache[cat])return HR_QA.cache[cat];if(HR_QA.loading[cat])return HR_QA.loading[cat];HR_QA.loading[cat]=Promise.all(files.map(f=>fetch(f,{cache:"force-cache"}).then(r=>r.ok?r.json():fetch("chat-data/"+f,{cache:"force-cache"}).then(rr=>rr.ok?rr.json():[])).catch(()=>fetch("chat-data/"+f,{cache:"force-cache"}).then(rr=>rr.ok?rr.json():[]).catch(()=>[])))).then(parts=>{const arr=parts.flat();HR_QA.cache[cat]=arr;return arr});return HR_QA.loading[cat];}
-  function score(rec,expanded,userTokens,cats){let s=0;const q=norm(rec.q+" "+(rec.k||[]).join(" ")+" "+rec.c);if(cats.includes(rec.c))s+=6;userTokens.forEach(w=>{if(q.includes(w))s+=3;if((rec.k||[]).includes(w))s+=4});return s;}
-  function fallbackGreeting(message){const t=norm(message);if(/\b(hello|hi|hey)\b/.test(t))return "Hello 👋 Welcome to HumanlyReview. I can help with services, pricing, payment, file upload, PDF report delivery, or support. What would you like to know?";if(t.includes("how are you"))return "I’m doing great, thank you for asking 😊 How can I help you with HumanlyReview today?";return null;}
-  window.hrFindIndexedAnswer=async function(message){const greet=fallbackGreeting(message);if(greet)return greet;const expanded=expand(message), userTokens=tokens(expanded), cats=detectCats(expanded);const pools=await Promise.all(cats.slice(0,4).map(loadCat));const candidates=pools.flat();if(!candidates.length)return null;let best=null,bestScore=0;candidates.forEach(rec=>{const sc=score(rec,expanded,userTokens,cats);if(sc>bestScore){bestScore=sc;best=rec}});return best&&bestScore>=7?best.a:null;};
-  const oldSend=window.sendChatMessage;
-  window.sendChatMessage=async function(){const emailInput=document.getElementById("chatEmail"),input=document.getElementById("chatMessage");const email=emailInput?emailInput.value.trim():"",message=input?input.value.trim():"";if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){if(emailInput)emailInput.classList.add("invalid");const body=document.getElementById("liveChatBody");if(body){const div=document.createElement("div");div.className="chat-error-note";div.textContent="Please enter a valid email address first. Support needs it to contact you about your message.";body.appendChild(div);body.scrollTop=body.scrollHeight;}return;}if(!message)return;if(input)input.value="";const body=document.getElementById("liveChatBody");function add(text,type){if(!body)return;const div=document.createElement("div");div.className="chat-msg "+(type==="user"?"chat-user":"chat-bot");div.textContent=text;body.appendChild(div);body.scrollTop=body.scrollHeight;try{localStorage.setItem("hr_live_chat_history_v2",body.innerHTML)}catch(e){}}add(message,"user");let answer=null;try{answer=await window.hrFindIndexedAnswer(message)}catch(e){}if(answer){add(answer,"bot");try{postBackend({action:"liveChatMessage",email,message,page:location.href,clientAnswer:answer});}catch(e){}return;}if(typeof oldSend==="function"){if(input)input.value=message;return oldSend();}};
+  function byId(id){return document.getElementById(id);}
+  const GUIDE={
+    main:{title:"Hello 👋 Please choose what you need help with:",options:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts, and more"],
+      ["pricing","💳 Pricing and plans","Plans, demo, free trial"],
+      ["submit","📤 How to submit content","Email OTP, paste/upload, file limits"],
+      ["payment","🔐 Payment help","Paystack, failed payment, manual verification"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour"],
+      ["status","🧾 Submission status","Submission ID, waiting timer, report sent"],
+      ["privacy","🛡️ Privacy and safety","Confidentiality and secure use"],
+      ["policy","⚖️ Feedback-only policy","What we can and cannot do"],
+      ["support","👤 Contact support","Send a message to support"]]},
+    services:{title:"What type of work do you want reviewed?",options:[
+      ["writing","✍️ Writing review","Essays, reports, CV, letters, articles"],
+      ["design","🎨 Design / visual review","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides / presentation review","Pitch deck, PowerPoint, training slides"],
+      ["concepts","🏗️ Concept review","Architecture, product, packaging, creative concepts"],
+      ["business","💼 Business/formal review","Proposals, profiles, business documents"],
+      ["custom","✨ Custom request","Anything reviewable that is not listed"]],back:"main"},
+    pricing:{title:"Pricing and access help:",options:[
+      ["price_list","💵 What are the plans?","Choose a plan that fits your content size"],
+      ["free_trial","🎬 Is there a free trial?","No free trial; demo is provided instead"],
+      ["dollar","🌍 Why prices show in dollars?","International-friendly display"],
+      ["choose_plan","🧭 Which plan should I choose?","Quick guidance"]],back:"main"},
+    submit:{title:"Submission help:",options:[
+      ["otp","📧 Email verification / OTP","Why OTP is needed"],
+      ["paste_upload","📝 Paste or upload?","Why only one method is active"],
+      ["file_types","📎 Accepted file types","PDF, DOCX, PPTX, images, etc."],
+      ["file_limits","📦 File limits","Depends on selected plan"],
+      ["refresh_save","🔄 Page refresh / saved progress","Why progress remains"]],back:"main"},
+    payment:{title:"Payment support:",options:[
+      ["paystack","🔐 How payment works","Secure checkout through Paystack"],
+      ["failed_payment","⚠️ Payment failed","What to do next"],
+      ["paid_not_verified","✅ Paid but not verified","Admin can manually verify"],
+      ["refund","↩️ Refund/payment issue","What details to send support"]],back:"main"},
+    delivery:{title:"Report delivery:",options:[
+      ["delivery_time","⏱️ How long does it take?","Expected less than 1 hour"],
+      ["pdf_only","📄 Is the report PDF?","Yes, PDF only"],
+      ["not_received","📭 I did not receive report","Check inbox/spam, then contact support"],
+      ["report_contains","📋 What report includes","Score, strengths, weaknesses, checklist"]],back:"main"},
+    status:{title:"Submission status help:",options:[
+      ["submission_id","🧾 What is Submission ID?","Your tracking reference"],
+      ["timer","⏳ What does the timer mean?","Waiting countdown"],
+      ["sent_status","✅ What happens when report is sent?","Timer stops and success message appears"]],back:"main"},
+    privacy:{title:"Privacy and safety:",options:[
+      ["confidential","🔒 Is my content private?","Handled carefully for review"],
+      ["sensitive","🚫 What should I not upload?","Avoid passwords/private secrets"],
+      ["email_required","📧 Why email is required?","For delivery and support contact"]],back:"main"},
+    policy:{title:"Feedback-only policy:",options:[
+      ["feedback_only","✅ What does feedback-only mean?","We guide; final work remains yours"],
+      ["no_completion","🚫 Can you do my work for me?","No completion/falsification/submission"],
+      ["ai_human","🧠 Is it AI or human?","AI-based, guided by expert knowledge"]],back:"main"},
+    support:{title:"Contact support:",options:[
+      ["support_hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["send_support","✉️ Send support message","Type a message with your email"],
+      ["urgent_help","🚨 Urgent issue","What to include"]],back:"main"}
+  };
+  const ANSWERS={
+    writing:"For writing, HumanlyReview checks clarity, grammar, tone, structure, flow, readability, missing points, weak sections, and improvement steps. You receive feedback, not rewritten work.",
+    design:"For design or visual work, the report checks layout, spacing, alignment, hierarchy, color, contrast, brand impression, and professional quality.",
+    slides:"For slides and presentations, the report checks message flow, slide clarity, audience understanding, design consistency, pitch strength, and key-point arrangement.",
+    concepts:"For architecture, product, packaging, or creative concepts, the report checks idea clarity, presentation quality, practical impression, missing details, weak areas, and suggestions.",
+    business:"For business/formal work, the report checks professional tone, credibility, structure, completeness, risk signals, and reader confidence.",
+    custom:"If your work is not listed, you can still submit it as a custom request if it is reviewable. Add a clear brief so the system understands what type of feedback you want.",
+    price_list:"Plans are shown on the Pricing page. Standard is for normal review needs, Premium is for larger or more detailed work, and Enterprise is for bigger files or special requests.",
+    free_trial:"We do not offer a free trial. Instead, the website includes a demo so you can understand how the review process works before submitting.",
+    dollar:"Prices are displayed in USD for a more international and professional experience. Secure checkout is handled through Paystack.",
+    choose_plan:"Choose Standard for smaller/simple reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files, or special review needs.",
+    otp:"Email OTP confirms that the report will be delivered to the correct email. If the OTP expires, request a new code.",
+    paste_upload:"To keep the submission clean, use one main method: paste content OR upload files. If you paste, upload locks. If you upload, paste locks.",
+    file_types:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.",
+    file_limits:"File limits depend on the selected plan. The plan card shows the allowed file number and size before payment.",
+    refresh_save:"If the browser refreshes, progress is saved on that device where possible, so the user can continue instead of starting again.",
+    paystack:"Payment is processed securely through Paystack. Keep your payment reference after payment.",
+    failed_payment:"If payment fails, try again with a valid card or refresh the page. If money was deducted, contact support with your email and payment reference.",
+    paid_not_verified:"If payment succeeds but the website does not recognize it, admin can manually verify it after checking the payment reference/proof.",
+    refund:"For payment/refund issues, contact support with your email, payment reference, and Submission ID if available.",
+    delivery_time:"The review report is expected to be ready in less than 1 hour after successful submission.",
+    pdf_only:"Yes. The final feedback report is sent to the verified email as a PDF only. PDF keeps it neat, professional, and easy to open.",
+    not_received:"Check your inbox and spam/junk folder first. If it is still missing after 1 hour, contact support with your Submission ID.",
+    report_contains:"The report can include an overall score over 100, review summary, strengths, weak points, risks, improvement checklist, and next-step guidance.",
+    submission_id:"Submission ID is your tracking reference. Keep it safe and include it whenever you contact support.",
+    timer:"The timer shows the expected waiting period for your report. When admin marks the report as sent, the timer stops and the sent message appears.",
+    sent_status:"When the report is sent, the website shows a green success message that is different from the normal waiting screen.",
+    confidential:"Your content is handled carefully for review purposes. Use your verified email and avoid unnecessary sensitive information.",
+    sensitive:"Do not upload passwords, bank PINs, private keys, or unnecessary confidential secrets.",
+    email_required:"Email is needed for OTP verification, report delivery, and support follow-up.",
+    feedback_only:"Feedback-only means HumanlyReview helps you understand what to improve. The final work remains yours.",
+    no_completion:"No. HumanlyReview does not complete, falsify, or submit work for users. It provides review feedback only.",
+    ai_human:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge to give clear, practical feedback.",
+    support_hours:"Support is monitored between 07:00 and 22:00 GMT. Outside that time, messages are recorded and support follows up by email.",
+    urgent_help:"For urgent help, include your email, Submission ID, payment reference if any, and a short explanation of the issue.",
+    send_support:"Please type your message below and enter a valid email so support can contact you. Your message will also be sent to Telegram."
+  };
+  function body(){return byId("liveChatBody");}
+  function save(){try{localStorage.setItem("hr_guided_chat_v1",body().innerHTML)}catch(e){}}
+  function clearBody(){if(body())body().innerHTML="";}
+  function addBot(text){const d=document.createElement("div");d.className="chat-msg chat-bot";d.textContent=text;body().appendChild(d);body().scrollTop=body().scrollHeight;save();}
+  function addUser(text){const d=document.createElement("div");d.className="chat-msg chat-user";d.textContent=text;body().appendChild(d);body().scrollTop=body().scrollHeight;save();}
+  function renderMenu(id){
+    const menu=GUIDE[id]||GUIDE.main; addBot(menu.title);
+    const wrap=document.createElement("div"); wrap.className="guided-chat-menu";
+    menu.options.forEach(([next,label,mini])=>{
+      const b=document.createElement("button"); b.type="button"; b.className="guided-chat-btn"; b.innerHTML=label+(mini?`<span class="mini">${mini}</span>`:"");
+      b.onclick=()=>handleChoice(next,label); wrap.appendChild(b);
+    });
+    body().appendChild(wrap);
+    if(menu.back){
+      const nav=document.createElement("div"); nav.className="guided-back-row";
+      [["← Back",()=>renderMenu(menu.back)],["Main menu",()=>renderMenu("main")]].forEach(([t,fn])=>{const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);});
+      body().appendChild(nav);
+    }
+    body().scrollTop=body().scrollHeight; save();
+  }
+  function handleChoice(key,label){
+    addUser(label.replace(/^[^A-Za-z0-9]+/,""));
+    if(GUIDE[key]){renderMenu(key);return;}
+    addBot(ANSWERS[key]||"Thank you. Please choose a related option or contact support for help.");
+    if(key==="send_support"||key==="urgent_help"){const box=document.createElement("div");box.className="guided-contact-box";box.textContent="Use the email box and custom question box below. Support will reply through your email.";body().appendChild(box);showManualMode();}
+    const nav=document.createElement("div");nav.className="guided-back-row";
+    [["Main menu",()=>renderMenu("main")],["Contact support",()=>handleChoice("send_support","Contact support")]].forEach(([t,fn])=>{const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);});
+    body().appendChild(nav);body().scrollTop=body().scrollHeight;save();
+  }
+  function hideManualMode(){const form=document.querySelector(".live-chat-form");if(form)form.classList.add("manual-mode-hidden");}
+  function showManualMode(){const form=document.querySelector(".live-chat-form");if(form)form.classList.remove("manual-mode-hidden");const msg=byId("chatMessage");if(msg)msg.focus();}
+  window.openGuidedChat=function(){const panel=byId("liveChatPanel");if(panel)panel.classList.add("open");clearBody();hideManualMode();renderMenu("main");};
+  function bindGuided(){if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=window.openGuidedChat;if(byId("manualChatToggle"))byId("manualChatToggle").onclick=function(){showManualMode();addBot("No problem. Type your question below. Please enter a valid email first so support can contact you if needed.");};}
+  bindGuided();document.addEventListener("DOMContentLoaded",bindGuided);setTimeout(bindGuided,500);
+})();
+
+
+/* ---- FINAL guided-only live chat, no custom typing, email required ---- */
+(function(){
+  function byId(id){return document.getElementById(id);}
+  function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim());}
+  function email(){const el=byId("chatEmail");return el?el.value.trim():"";}
+  function emailReady(){return isEmail(email());}
+  function body(){return byId("liveChatBody");}
+  function save(){try{localStorage.setItem("hr_guided_only_chat_v1",body().innerHTML)}catch(e){}}
+  function setEmailStatus(type,msg){
+    const el=byId("guidedEmailStatus");
+    if(!el)return;
+    el.className=type==="ok"?"guided-email-ok":"guided-email-error";
+    el.textContent=msg;
+  }
+  function addBot(text){
+    const d=document.createElement("div");
+    d.className="chat-msg chat-bot";
+    d.textContent=text;
+    body().appendChild(d);
+    body().scrollTop=body().scrollHeight;
+    save();
+  }
+  function addUser(text){
+    const d=document.createElement("div");
+    d.className="chat-msg chat-user";
+    d.textContent=text;
+    body().appendChild(d);
+    body().scrollTop=body().scrollHeight;
+    save();
+  }
+  function logChoice(question,answer){
+    try{
+      postBackend({
+        action:"liveChatMessage",
+        email:email(),
+        message:"Guided option selected: "+question,
+        page:location.href,
+        clientAnswer:answer
+      });
+    }catch(e){}
+  }
+
+  const GUIDE={
+    main:{title:"Hello 👋 Please enter your email, then choose what you need help with:",options:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts, and more"],
+      ["pricing","💳 Pricing and plans","Plans, demo, free trial"],
+      ["submit","📤 How to submit content","Email OTP, paste/upload, file limits"],
+      ["payment","🔐 Payment help","Paystack, failed payment, manual verification"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour"],
+      ["status","🧾 Submission status","Submission ID, waiting timer, report sent"],
+      ["privacy","🛡️ Privacy and safety","Confidentiality and secure use"],
+      ["policy","⚖️ Feedback-only policy","What we can and cannot do"],
+      ["support","👤 Support information","Support hours and urgent help"]
+    ]},
+    services:{title:"What type of work do you want reviewed?",options:[
+      ["writing","✍️ Writing review","Essays, reports, CV, letters, articles"],
+      ["design","🎨 Design / visual review","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides / presentation review","Pitch deck, PowerPoint, training slides"],
+      ["concepts","🏗️ Concept review","Architecture, product, packaging, creative concepts"],
+      ["business","💼 Business/formal review","Proposals, profiles, business documents"],
+      ["custom","✨ Custom request","Anything reviewable that is not listed"]],back:"main"},
+    pricing:{title:"Pricing and access help:",options:[
+      ["price_list","💵 What are the plans?","Choose a plan that fits your content size"],
+      ["free_trial","🎬 Is there a free trial?","No free trial; demo is provided instead"],
+      ["dollar","🌍 Why prices show in dollars?","International-friendly display"],
+      ["choose_plan","🧭 Which plan should I choose?","Quick guidance"]],back:"main"},
+    submit:{title:"Submission help:",options:[
+      ["otp","📧 Email verification / OTP","Why OTP is needed"],
+      ["paste_upload","📝 Paste or upload?","Why only one method is active"],
+      ["file_types","📎 Accepted file types","PDF, DOCX, PPTX, images, etc."],
+      ["file_limits","📦 File limits","Depends on selected plan"],
+      ["refresh_save","🔄 Page refresh / saved progress","Why progress remains"]],back:"main"},
+    payment:{title:"Payment support:",options:[
+      ["paystack","🔐 How payment works","Secure checkout through Paystack"],
+      ["failed_payment","⚠️ Payment failed","What to do next"],
+      ["paid_not_verified","✅ Paid but not verified","Admin can manually verify"],
+      ["refund","↩️ Refund/payment issue","What details are needed"]],back:"main"},
+    delivery:{title:"Report delivery:",options:[
+      ["delivery_time","⏱️ How long does it take?","Expected less than 1 hour"],
+      ["pdf_only","📄 Is the report PDF?","Yes, PDF only"],
+      ["not_received","📭 I did not receive report","Check inbox/spam, then contact support"],
+      ["report_contains","📋 What report includes","Score, strengths, weaknesses, checklist"]],back:"main"},
+    status:{title:"Submission status help:",options:[
+      ["submission_id","🧾 What is Submission ID?","Your tracking reference"],
+      ["timer","⏳ What does the timer mean?","Waiting countdown"],
+      ["sent_status","✅ What happens when report is sent?","Timer stops and success message appears"]],back:"main"},
+    privacy:{title:"Privacy and safety:",options:[
+      ["confidential","🔒 Is my content private?","Handled carefully for review"],
+      ["sensitive","🚫 What should I not upload?","Avoid passwords/private secrets"],
+      ["email_required","📧 Why email is required?","For delivery and support contact"]],back:"main"},
+    policy:{title:"Feedback-only policy:",options:[
+      ["feedback_only","✅ What does feedback-only mean?","We guide; final work remains yours"],
+      ["no_completion","🚫 Can you do my work for me?","No completion/falsification/submission"],
+      ["ai_human","🧠 Is it AI or human?","AI-based, guided by expert knowledge"]],back:"main"},
+    support:{title:"Support information:",options:[
+      ["support_hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["urgent_help","🚨 Urgent issue","What details to prepare"],
+      ["not_received","📭 Report not received","What to check first"],
+      ["paid_not_verified","✅ Payment not verified","What to do next"]],back:"main"}
+  };
+
+  const ANSWERS={
+    writing:"For writing, HumanlyReview checks clarity, grammar, tone, structure, flow, readability, missing points, weak sections, and improvement steps. You receive feedback, not rewritten work.",
+    design:"For design or visual work, the report checks layout, spacing, alignment, hierarchy, color, contrast, brand impression, and professional quality.",
+    slides:"For slides and presentations, the report checks message flow, slide clarity, audience understanding, design consistency, pitch strength, and key-point arrangement.",
+    concepts:"For architecture, product, packaging, or creative concepts, the report checks idea clarity, presentation quality, practical impression, missing details, weak areas, and suggestions.",
+    business:"For business/formal work, the report checks professional tone, credibility, structure, completeness, risk signals, and reader confidence.",
+    custom:"If your work is not listed, you can still submit it as a custom request if it is reviewable. Choose the closest plan, upload or paste the content, and add a clear brief.",
+    price_list:"Plans are shown on the Pricing page. Standard is for normal review needs, Premium is for larger or more detailed work, and Enterprise is for bigger files or special requests.",
+    free_trial:"We do not offer a free trial. Instead, the website includes a demo so you can understand how the review process works before submitting.",
+    dollar:"Prices are displayed in USD for a more international and professional experience. Secure checkout is handled through Paystack.",
+    choose_plan:"Choose Standard for smaller/simple reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files, or special review needs.",
+    otp:"Email OTP confirms that the report will be delivered to the correct email. If the OTP expires, request a new code.",
+    paste_upload:"To keep the submission clean, use one main method: paste content OR upload files. If you paste, upload locks. If you upload, paste locks.",
+    file_types:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.",
+    file_limits:"File limits depend on the selected plan. The plan card shows the allowed file number and size before payment.",
+    refresh_save:"If the browser refreshes, progress is saved on that device where possible, so the user can continue instead of starting again.",
+    paystack:"Payment is processed securely through Paystack. Keep your payment reference after payment.",
+    failed_payment:"If payment fails, try again with a valid card or refresh the page. If money was deducted, use your payment reference when contacting support.",
+    paid_not_verified:"If payment succeeds but the website does not recognize it, admin can manually verify it after checking the payment reference/proof.",
+    refund:"For payment/refund issues, prepare your email, payment reference, and Submission ID if available.",
+    delivery_time:"The review report is expected to be ready in less than 1 hour after successful submission.",
+    pdf_only:"Yes. The final feedback report is sent to the verified email as a PDF only. PDF keeps it neat, professional, and easy to open.",
+    not_received:"Check your inbox and spam/junk folder first. If it is still missing after 1 hour, use your Submission ID when contacting support.",
+    report_contains:"The report can include an overall score over 100, review summary, strengths, weak points, risks, improvement checklist, and next-step guidance.",
+    submission_id:"Submission ID is your tracking reference. Keep it safe and include it whenever you contact support.",
+    timer:"The timer shows the expected waiting period for your report. When admin marks the report as sent, the timer stops and the sent message appears.",
+    sent_status:"When the report is sent, the website shows a green success message that is different from the normal waiting screen.",
+    confidential:"Your content is handled carefully for review purposes. Use your verified email and avoid unnecessary sensitive information.",
+    sensitive:"Do not upload passwords, bank PINs, private keys, or unnecessary confidential secrets.",
+    email_required:"Email is needed for OTP verification, report delivery, and support follow-up.",
+    feedback_only:"Feedback-only means HumanlyReview helps you understand what to improve. The final work remains yours.",
+    no_completion:"No. HumanlyReview does not complete, falsify, or submit work for users. It provides review feedback only.",
+    ai_human:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge to give clear, practical feedback.",
+    support_hours:"Support is monitored between 07:00 and 22:00 GMT. Outside that time, messages are recorded and support follows up by email.",
+    urgent_help:"For urgent help, keep your email, Submission ID, payment reference if any, and a short explanation of the issue ready."
+  };
+
+  function requireEmail(){
+    const input=byId("chatEmail");
+    if(emailReady()){
+      if(input)input.classList.remove("invalid");
+      setEmailStatus("ok","Email confirmed. You can now use the guided options.");
+      return true;
+    }
+    if(input)input.classList.add("invalid");
+    setEmailStatus("error","Please enter a valid email first. It is required before using live chat.");
+    return false;
+  }
+  function renderMenu(id){
+    if(!requireEmail())return;
+    const menu=GUIDE[id]||GUIDE.main;
+    addBot(menu.title);
+    const wrap=document.createElement("div");
+    wrap.className="guided-chat-menu";
+    menu.options.forEach(([next,label,mini])=>{
+      const b=document.createElement("button");
+      b.type="button";b.className="guided-chat-btn";
+      b.innerHTML=label+(mini?`<span class="mini">${mini}</span>`:"");
+      b.onclick=()=>handleChoice(next,label);
+      wrap.appendChild(b);
+    });
+    body().appendChild(wrap);
+    if(menu.back){
+      const nav=document.createElement("div");
+      nav.className="guided-back-row";
+      [["← Back",()=>renderMenu(menu.back)],["Main menu",()=>renderMenu("main")]].forEach(([t,fn])=>{
+        const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);
+      });
+      body().appendChild(nav);
+    }
+    body().scrollTop=body().scrollHeight;save();
+  }
+  function handleChoice(key,label){
+    if(!requireEmail())return;
+    const clean=label.replace(/^[^A-Za-z0-9]+/,"");
+    addUser(clean);
+    if(GUIDE[key]){renderMenu(key);return;}
+    const ans=ANSWERS[key]||"Thank you. Please choose a related option for more help.";
+    addBot(ans);
+    logChoice(clean,ans);
+    const nav=document.createElement("div");
+    nav.className="guided-back-row";
+    [["Main menu",()=>renderMenu("main")],["Support info",()=>renderMenu("support")]].forEach(([t,fn])=>{
+      const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);
+    });
+    body().appendChild(nav);body().scrollTop=body().scrollHeight;save();
+  }
+  window.openGuidedOnlyChat=function(){
+    const panel=byId("liveChatPanel");
+    if(panel)panel.classList.add("open");
+    if(body())body().innerHTML="";
+    addBot("Welcome to HumanlyReview 👋 Enter your email below first, then tap the option you need. No typing is required.");
+    if(emailReady())renderMenu("main");
+    else setEmailStatus("error","Enter a valid email to unlock the guided chat options.");
+  };
+  function bind(){
+    if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=window.openGuidedOnlyChat;
+    if(byId("liveChatClose"))byId("liveChatClose").onclick=function(){byId("liveChatPanel").classList.remove("open")};
+    if(byId("chatEmail"))byId("chatEmail").oninput=function(){
+      if(emailReady()){
+        this.classList.remove("invalid");
+        setEmailStatus("ok","Email confirmed. Guided options are ready.");
+        if(body() && !body().querySelector(".guided-chat-menu"))renderMenu("main");
+      }
+    };
+  }
+  bind();
+  document.addEventListener("DOMContentLoaded",bind);
+  setTimeout(bind,500);
 })();
 
 </script>
@@ -2071,6 +2713,35 @@ body.owner-unlocked #adminModal.open{
 /* ---- 100k indexed chat search UX ---- */
 .chat-source-note{font-size:11px;color:#667085;font-weight:800;margin-top:4px}
 
+
+/* ---- Minimal owner + guided tick live chat UX ---- */
+.minimal-owner-card{text-align:left!important;max-width:560px;margin:0 auto}
+.minimal-owner-card h2{font-size:clamp(42px,11vw,72px)!important;line-height:.92!important;margin:12px 0 8px!important}
+.minimal-owner-card p{font-size:clamp(17px,4vw,22px)!important;margin-bottom:18px!important}
+.minimal-owner-card .owner-safe-note,.minimal-owner-card .owner-security-message{display:none!important}
+.guided-chat-menu{display:grid;gap:8px;margin-top:6px}
+.guided-chat-btn{border:1px solid #d6e4ff;background:white;color:#101828;text-align:left;border-radius:16px;padding:11px 12px;font-weight:950;line-height:1.25;box-shadow:0 8px 18px rgba(16,24,40,.04)}
+.guided-chat-btn:hover,.guided-chat-btn:focus{border-color:#1d4ed8;background:#eef4ff}
+.guided-chat-btn .mini{display:block;color:#667085;font-size:11px;font-weight:800;margin-top:3px}
+.guided-back-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.guided-small-btn{border:1px solid #d0d5dd;background:#fff;border-radius:999px;padding:8px 10px;font-weight:950;color:#344054;font-size:12px}
+.guided-contact-box{padding:10px 12px;border-radius:16px;background:#fffaeb;border:1px solid #fedf89;color:#93370d;font-size:12px;font-weight:850;line-height:1.4}
+.live-chat-form.manual-mode-hidden .live-chat-form-row{display:none}
+.chat-mode-toggle{border:0;border-radius:14px;background:#eef4ff;color:#1d4ed8;font-weight:950;padding:10px 12px}
+.chat-email-required-note{font-size:11px;color:#667085;font-weight:850;line-height:1.35}
+.chat-msg.chat-bot{max-width:94%}
+
+
+/* ---- Guided-only no typing live chat ---- */
+.live-chat-form{display:block!important}
+.live-chat-form .live-chat-form-row,
+#manualChatToggle,
+.live-chat-form .chat-mini-note{display:none!important}
+.guided-email-gate{padding:12px;border-radius:18px;background:#eef4ff;border:1px solid #c7d7fe;color:#1d4ed8;font-weight:850;line-height:1.4;margin-bottom:10px}
+.guided-email-error{padding:10px 12px;border-radius:16px;background:#fef3f2;border:1px solid #fecdca;color:#b42318;font-size:12px;font-weight:900;line-height:1.35;margin-top:8px}
+.guided-email-ok{padding:10px 12px;border-radius:16px;background:#ecfdf3;border:1px solid #abefc6;color:#027a48;font-size:12px;font-weight:900;line-height:1.35;margin-top:8px}
+.guided-chat-btn.locked{opacity:.55;pointer-events:none}
+
 </style>
 </head>
 <body>
@@ -2228,28 +2899,28 @@ body.owner-unlocked #adminModal.open{
 
 
 
+
 <section class="page owner-page" id="page-owner">
   <div class="owner-bg safe-owner-bg">
     <div class="safe-owner-shell">
-      <div class="owner-login-card safe-owner-card">
+      <div class="owner-login-card safe-owner-card minimal-owner-card">
         <div class="owner-logo-mini">HR</div>
-        <span class="page-kicker">Private Access</span>
+        <span class="page-kicker">Private Area</span>
         <h2>Owner Login</h2>
-        <p>Enter your private admin PIN. The editor opens only after successful verification.</p>
-        <div class="owner-security-message">For security, this page does not show owner tools before login.</div>
+        <p>Enter your private PIN to continue.</p>
         <label>Admin PIN
           <div class="pin-wrap premium-pin">
-            <input id="ownerPagePin" type="password" placeholder="Enter your admin PIN" autocomplete="current-password">
+            <input id="ownerPagePin" type="password" placeholder="Enter PIN" autocomplete="current-password">
             <button class="pin-toggle" type="button" id="toggleOwnerPinBtn" aria-label="Show PIN">👁️</button>
           </div>
         </label>
-        <button class="btn primary owner-login-button" type="button" id="ownerPageLoginBtn">Open Owner Dashboard</button>
+        <button class="btn primary owner-login-button" type="button" id="ownerPageLoginBtn">Login</button>
         <div id="ownerPageMessage" class="field-note"></div>
-        <div class="owner-safe-note">If you are not the website owner, please return to the homepage.</div>
       </div>
     </div>
   </div>
 </section>
+
 
 
 
@@ -3752,31 +4423,352 @@ document.addEventListener("DOMContentLoaded",function(){
 
 
 
-/* ---- 100k Q&A Indexed Live Chat Search ---- */
+
+
+
+/* ---- Guided tick live chat override ---- */
 (function(){
-  const HR_QA={manifest:null,cache:{},loading:{},stop:new Set("the and for you your are can how what when where why who will with this that have from into about does did do not our we it is to in on of a an be as if or by at please kindly want need".split(" ")),
-    synonyms:{price:["cost","fee","charge","amount","how much","pricing","plan"],payment:["pay","paid","card","paystack","checkout","transaction","reference","charged"],report:["pdf","feedback","result","review","email","gmail","inbox"],upload:["file","attach","submit","document","paste","send"],fast:["quick","urgent","asap","immediately","soon"],design:["logo","flyer","poster","banner","visual","infographic","layout","cover"],writing:["essay","article","grammar","paragraph","manuscript","story","cv","resume"],support:["help","contact","agent","human","complaint","problem","issue"],greeting:["hello","hi","hey","good morning","good afternoon","good evening","how are you"]}};
-  function norm(t){return String(t||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();}
-  function tokens(t){return norm(t).split(" ").filter(w=>w.length>2&&!HR_QA.stop.has(w));}
-  function expand(t){let out=norm(t),low=out;Object.keys(HR_QA.synonyms).forEach(main=>HR_QA.synonyms[main].forEach(s=>{if(low.includes(s))out+=" "+main}));return out;}
-  function detectCats(text){const t=expand(text),cats=[];function add(c){if(!cats.includes(c))cats.push(c)}
-    if(/\b(hello|hi|hey|greeting|morning|afternoon|evening)\b/.test(t))add("greeting");
-    if(/\b(price|pricing|cost|fee|charge|amount|plan|trial|demo|free)\b/.test(t))add("pricing");
-    if(/\b(payment|pay|paid|paystack|card|checkout|transaction|reference|refund|charged|verify)\b/.test(t))add("payment");
-    if(/\b(report|pdf|feedback|result|delivery|time|hour|email|gmail|inbox|status|submission)\b/.test(t))add("delivery");
-    if(/\b(upload|file|attach|document|paste|submit|doc|ppt|jpg|png|image)\b/.test(t))add("upload");
-    if(/\b(service|review|writing|essay|design|logo|book|cover|architecture|slide|presentation|cv|business|poster|flyer|infographic)\b/.test(t))add("services");
-    if(/\b(privacy|private|secure|security|safe|confidential|data)\b/.test(t))add("privacy");
-    if(/\b(do my work|complete my work|write for me|submit for me|fake|cheat|plagiarism|falsify)\b/.test(t))add("ethics");
-    if(/\b(support|help|contact|agent|human|complaint|problem|issue|urgent)\b/.test(t))add("support");
-    add("general");return cats;}
-  async function loadManifest(){if(HR_QA.manifest)return HR_QA.manifest;try{const r=await fetch("manifest.json",{cache:"force-cache"}).catch(()=>fetch("manifest.json",{cache:"force-cache"}).catch(()=>fetch("chat-data/manifest.json",{cache:"force-cache"})));HR_QA.manifest=r.ok?await r.json():{categories:{},total:0}}catch(e){HR_QA.manifest={categories:{},total:0}}return HR_QA.manifest;}
-  async function loadCat(cat){await loadManifest();const files=(HR_QA.manifest.categories&&HR_QA.manifest.categories[cat])||[];if(!files.length)return[];if(HR_QA.cache[cat])return HR_QA.cache[cat];if(HR_QA.loading[cat])return HR_QA.loading[cat];HR_QA.loading[cat]=Promise.all(files.map(f=>fetch(f,{cache:"force-cache"}).then(r=>r.ok?r.json():fetch("chat-data/"+f,{cache:"force-cache"}).then(rr=>rr.ok?rr.json():[])).catch(()=>fetch("chat-data/"+f,{cache:"force-cache"}).then(rr=>rr.ok?rr.json():[]).catch(()=>[])))).then(parts=>{const arr=parts.flat();HR_QA.cache[cat]=arr;return arr});return HR_QA.loading[cat];}
-  function score(rec,expanded,userTokens,cats){let s=0;const q=norm(rec.q+" "+(rec.k||[]).join(" ")+" "+rec.c);if(cats.includes(rec.c))s+=6;userTokens.forEach(w=>{if(q.includes(w))s+=3;if((rec.k||[]).includes(w))s+=4});return s;}
-  function fallbackGreeting(message){const t=norm(message);if(/\b(hello|hi|hey)\b/.test(t))return "Hello 👋 Welcome to HumanlyReview. I can help with services, pricing, payment, file upload, PDF report delivery, or support. What would you like to know?";if(t.includes("how are you"))return "I’m doing great, thank you for asking 😊 How can I help you with HumanlyReview today?";return null;}
-  window.hrFindIndexedAnswer=async function(message){const greet=fallbackGreeting(message);if(greet)return greet;const expanded=expand(message), userTokens=tokens(expanded), cats=detectCats(expanded);const pools=await Promise.all(cats.slice(0,4).map(loadCat));const candidates=pools.flat();if(!candidates.length)return null;let best=null,bestScore=0;candidates.forEach(rec=>{const sc=score(rec,expanded,userTokens,cats);if(sc>bestScore){bestScore=sc;best=rec}});return best&&bestScore>=7?best.a:null;};
-  const oldSend=window.sendChatMessage;
-  window.sendChatMessage=async function(){const emailInput=document.getElementById("chatEmail"),input=document.getElementById("chatMessage");const email=emailInput?emailInput.value.trim():"",message=input?input.value.trim():"";if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){if(emailInput)emailInput.classList.add("invalid");const body=document.getElementById("liveChatBody");if(body){const div=document.createElement("div");div.className="chat-error-note";div.textContent="Please enter a valid email address first. Support needs it to contact you about your message.";body.appendChild(div);body.scrollTop=body.scrollHeight;}return;}if(!message)return;if(input)input.value="";const body=document.getElementById("liveChatBody");function add(text,type){if(!body)return;const div=document.createElement("div");div.className="chat-msg "+(type==="user"?"chat-user":"chat-bot");div.textContent=text;body.appendChild(div);body.scrollTop=body.scrollHeight;try{localStorage.setItem("hr_live_chat_history_v2",body.innerHTML)}catch(e){}}add(message,"user");let answer=null;try{answer=await window.hrFindIndexedAnswer(message)}catch(e){}if(answer){add(answer,"bot");try{postBackend({action:"liveChatMessage",email,message,page:location.href,clientAnswer:answer});}catch(e){}return;}if(typeof oldSend==="function"){if(input)input.value=message;return oldSend();}};
+  function byId(id){return document.getElementById(id);}
+  const GUIDE={
+    main:{title:"Hello 👋 Please choose what you need help with:",options:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts, and more"],
+      ["pricing","💳 Pricing and plans","Plans, demo, free trial"],
+      ["submit","📤 How to submit content","Email OTP, paste/upload, file limits"],
+      ["payment","🔐 Payment help","Paystack, failed payment, manual verification"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour"],
+      ["status","🧾 Submission status","Submission ID, waiting timer, report sent"],
+      ["privacy","🛡️ Privacy and safety","Confidentiality and secure use"],
+      ["policy","⚖️ Feedback-only policy","What we can and cannot do"],
+      ["support","👤 Contact support","Send a message to support"]]},
+    services:{title:"What type of work do you want reviewed?",options:[
+      ["writing","✍️ Writing review","Essays, reports, CV, letters, articles"],
+      ["design","🎨 Design / visual review","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides / presentation review","Pitch deck, PowerPoint, training slides"],
+      ["concepts","🏗️ Concept review","Architecture, product, packaging, creative concepts"],
+      ["business","💼 Business/formal review","Proposals, profiles, business documents"],
+      ["custom","✨ Custom request","Anything reviewable that is not listed"]],back:"main"},
+    pricing:{title:"Pricing and access help:",options:[
+      ["price_list","💵 What are the plans?","Choose a plan that fits your content size"],
+      ["free_trial","🎬 Is there a free trial?","No free trial; demo is provided instead"],
+      ["dollar","🌍 Why prices show in dollars?","International-friendly display"],
+      ["choose_plan","🧭 Which plan should I choose?","Quick guidance"]],back:"main"},
+    submit:{title:"Submission help:",options:[
+      ["otp","📧 Email verification / OTP","Why OTP is needed"],
+      ["paste_upload","📝 Paste or upload?","Why only one method is active"],
+      ["file_types","📎 Accepted file types","PDF, DOCX, PPTX, images, etc."],
+      ["file_limits","📦 File limits","Depends on selected plan"],
+      ["refresh_save","🔄 Page refresh / saved progress","Why progress remains"]],back:"main"},
+    payment:{title:"Payment support:",options:[
+      ["paystack","🔐 How payment works","Secure checkout through Paystack"],
+      ["failed_payment","⚠️ Payment failed","What to do next"],
+      ["paid_not_verified","✅ Paid but not verified","Admin can manually verify"],
+      ["refund","↩️ Refund/payment issue","What details to send support"]],back:"main"},
+    delivery:{title:"Report delivery:",options:[
+      ["delivery_time","⏱️ How long does it take?","Expected less than 1 hour"],
+      ["pdf_only","📄 Is the report PDF?","Yes, PDF only"],
+      ["not_received","📭 I did not receive report","Check inbox/spam, then contact support"],
+      ["report_contains","📋 What report includes","Score, strengths, weaknesses, checklist"]],back:"main"},
+    status:{title:"Submission status help:",options:[
+      ["submission_id","🧾 What is Submission ID?","Your tracking reference"],
+      ["timer","⏳ What does the timer mean?","Waiting countdown"],
+      ["sent_status","✅ What happens when report is sent?","Timer stops and success message appears"]],back:"main"},
+    privacy:{title:"Privacy and safety:",options:[
+      ["confidential","🔒 Is my content private?","Handled carefully for review"],
+      ["sensitive","🚫 What should I not upload?","Avoid passwords/private secrets"],
+      ["email_required","📧 Why email is required?","For delivery and support contact"]],back:"main"},
+    policy:{title:"Feedback-only policy:",options:[
+      ["feedback_only","✅ What does feedback-only mean?","We guide; final work remains yours"],
+      ["no_completion","🚫 Can you do my work for me?","No completion/falsification/submission"],
+      ["ai_human","🧠 Is it AI or human?","AI-based, guided by expert knowledge"]],back:"main"},
+    support:{title:"Contact support:",options:[
+      ["support_hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["send_support","✉️ Send support message","Type a message with your email"],
+      ["urgent_help","🚨 Urgent issue","What to include"]],back:"main"}
+  };
+  const ANSWERS={
+    writing:"For writing, HumanlyReview checks clarity, grammar, tone, structure, flow, readability, missing points, weak sections, and improvement steps. You receive feedback, not rewritten work.",
+    design:"For design or visual work, the report checks layout, spacing, alignment, hierarchy, color, contrast, brand impression, and professional quality.",
+    slides:"For slides and presentations, the report checks message flow, slide clarity, audience understanding, design consistency, pitch strength, and key-point arrangement.",
+    concepts:"For architecture, product, packaging, or creative concepts, the report checks idea clarity, presentation quality, practical impression, missing details, weak areas, and suggestions.",
+    business:"For business/formal work, the report checks professional tone, credibility, structure, completeness, risk signals, and reader confidence.",
+    custom:"If your work is not listed, you can still submit it as a custom request if it is reviewable. Add a clear brief so the system understands what type of feedback you want.",
+    price_list:"Plans are shown on the Pricing page. Standard is for normal review needs, Premium is for larger or more detailed work, and Enterprise is for bigger files or special requests.",
+    free_trial:"We do not offer a free trial. Instead, the website includes a demo so you can understand how the review process works before submitting.",
+    dollar:"Prices are displayed in USD for a more international and professional experience. Secure checkout is handled through Paystack.",
+    choose_plan:"Choose Standard for smaller/simple reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files, or special review needs.",
+    otp:"Email OTP confirms that the report will be delivered to the correct email. If the OTP expires, request a new code.",
+    paste_upload:"To keep the submission clean, use one main method: paste content OR upload files. If you paste, upload locks. If you upload, paste locks.",
+    file_types:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.",
+    file_limits:"File limits depend on the selected plan. The plan card shows the allowed file number and size before payment.",
+    refresh_save:"If the browser refreshes, progress is saved on that device where possible, so the user can continue instead of starting again.",
+    paystack:"Payment is processed securely through Paystack. Keep your payment reference after payment.",
+    failed_payment:"If payment fails, try again with a valid card or refresh the page. If money was deducted, contact support with your email and payment reference.",
+    paid_not_verified:"If payment succeeds but the website does not recognize it, admin can manually verify it after checking the payment reference/proof.",
+    refund:"For payment/refund issues, contact support with your email, payment reference, and Submission ID if available.",
+    delivery_time:"The review report is expected to be ready in less than 1 hour after successful submission.",
+    pdf_only:"Yes. The final feedback report is sent to the verified email as a PDF only. PDF keeps it neat, professional, and easy to open.",
+    not_received:"Check your inbox and spam/junk folder first. If it is still missing after 1 hour, contact support with your Submission ID.",
+    report_contains:"The report can include an overall score over 100, review summary, strengths, weak points, risks, improvement checklist, and next-step guidance.",
+    submission_id:"Submission ID is your tracking reference. Keep it safe and include it whenever you contact support.",
+    timer:"The timer shows the expected waiting period for your report. When admin marks the report as sent, the timer stops and the sent message appears.",
+    sent_status:"When the report is sent, the website shows a green success message that is different from the normal waiting screen.",
+    confidential:"Your content is handled carefully for review purposes. Use your verified email and avoid unnecessary sensitive information.",
+    sensitive:"Do not upload passwords, bank PINs, private keys, or unnecessary confidential secrets.",
+    email_required:"Email is needed for OTP verification, report delivery, and support follow-up.",
+    feedback_only:"Feedback-only means HumanlyReview helps you understand what to improve. The final work remains yours.",
+    no_completion:"No. HumanlyReview does not complete, falsify, or submit work for users. It provides review feedback only.",
+    ai_human:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge to give clear, practical feedback.",
+    support_hours:"Support is monitored between 07:00 and 22:00 GMT. Outside that time, messages are recorded and support follows up by email.",
+    urgent_help:"For urgent help, include your email, Submission ID, payment reference if any, and a short explanation of the issue.",
+    send_support:"Please type your message below and enter a valid email so support can contact you. Your message will also be sent to Telegram."
+  };
+  function body(){return byId("liveChatBody");}
+  function save(){try{localStorage.setItem("hr_guided_chat_v1",body().innerHTML)}catch(e){}}
+  function clearBody(){if(body())body().innerHTML="";}
+  function addBot(text){const d=document.createElement("div");d.className="chat-msg chat-bot";d.textContent=text;body().appendChild(d);body().scrollTop=body().scrollHeight;save();}
+  function addUser(text){const d=document.createElement("div");d.className="chat-msg chat-user";d.textContent=text;body().appendChild(d);body().scrollTop=body().scrollHeight;save();}
+  function renderMenu(id){
+    const menu=GUIDE[id]||GUIDE.main; addBot(menu.title);
+    const wrap=document.createElement("div"); wrap.className="guided-chat-menu";
+    menu.options.forEach(([next,label,mini])=>{
+      const b=document.createElement("button"); b.type="button"; b.className="guided-chat-btn"; b.innerHTML=label+(mini?`<span class="mini">${mini}</span>`:"");
+      b.onclick=()=>handleChoice(next,label); wrap.appendChild(b);
+    });
+    body().appendChild(wrap);
+    if(menu.back){
+      const nav=document.createElement("div"); nav.className="guided-back-row";
+      [["← Back",()=>renderMenu(menu.back)],["Main menu",()=>renderMenu("main")]].forEach(([t,fn])=>{const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);});
+      body().appendChild(nav);
+    }
+    body().scrollTop=body().scrollHeight; save();
+  }
+  function handleChoice(key,label){
+    addUser(label.replace(/^[^A-Za-z0-9]+/,""));
+    if(GUIDE[key]){renderMenu(key);return;}
+    addBot(ANSWERS[key]||"Thank you. Please choose a related option or contact support for help.");
+    if(key==="send_support"||key==="urgent_help"){const box=document.createElement("div");box.className="guided-contact-box";box.textContent="Use the email box and custom question box below. Support will reply through your email.";body().appendChild(box);showManualMode();}
+    const nav=document.createElement("div");nav.className="guided-back-row";
+    [["Main menu",()=>renderMenu("main")],["Contact support",()=>handleChoice("send_support","Contact support")]].forEach(([t,fn])=>{const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);});
+    body().appendChild(nav);body().scrollTop=body().scrollHeight;save();
+  }
+  function hideManualMode(){const form=document.querySelector(".live-chat-form");if(form)form.classList.add("manual-mode-hidden");}
+  function showManualMode(){const form=document.querySelector(".live-chat-form");if(form)form.classList.remove("manual-mode-hidden");const msg=byId("chatMessage");if(msg)msg.focus();}
+  window.openGuidedChat=function(){const panel=byId("liveChatPanel");if(panel)panel.classList.add("open");clearBody();hideManualMode();renderMenu("main");};
+  function bindGuided(){if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=window.openGuidedChat;if(byId("manualChatToggle"))byId("manualChatToggle").onclick=function(){showManualMode();addBot("No problem. Type your question below. Please enter a valid email first so support can contact you if needed.");};}
+  bindGuided();document.addEventListener("DOMContentLoaded",bindGuided);setTimeout(bindGuided,500);
+})();
+
+
+/* ---- FINAL guided-only live chat, no custom typing, email required ---- */
+(function(){
+  function byId(id){return document.getElementById(id);}
+  function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim());}
+  function email(){const el=byId("chatEmail");return el?el.value.trim():"";}
+  function emailReady(){return isEmail(email());}
+  function body(){return byId("liveChatBody");}
+  function save(){try{localStorage.setItem("hr_guided_only_chat_v1",body().innerHTML)}catch(e){}}
+  function setEmailStatus(type,msg){
+    const el=byId("guidedEmailStatus");
+    if(!el)return;
+    el.className=type==="ok"?"guided-email-ok":"guided-email-error";
+    el.textContent=msg;
+  }
+  function addBot(text){
+    const d=document.createElement("div");
+    d.className="chat-msg chat-bot";
+    d.textContent=text;
+    body().appendChild(d);
+    body().scrollTop=body().scrollHeight;
+    save();
+  }
+  function addUser(text){
+    const d=document.createElement("div");
+    d.className="chat-msg chat-user";
+    d.textContent=text;
+    body().appendChild(d);
+    body().scrollTop=body().scrollHeight;
+    save();
+  }
+  function logChoice(question,answer){
+    try{
+      postBackend({
+        action:"liveChatMessage",
+        email:email(),
+        message:"Guided option selected: "+question,
+        page:location.href,
+        clientAnswer:answer
+      });
+    }catch(e){}
+  }
+
+  const GUIDE={
+    main:{title:"Hello 👋 Please enter your email, then choose what you need help with:",options:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts, and more"],
+      ["pricing","💳 Pricing and plans","Plans, demo, free trial"],
+      ["submit","📤 How to submit content","Email OTP, paste/upload, file limits"],
+      ["payment","🔐 Payment help","Paystack, failed payment, manual verification"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour"],
+      ["status","🧾 Submission status","Submission ID, waiting timer, report sent"],
+      ["privacy","🛡️ Privacy and safety","Confidentiality and secure use"],
+      ["policy","⚖️ Feedback-only policy","What we can and cannot do"],
+      ["support","👤 Support information","Support hours and urgent help"]
+    ]},
+    services:{title:"What type of work do you want reviewed?",options:[
+      ["writing","✍️ Writing review","Essays, reports, CV, letters, articles"],
+      ["design","🎨 Design / visual review","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides / presentation review","Pitch deck, PowerPoint, training slides"],
+      ["concepts","🏗️ Concept review","Architecture, product, packaging, creative concepts"],
+      ["business","💼 Business/formal review","Proposals, profiles, business documents"],
+      ["custom","✨ Custom request","Anything reviewable that is not listed"]],back:"main"},
+    pricing:{title:"Pricing and access help:",options:[
+      ["price_list","💵 What are the plans?","Choose a plan that fits your content size"],
+      ["free_trial","🎬 Is there a free trial?","No free trial; demo is provided instead"],
+      ["dollar","🌍 Why prices show in dollars?","International-friendly display"],
+      ["choose_plan","🧭 Which plan should I choose?","Quick guidance"]],back:"main"},
+    submit:{title:"Submission help:",options:[
+      ["otp","📧 Email verification / OTP","Why OTP is needed"],
+      ["paste_upload","📝 Paste or upload?","Why only one method is active"],
+      ["file_types","📎 Accepted file types","PDF, DOCX, PPTX, images, etc."],
+      ["file_limits","📦 File limits","Depends on selected plan"],
+      ["refresh_save","🔄 Page refresh / saved progress","Why progress remains"]],back:"main"},
+    payment:{title:"Payment support:",options:[
+      ["paystack","🔐 How payment works","Secure checkout through Paystack"],
+      ["failed_payment","⚠️ Payment failed","What to do next"],
+      ["paid_not_verified","✅ Paid but not verified","Admin can manually verify"],
+      ["refund","↩️ Refund/payment issue","What details are needed"]],back:"main"},
+    delivery:{title:"Report delivery:",options:[
+      ["delivery_time","⏱️ How long does it take?","Expected less than 1 hour"],
+      ["pdf_only","📄 Is the report PDF?","Yes, PDF only"],
+      ["not_received","📭 I did not receive report","Check inbox/spam, then contact support"],
+      ["report_contains","📋 What report includes","Score, strengths, weaknesses, checklist"]],back:"main"},
+    status:{title:"Submission status help:",options:[
+      ["submission_id","🧾 What is Submission ID?","Your tracking reference"],
+      ["timer","⏳ What does the timer mean?","Waiting countdown"],
+      ["sent_status","✅ What happens when report is sent?","Timer stops and success message appears"]],back:"main"},
+    privacy:{title:"Privacy and safety:",options:[
+      ["confidential","🔒 Is my content private?","Handled carefully for review"],
+      ["sensitive","🚫 What should I not upload?","Avoid passwords/private secrets"],
+      ["email_required","📧 Why email is required?","For delivery and support contact"]],back:"main"},
+    policy:{title:"Feedback-only policy:",options:[
+      ["feedback_only","✅ What does feedback-only mean?","We guide; final work remains yours"],
+      ["no_completion","🚫 Can you do my work for me?","No completion/falsification/submission"],
+      ["ai_human","🧠 Is it AI or human?","AI-based, guided by expert knowledge"]],back:"main"},
+    support:{title:"Support information:",options:[
+      ["support_hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["urgent_help","🚨 Urgent issue","What details to prepare"],
+      ["not_received","📭 Report not received","What to check first"],
+      ["paid_not_verified","✅ Payment not verified","What to do next"]],back:"main"}
+  };
+
+  const ANSWERS={
+    writing:"For writing, HumanlyReview checks clarity, grammar, tone, structure, flow, readability, missing points, weak sections, and improvement steps. You receive feedback, not rewritten work.",
+    design:"For design or visual work, the report checks layout, spacing, alignment, hierarchy, color, contrast, brand impression, and professional quality.",
+    slides:"For slides and presentations, the report checks message flow, slide clarity, audience understanding, design consistency, pitch strength, and key-point arrangement.",
+    concepts:"For architecture, product, packaging, or creative concepts, the report checks idea clarity, presentation quality, practical impression, missing details, weak areas, and suggestions.",
+    business:"For business/formal work, the report checks professional tone, credibility, structure, completeness, risk signals, and reader confidence.",
+    custom:"If your work is not listed, you can still submit it as a custom request if it is reviewable. Choose the closest plan, upload or paste the content, and add a clear brief.",
+    price_list:"Plans are shown on the Pricing page. Standard is for normal review needs, Premium is for larger or more detailed work, and Enterprise is for bigger files or special requests.",
+    free_trial:"We do not offer a free trial. Instead, the website includes a demo so you can understand how the review process works before submitting.",
+    dollar:"Prices are displayed in USD for a more international and professional experience. Secure checkout is handled through Paystack.",
+    choose_plan:"Choose Standard for smaller/simple reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files, or special review needs.",
+    otp:"Email OTP confirms that the report will be delivered to the correct email. If the OTP expires, request a new code.",
+    paste_upload:"To keep the submission clean, use one main method: paste content OR upload files. If you paste, upload locks. If you upload, paste locks.",
+    file_types:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG, and PNG.",
+    file_limits:"File limits depend on the selected plan. The plan card shows the allowed file number and size before payment.",
+    refresh_save:"If the browser refreshes, progress is saved on that device where possible, so the user can continue instead of starting again.",
+    paystack:"Payment is processed securely through Paystack. Keep your payment reference after payment.",
+    failed_payment:"If payment fails, try again with a valid card or refresh the page. If money was deducted, use your payment reference when contacting support.",
+    paid_not_verified:"If payment succeeds but the website does not recognize it, admin can manually verify it after checking the payment reference/proof.",
+    refund:"For payment/refund issues, prepare your email, payment reference, and Submission ID if available.",
+    delivery_time:"The review report is expected to be ready in less than 1 hour after successful submission.",
+    pdf_only:"Yes. The final feedback report is sent to the verified email as a PDF only. PDF keeps it neat, professional, and easy to open.",
+    not_received:"Check your inbox and spam/junk folder first. If it is still missing after 1 hour, use your Submission ID when contacting support.",
+    report_contains:"The report can include an overall score over 100, review summary, strengths, weak points, risks, improvement checklist, and next-step guidance.",
+    submission_id:"Submission ID is your tracking reference. Keep it safe and include it whenever you contact support.",
+    timer:"The timer shows the expected waiting period for your report. When admin marks the report as sent, the timer stops and the sent message appears.",
+    sent_status:"When the report is sent, the website shows a green success message that is different from the normal waiting screen.",
+    confidential:"Your content is handled carefully for review purposes. Use your verified email and avoid unnecessary sensitive information.",
+    sensitive:"Do not upload passwords, bank PINs, private keys, or unnecessary confidential secrets.",
+    email_required:"Email is needed for OTP verification, report delivery, and support follow-up.",
+    feedback_only:"Feedback-only means HumanlyReview helps you understand what to improve. The final work remains yours.",
+    no_completion:"No. HumanlyReview does not complete, falsify, or submit work for users. It provides review feedback only.",
+    ai_human:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge to give clear, practical feedback.",
+    support_hours:"Support is monitored between 07:00 and 22:00 GMT. Outside that time, messages are recorded and support follows up by email.",
+    urgent_help:"For urgent help, keep your email, Submission ID, payment reference if any, and a short explanation of the issue ready."
+  };
+
+  function requireEmail(){
+    const input=byId("chatEmail");
+    if(emailReady()){
+      if(input)input.classList.remove("invalid");
+      setEmailStatus("ok","Email confirmed. You can now use the guided options.");
+      return true;
+    }
+    if(input)input.classList.add("invalid");
+    setEmailStatus("error","Please enter a valid email first. It is required before using live chat.");
+    return false;
+  }
+  function renderMenu(id){
+    if(!requireEmail())return;
+    const menu=GUIDE[id]||GUIDE.main;
+    addBot(menu.title);
+    const wrap=document.createElement("div");
+    wrap.className="guided-chat-menu";
+    menu.options.forEach(([next,label,mini])=>{
+      const b=document.createElement("button");
+      b.type="button";b.className="guided-chat-btn";
+      b.innerHTML=label+(mini?`<span class="mini">${mini}</span>`:"");
+      b.onclick=()=>handleChoice(next,label);
+      wrap.appendChild(b);
+    });
+    body().appendChild(wrap);
+    if(menu.back){
+      const nav=document.createElement("div");
+      nav.className="guided-back-row";
+      [["← Back",()=>renderMenu(menu.back)],["Main menu",()=>renderMenu("main")]].forEach(([t,fn])=>{
+        const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);
+      });
+      body().appendChild(nav);
+    }
+    body().scrollTop=body().scrollHeight;save();
+  }
+  function handleChoice(key,label){
+    if(!requireEmail())return;
+    const clean=label.replace(/^[^A-Za-z0-9]+/,"");
+    addUser(clean);
+    if(GUIDE[key]){renderMenu(key);return;}
+    const ans=ANSWERS[key]||"Thank you. Please choose a related option for more help.";
+    addBot(ans);
+    logChoice(clean,ans);
+    const nav=document.createElement("div");
+    nav.className="guided-back-row";
+    [["Main menu",()=>renderMenu("main")],["Support info",()=>renderMenu("support")]].forEach(([t,fn])=>{
+      const b=document.createElement("button");b.className="guided-small-btn";b.type="button";b.textContent=t;b.onclick=fn;nav.appendChild(b);
+    });
+    body().appendChild(nav);body().scrollTop=body().scrollHeight;save();
+  }
+  window.openGuidedOnlyChat=function(){
+    const panel=byId("liveChatPanel");
+    if(panel)panel.classList.add("open");
+    if(body())body().innerHTML="";
+    addBot("Welcome to HumanlyReview 👋 Enter your email below first, then tap the option you need. No typing is required.");
+    if(emailReady())renderMenu("main");
+    else setEmailStatus("error","Enter a valid email to unlock the guided chat options.");
+  };
+  function bind(){
+    if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=window.openGuidedOnlyChat;
+    if(byId("liveChatClose"))byId("liveChatClose").onclick=function(){byId("liveChatPanel").classList.remove("open")};
+    if(byId("chatEmail"))byId("chatEmail").oninput=function(){
+      if(emailReady()){
+        this.classList.remove("invalid");
+        setEmailStatus("ok","Email confirmed. Guided options are ready.");
+        if(body() && !body().querySelector(".guided-chat-menu"))renderMenu("main");
+      }
+    };
+  }
+  bind();
+  document.addEventListener("DOMContentLoaded",bind);
+  setTimeout(bind,500);
 })();
 
 </script>
@@ -3791,15 +4783,18 @@ document.addEventListener("DOMContentLoaded",function(){
     <button class="live-chat-close" id="liveChatClose" type="button">×</button>
   </div>
   <div class="live-chat-body" id="liveChatBody"></div>
-  <div class="live-chat-form">
-    <input id="chatEmail" type="email" placeholder="Enter your email so support can contact you" required>
-    <div class="live-chat-form-row">
-      <textarea id="chatMessage" placeholder="Type your message here..."></textarea>
-      <button class="live-chat-send" id="liveChatSend" type="button">Send</button>
-    </div>
-    <div class="chat-mini-note">Email is required so support can contact you. Instant help is provided first, and your message is also sent to support.</div>
+  
+<div class="live-chat-form">
+  <div class="guided-email-gate">Enter your email first. After that, use the tap options in the chat. No typing is required.</div>
+  <input id="chatEmail" type="email" placeholder="Enter your email to continue" required>
+  <div id="guidedEmailStatus"></div>
+  <div class="live-chat-form-row" aria-hidden="true">
+    <textarea id="chatMessage" placeholder=""></textarea>
+    <button class="live-chat-send" id="liveChatSend" type="button">Send</button>
   </div>
 </div>
+</div>
+
 
 </body>
 </html>
