@@ -1,0 +1,60 @@
+HumanlyReview Telegram Owner Control Setup
+
+What this adds:
+- Passworded Telegram owner login.
+- Control what notifications enter Telegram.
+- View stats and summaries.
+- List submissions.
+- Verify payment.
+- Mark report as sent.
+- Delete/hide submissions.
+- Change admin PIN.
+- Adjust support hours.
+
+Important limitation:
+Telegram can control backend/admin actions and settings.
+Telegram cannot rewrite your GitHub website design unless you upload a new index.html.
+
+STEP 1 - Apps Script
+Replace Code.gs with the Code.gs in this package.
+Save.
+Deploy > Manage deployments > Edit pencil > New version > Deploy.
+
+STEP 2 - Set Telegram webhook
+Copy your Apps Script Web App URL.
+In Apps Script, run this function manually once:
+
+setTelegramWebhook("PASTE_YOUR_WEB_APP_URL_HERE")
+
+STEP 3 - Login in Telegram
+Open your Telegram bot and send:
+/login YOUR_ADMIN_PIN
+
+Main commands:
+/help
+/settings
+/stats
+/summary
+/active
+/unpaid
+/paid
+/sent
+/details SUBMISSION_ID
+/verify SUBMISSION_ID
+/marksent SUBMISSION_ID
+/delete SUBMISSION_ID
+
+Notification controls:
+/notify submissions on
+/notify submissions off
+/notify chats on
+/notify chats off
+/notify payments on
+/notify status off
+/compact on
+/maxlist 10
+/hours 7 22
+
+Security:
+/pin OLD_PIN NEW_PIN
+/logout
