@@ -1,0 +1,28 @@
+GitHub Small File Upload Version
+
+Why this version exists:
+GitHub failed because at least one old JSON file was too large for browser upload.
+
+This version splits the 100k Q&A data into many smaller files.
+
+Upload to GitHub:
+- index.html
+- README.md
+- .nojekyll
+- manifest.json
+- every file starting with qa_ and ending with .json
+
+Do NOT upload Code.gs to GitHub.
+Code.gs goes to Google Apps Script only.
+
+Number of QA JSON files: 517
+Largest file in this package: index.html = 0.25 MB
+Total JSON size: 48.95 MB
+
+Easiest mobile method:
+1. Upload index.html, README.md, .nojekyll, manifest.json first.
+2. Then upload qa_*.json files in groups of 20-50 files.
+3. Commit each group.
+4. Repeat until all qa_*.json files are uploaded.
+
+If GitHub fails again, upload fewer files per group, such as 10 files at a time.

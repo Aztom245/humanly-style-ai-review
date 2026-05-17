@@ -1,0 +1,33 @@
+HumanlyReview Easy Upload Version
+
+This version works in BOTH cases:
+
+CASE 1:
+You upload the full chat-data folder.
+The site loads:
+chat-data/manifest.json
+chat-data/pricing_1.json
+chat-data/payment_1.json
+etc.
+
+CASE 2:
+GitHub shows only many JSON files without the folder.
+The site can also load:
+manifest.json
+pricing_1.json
+payment_1.json
+delivery_1.json
+etc.
+
+Easiest instruction:
+Upload EVERYTHING you see in this package to GitHub:
+- index.html
+- README.md
+- .nojekyll
+- all JSON files
+- chat-data folder if your device allows it
+
+Do NOT upload Code.gs to GitHub. Code.gs goes to Apps Script only.
+
+If GitHub does not show the folder separately, upload all the JSON files you see.
+Do not delete manifest.json.
