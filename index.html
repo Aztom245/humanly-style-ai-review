@@ -5270,5 +5270,518 @@ document.addEventListener("DOMContentLoaded",function(){
 })();
 </script>
 
+
+<style>
+/* =========================================================
+   FINAL LIVE CHAT + ADMIN UX V2
+   ========================================================= */
+#liveChatPanel{
+  border-radius:28px!important;
+  overflow:hidden!important;
+}
+#liveChatBody{
+  background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%)!important;
+  padding:14px!important;
+}
+.live-chat-form{
+  padding:12px!important;
+  background:#fff!important;
+  border-top:1px solid #e4e7ec!important;
+}
+.live-chat-form .live-chat-form-row,
+#manualChatToggle,
+.live-chat-form .chat-mini-note,
+.guided-email-gate{
+  display:none!important;
+}
+#chatEmail{
+  width:100%!important;
+  min-height:50px!important;
+  border-radius:18px!important;
+  border:1px solid #d0d5dd!important;
+  padding:12px 14px!important;
+  font-weight:850!important;
+}
+#chatEmail.hr-email-hidden,
+#guidedEmailStatus.hr-email-hidden{
+  display:none!important;
+}
+.hr-chat-card{
+  border:1px solid #e4e7ec;
+  background:#fff;
+  border-radius:22px;
+  padding:13px;
+  box-shadow:0 14px 30px rgba(16,24,40,.06);
+  margin-bottom:10px;
+}
+.hr-chat-title{
+  font-weight:950;
+  color:#101828;
+  line-height:1.35;
+  font-size:14px;
+}
+.hr-chat-subtitle{
+  color:#667085;
+  font-weight:800;
+  font-size:12px;
+  line-height:1.4;
+  margin-top:5px;
+}
+.hr-chat-grid{
+  display:grid;
+  gap:9px;
+  margin-top:10px;
+}
+.hr-chat-choice{
+  width:100%;
+  border:1px solid #dbe7ff;
+  background:linear-gradient(180deg,#ffffff,#f8fbff);
+  color:#101828;
+  border-radius:18px;
+  padding:12px 13px;
+  text-align:left;
+  font-weight:950;
+  box-shadow:0 8px 20px rgba(16,24,40,.05);
+}
+.hr-chat-choice:active{
+  transform:scale(.99);
+}
+.hr-chat-choice small{
+  display:block;
+  margin-top:4px;
+  color:#667085;
+  font-size:11px;
+  font-weight:850;
+  line-height:1.35;
+}
+.hr-chat-answer{
+  color:#344054;
+  font-weight:850;
+  line-height:1.55;
+  font-size:13px;
+}
+.hr-chat-nav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.hr-chat-nav button{
+  border:1px solid #d0d5dd;
+  background:#fff;
+  color:#344054;
+  border-radius:999px;
+  padding:9px 12px;
+  font-weight:950;
+  font-size:12px;
+}
+.hr-chat-nav .primary-mini{
+  border-color:#c7d7fe;
+  color:#1d4ed8;
+  background:#eef4ff;
+}
+.hr-email-error{
+  border-radius:16px;
+  padding:10px 12px;
+  background:#fef3f2;
+  color:#b42318;
+  border:1px solid #fecdca;
+  font-size:12px;
+  font-weight:900;
+  margin-top:8px;
+}
+.hr-chat-step{
+  color:#667085;
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:8px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+/* Admin stat panel stronger UX */
+#adminCleanPanel{
+  border:1px solid #e4e7ec!important;
+  border-radius:26px!important;
+  background:linear-gradient(180deg,#ffffff,#f8fbff)!important;
+  padding:18px!important;
+  box-shadow:0 18px 45px rgba(16,24,40,.08)!important;
+}
+#adminCleanPanel h3{
+  margin:0 0 6px!important;
+  font-size:24px!important;
+  letter-spacing:-.04em!important;
+}
+.admin-clean-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+.admin-clean-stat{
+  border-radius:20px!important;
+  border:1px solid #dbe7ff!important;
+  background:#fff!important;
+  padding:14px!important;
+}
+.admin-clean-stat strong{
+  display:block!important;
+  font-size:28px!important;
+  color:#101828!important;
+  line-height:1!important;
+}
+.admin-clean-stat span{
+  display:block!important;
+  margin-top:6px!important;
+  color:#667085!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.admin-clean-actions{
+  display:flex!important;
+  gap:10px!important;
+  flex-wrap:wrap!important;
+  margin-top:14px!important;
+}
+.admin-clean-actions button{
+  min-height:46px!important;
+  border-radius:16px!important;
+}
+.admin-clean-note{
+  margin-top:12px!important;
+  border-radius:16px!important;
+  padding:11px 13px!important;
+  background:#ecfdf3!important;
+  color:#027a48!important;
+  border:1px solid #abefc6!important;
+  font-weight:900!important;
+  display:none;
+}
+.admin-clean-note.show{display:block!important}
+@media(max-width:760px){
+  .admin-clean-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+</style>
+
+<script>
+/* =========================================================
+   FINAL LIVE CHAT + ADMIN UX V2
+   - back works one-by-one
+   - email message disappears after valid email
+   - admin stats uses the real admin token
+   - new email OTP warning is stronger
+   ========================================================= */
+(function(){
+  function byId(id){return document.getElementById(id)}
+  function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim())}
+  function body(){return byId("liveChatBody")}
+  function getChatEmail(){var e=byId("chatEmail");return e?e.value.trim():""}
+  function setStatus(msg,isError){
+    var el=byId("guidedEmailStatus");
+    if(!el)return;
+    if(!msg){el.textContent="";el.className="hr-email-hidden";return}
+    el.className=isError?"hr-email-error":"hr-email-hidden";
+    el.textContent=msg;
+  }
+  function clearBody(){
+    var b=body();
+    if(b)b.innerHTML="";
+    try{
+      localStorage.removeItem("hr_guided_only_chat_v1");
+      localStorage.removeItem("hr_guided_chat_v1");
+      localStorage.removeItem("hr_live_chat_v1");
+    }catch(e){}
+  }
+  var stack=[];
+  var current={type:"gate", key:"main"};
+  var MENU={
+    main:{title:"How can we help you?",sub:"Choose one option. You can go back step-by-step anytime.",items:[
+      ["services","✅ What can HumanlyReview review?","Writing, design, books, slides, concepts and custom reviews"],
+      ["pricing","💳 Pricing and payment","Plans, demo, checkout and payment issue"],
+      ["submit","📤 Submit content","OTP, paste/upload, file types and limits"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour, missing report"],
+      ["privacy","🛡️ Privacy and policy","Confidentiality, feedback-only rules and AI review"],
+      ["support","👤 Support help","Support hours and contact details"]
+    ]},
+    services:{title:"What type of work do you want reviewed?",sub:"Select the closest option.",items:[
+      ["writing","✍️ Writing review","Essay, report, CV, letter, article or proposal"],
+      ["design","🎨 Design review","Logo, flyer, poster, book cover or infographic"],
+      ["slides","📊 Slides review","Pitch deck, presentation or training slides"],
+      ["concept","🏗️ Concept review","Architecture, product, packaging or creative concept"],
+      ["custom","✨ Custom request","Any reviewable content that is not listed"]
+    ]},
+    pricing:{title:"Pricing and payment",sub:"Choose what you want to understand.",items:[
+      ["plans","💵 What are the plans?","Standard, Premium and Enterprise"],
+      ["trial","🎬 Is there a free trial?","Demo instead of free trial"],
+      ["checkout","🔐 How checkout works","Secure Paystack checkout"],
+      ["payIssue","⚠️ Payment issue","Paid but not verified or failed payment"]
+    ]},
+    submit:{title:"Submitting content",sub:"Choose the exact help you need.",items:[
+      ["otp","📧 Email OTP","Why email verification is required"],
+      ["pasteUpload","📝 Paste or upload","Why one method locks the other"],
+      ["files","📎 Accepted file types","PDF, DOCX, PPTX, images and more"],
+      ["limits","📦 File limits","Depends on selected plan"]
+    ]},
+    delivery:{title:"Report delivery",sub:"Your report is sent as PDF.",items:[
+      ["time","⏱️ Delivery time","Expected in less than 1 hour"],
+      ["pdf","📄 PDF only","Why report is delivered as PDF"],
+      ["missing","📭 Report not received","What to check and what to send support"],
+      ["contains","📋 What report includes","Score, strengths, weaknesses and checklist"]
+    ]},
+    privacy:{title:"Privacy and policy",sub:"Important service rules.",items:[
+      ["safe","🔒 Is my content private?","How content is handled"],
+      ["feedbackOnly","⚖️ Feedback-only policy","We guide; final work remains yours"],
+      ["aiHuman","🧠 Human-trained AI","AI-based review guided by expert knowledge"]
+    ]},
+    support:{title:"Support help",sub:"Use these for follow-up guidance.",items:[
+      ["hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["urgent","🚨 Urgent issue","Details to prepare"],
+      ["contact","✉️ Contact email","support@humanlyreview.com"]
+    ]}
+  };
+  var ANSWERS={
+    writing:"For writing, the report checks clarity, grammar, tone, structure, flow, missing points, weak sections and next-step improvements.",
+    design:"For design, the report checks layout, spacing, alignment, color, hierarchy, brand impression, readability and professional quality.",
+    slides:"For slides, the report checks message flow, slide clarity, design consistency, audience understanding and presentation strength.",
+    concept:"For concepts, the report checks idea clarity, practical impression, missing details, weak areas and improvement direction.",
+    custom:"You can submit any reviewable content. Choose the closest category and add a clear brief so the review knows exactly what feedback you want.",
+    plans:"Choose Standard for smaller reviews, Premium for deeper or larger reviews, and Enterprise for bigger files, multiple files or special requests.",
+    trial:"There is no free trial. The demo explains how the review works before you submit.",
+    checkout:"Payment is handled securely through Paystack. The price and plan are shown clearly before checkout.",
+    payIssue:"If payment succeeds but the website does not verify it, keep your payment reference. The owner can verify it manually from the admin dashboard.",
+    otp:"OTP confirms that your report will be delivered to the correct email. If it expires, request a new code.",
+    pasteUpload:"Use paste OR upload. This keeps the submission clean and prevents duplicate/confusing content.",
+    files:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG and PNG.",
+    limits:"File limits depend on the selected plan. The plan card shows allowed file count and size before payment.",
+    time:"Your review report is expected in less than 1 hour after successful submission.",
+    pdf:"Yes. The final feedback report is sent to your verified email as a PDF only.",
+    missing:"Check inbox, spam and promotions first. If the report is not received after 1 hour, contact support with your Submission ID.",
+    contains:"The report can include an overall score out of 100, summary, strengths, weak points, risks, improvement checklist and next-step guidance.",
+    safe:"Your content is handled carefully for review. Avoid uploading passwords, bank PINs or unnecessary private secrets.",
+    feedbackOnly:"HumanlyReview provides feedback only. We do not complete, falsify or submit work for users.",
+    aiHuman:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge for practical, clear feedback.",
+    hours:"Support is monitored between 07:00 and 22:00 GMT. Messages outside that time can still be logged for follow-up.",
+    urgent:"For urgent help, keep your email, Submission ID, payment reference and a short explanation ready.",
+    contact:"Support email: support@humanlyreview.com"
+  };
+  function emailReady(){
+    var e=byId("chatEmail");
+    if(!e)return false;
+    if(validEmail(e.value)){
+      e.classList.remove("invalid");
+      e.classList.add("hr-email-hidden");
+      setStatus("",false);
+      return true;
+    }
+    e.classList.remove("hr-email-hidden");
+    e.classList.add("invalid");
+    setStatus("Enter a valid email first. It is used only for support follow-up.",true);
+    return false;
+  }
+  function card(title,sub){
+    var c=document.createElement("div");c.className="hr-chat-card";
+    var step=document.createElement("div");step.className="hr-chat-step";step.textContent="Live support guide";
+    var h=document.createElement("div");h.className="hr-chat-title";h.textContent=title;
+    c.appendChild(step);c.appendChild(h);
+    if(sub){var p=document.createElement("div");p.className="hr-chat-subtitle";p.textContent=sub;c.appendChild(p)}
+    return c;
+  }
+  function nav(canBack){
+    var n=document.createElement("div");n.className="hr-chat-nav";
+    if(canBack){
+      var b=document.createElement("button");b.type="button";b.textContent="← Back";b.onclick=function(){goBack()};
+      n.appendChild(b);
+    }
+    var m=document.createElement("button");m.type="button";m.textContent="Main menu";m.className="primary-mini";m.onclick=function(){goMain()};
+    n.appendChild(m);
+    return n;
+  }
+  function render(screen, push){
+    if(push && current)stack.push(current);
+    current=screen;
+    var b=body(); if(!b)return;
+    b.innerHTML="";
+    if(!emailReady()){
+      var intro=card("Welcome to HumanlyReview support 👋","Enter your email once to unlock the help options. The email field will disappear after it is confirmed.");
+      b.appendChild(intro); return;
+    }
+    if(screen.type==="menu"){
+      var menu=MENU[screen.key]||MENU.main;
+      var c=card(menu.title,menu.sub);
+      var grid=document.createElement("div");grid.className="hr-chat-grid";
+      menu.items.forEach(function(it){
+        var btn=document.createElement("button");btn.type="button";btn.className="hr-chat-choice";
+        btn.innerHTML=it[1]+"<small>"+it[2]+"</small>";
+        btn.onclick=function(){
+          if(MENU[it[0]]) render({type:"menu",key:it[0]},true);
+          else render({type:"answer",key:it[0],label:it[1]},true);
+        };
+        grid.appendChild(btn);
+      });
+      c.appendChild(grid);
+      c.appendChild(nav(stack.length>0));
+      b.appendChild(c);
+    }else if(screen.type==="answer"){
+      var label=String(screen.label||"Answer").replace(/^[^A-Za-z0-9]+/,"");
+      var c2=card(label,"Here is the answer.");
+      var ans=document.createElement("div");ans.className="hr-chat-answer";ans.textContent=ANSWERS[screen.key]||"This option is available. Please continue with the form or use support if needed.";
+      c2.appendChild(ans);
+      c2.appendChild(nav(true));
+      b.appendChild(c2);
+      try{
+        if(typeof postBackend==="function"){
+          postBackend({action:"liveChatMessage",email:getChatEmail(),message:"Guided option: "+label,page:location.href,clientAnswer:ans.textContent});
+        }
+      }catch(e){}
+    }
+    b.scrollTop=0;
+  }
+  function goBack(){
+    if(stack.length){
+      var prev=stack.pop();
+      var old=current; current=null;
+      render(prev,false);
+      current=prev;
+    }else{
+      goMain();
+    }
+  }
+  function goMain(){stack=[];render({type:"menu",key:"main"},false)}
+  function openChat(){
+    var p=byId("liveChatPanel"); if(p)p.classList.add("open");
+    stack=[]; current={type:"menu",key:"main"};
+    clearBody();
+    render(current,false);
+  }
+  function bindLiveChat(){
+    if(byId("liveChatLauncher"))byId("liveChatLauncher").onclick=openChat;
+    if(byId("liveChatClose"))byId("liveChatClose").onclick=function(){var p=byId("liveChatPanel"); if(p)p.classList.remove("open")};
+    if(byId("chatEmail"))byId("chatEmail").oninput=function(){
+      if(validEmail(this.value)){
+        this.classList.add("hr-email-hidden");
+        setStatus("",false);
+        if(body() && !body().querySelector(".hr-chat-choice"))goMain();
+      }else{
+        this.classList.remove("hr-email-hidden");
+        setStatus("Enter a valid email first. It is used only for support follow-up.",true);
+      }
+    };
+  }
+
+  function getAdminTokenSafe(){
+    try{ if(typeof state!=="undefined" && state.adminToken) return state.adminToken; }catch(e){}
+    try{ if(window.state && window.state.adminToken) return window.state.adminToken; }catch(e){}
+    try{ return sessionStorage.getItem("hr_admin_token") || localStorage.getItem("hr_admin_token") || ""; }catch(e){}
+    return "";
+  }
+  function note(msg,err){
+    var el=byId("adminCleanMessage"); if(!el)return;
+    el.className="admin-clean-note show";
+    el.style.background=err?"#fef3f2":"#ecfdf3";
+    el.style.color=err?"#b42318":"#027a48";
+    el.style.borderColor=err?"#fecdca":"#abefc6";
+    el.textContent=msg;
+  }
+  async function loadStatsFixed(){
+    try{
+      var token=getAdminTokenSafe();
+      if(!token) throw new Error("Please login to the owner dashboard first, then tap Load stats.");
+      var r=await postBackend({action:"adminGetDashboardStats",adminToken:token});
+      if(byId("admTotal"))byId("admTotal").textContent=r.totalSubmissions||0;
+      if(byId("admActive"))byId("admActive").textContent=r.activeSubmissions||0;
+      if(byId("admPaid"))byId("admPaid").textContent=r.paidSubmissions||0;
+      if(byId("admChats"))byId("admChats").textContent=r.liveChats||0;
+      note("Stats loaded successfully.");
+    }catch(e){note(e.message||String(e),true)}
+  }
+  async function clearChatsFixed(){
+    try{
+      var token=getAdminTokenSafe();
+      if(!token) throw new Error("Please login first.");
+      if(!confirm("Clear all live chat logs?"))return;
+      var r=await postBackend({action:"adminClearLiveChats",adminToken:token});
+      note(r.message||"Live chat logs cleared.");
+      loadStatsFixed();
+    }catch(e){note(e.message||String(e),true)}
+  }
+  async function clearDeletedFixed(){
+    try{
+      var token=getAdminTokenSafe();
+      if(!token) throw new Error("Please login first.");
+      if(!confirm("Permanently remove deleted submission rows?"))return;
+      var r=await postBackend({action:"adminClearDeletedSubmissions",adminToken:token});
+      note(r.message||"Deleted rows removed.");
+      loadStatsFixed();
+    }catch(e){note(e.message||String(e),true)}
+  }
+  function rebindAdmin(){
+    if(byId("adminLoadStatsBtn"))byId("adminLoadStatsBtn").onclick=loadStatsFixed;
+    if(byId("adminClearChatsBtn"))byId("adminClearChatsBtn").onclick=clearChatsFixed;
+    if(byId("adminClearDeletedBtn"))byId("adminClearDeletedBtn").onclick=clearDeletedFixed;
+  }
+
+  function hasDraftData(){
+    try{
+      var draftText=["documentType","otherDocumentType","purpose","otherPurpose","contentText","brief","otp"].some(function(id){var el=byId(id);return el && String(el.value||"").trim();});
+      var files=(typeof state!=="undefined" && ((state.mainFiles&&state.mainFiles.length)||(state.briefFiles&&state.briefFiles.length)));
+      var paid=(typeof state!=="undefined" && (state.paymentVerified||state.paymentReference||state.authToken||state.verifiedEmail));
+      return !!(draftText||files||paid);
+    }catch(e){return false}
+  }
+  function clearForNewEmail(keepEmail){
+    try{
+      ["otp","documentType","otherDocumentType","purpose","otherPurpose","contentText","brief"].forEach(function(id){var el=byId(id);if(el)el.value=""});
+      if(typeof state!=="undefined"){
+        state.mainFiles=[];state.briefFiles=[];state.authToken="";state.verifiedEmail="";
+        state.paymentVerified=false;state.paymentReference="";
+      }
+      try{localStorage.removeItem("hr_review_draft_final_v1");localStorage.removeItem("hr_active_submission_final_v1");}catch(e){}
+      if(byId("email"))byId("email").value=keepEmail||"";
+      if(typeof updateUI==="function")updateUI();
+    }catch(e){}
+  }
+  function installOtpOverride(){
+    if(window.__hrOtpOverrideV2)return; window.__hrOtpOverrideV2=true;
+    var originalRequest=window.requestOtp;
+    if(typeof originalRequest==="function"){
+      window.requestOtp=async function(){
+        var newEmail=byId("email")?byId("email").value.trim():"";
+        var oldEmail="";
+        try{oldEmail=state.verifiedEmail||""}catch(e){}
+        if(hasDraftData() && newEmail && (!oldEmail || newEmail.toLowerCase()!==oldEmail.toLowerCase())){
+          var ok=confirm("You are starting verification with a new email. After the new OTP is verified, all current form progress, files, payment status, and saved draft on this browser will be cleared for a fresh submission. Continue?");
+          if(!ok)return;
+          sessionStorage.setItem("hr_clear_after_new_email_verify","1");
+        }
+        return originalRequest.apply(this,arguments);
+      };
+    }
+    var originalVerify=window.verifyOtp;
+    if(typeof originalVerify==="function"){
+      window.verifyOtp=async function(){
+        var email=byId("email")?byId("email").value.trim():"";
+        var res=await originalVerify.apply(this,arguments);
+        if(sessionStorage.getItem("hr_clear_after_new_email_verify")==="1"){
+          clearForNewEmail(email);
+          sessionStorage.removeItem("hr_clear_after_new_email_verify");
+          if(byId("email"))byId("email").value=email;
+          try{ if(typeof state!=="undefined") state.verifiedEmail=email; }catch(e){}
+          if(byId("emailMessage"))byId("emailMessage").innerHTML='<span class="success-text">New email verified. Previous form progress has been cleared for a fresh submission.</span>';
+          if(typeof updateUI==="function")updateUI();
+        }
+        return res;
+      };
+    }
+  }
+  function init(){
+    bindLiveChat();
+    rebindAdmin();
+    installOtpOverride();
+  }
+  document.addEventListener("DOMContentLoaded",init);
+  setTimeout(init,800);
+  setInterval(function(){rebindAdmin();installOtpOverride();},1500);
+})();
+</script>
+
 </body>
 </html>
