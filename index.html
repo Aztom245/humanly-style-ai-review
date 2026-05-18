@@ -4796,5 +4796,479 @@ document.addEventListener("DOMContentLoaded",function(){
 </div>
 
 
+
+<style>
+/* =========================================================
+   FINAL UI/UX CLEANUP OVERRIDE
+   ========================================================= */
+:root{
+  --hr-clean-blue:#1d4ed8;
+  --hr-clean-purple:#7c3aed;
+  --hr-clean-ink:#101828;
+  --hr-clean-muted:#667085;
+  --hr-clean-border:#e4e7ec;
+  --hr-clean-soft:#f8fafc;
+}
+
+/* Cleaner admin modal */
+#adminModal .modal-panel{
+  max-width:min(980px,94vw)!important;
+  border-radius:28px!important;
+  background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)!important;
+  box-shadow:0 30px 80px rgba(16,24,40,.25)!important;
+}
+#adminModal h2{
+  letter-spacing:-.04em!important;
+}
+#adminModal .small-muted{
+  color:#667085!important;
+  line-height:1.45!important;
+}
+#adminModal .owner-control-card,
+#adminModal .submission-manager,
+#adminModal .quick-sent-sticky,
+#adminModal .admin-clean-card{
+  border:1px solid #e4e7ec!important;
+  border-radius:24px!important;
+  background:#fff!important;
+  box-shadow:0 16px 40px rgba(16,24,40,.06)!important;
+  padding:18px!important;
+  margin:18px 0!important;
+}
+#adminModal .admin-grid,
+#adminModal .owner-control-grid,
+#adminModal .change-pin-grid{
+  gap:14px!important;
+}
+#adminModal input,
+#adminModal textarea,
+#adminModal select{
+  border-radius:16px!important;
+  border:1px solid #d0d5dd!important;
+  background:#fff!important;
+}
+#adminModal .btn{
+  border-radius:16px!important;
+  min-height:48px!important;
+}
+.admin-clean-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.admin-clean-stat{
+  border-radius:18px;
+  padding:14px;
+  background:linear-gradient(180deg,#f8fafc,#eef4ff);
+  border:1px solid #dbe7ff;
+}
+.admin-clean-stat strong{
+  display:block;
+  font-size:26px;
+  line-height:1;
+  color:#101828;
+  letter-spacing:-.04em;
+}
+.admin-clean-stat span{
+  display:block;
+  margin-top:6px;
+  color:#667085;
+  font-size:12px;
+  font-weight:900;
+}
+.admin-clean-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+.admin-clean-note{
+  margin-top:12px;
+  border-radius:16px;
+  padding:11px 13px;
+  background:#ecfdf3;
+  color:#027a48;
+  border:1px solid #abefc6;
+  font-weight:900;
+  display:none;
+}
+.admin-clean-note.show{display:block}
+@media(max-width:760px){
+  .admin-clean-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Live chat clean guided UI */
+.live-chat-panel{
+  border-radius:24px!important;
+  overflow:hidden!important;
+  box-shadow:0 24px 70px rgba(16,24,40,.24)!important;
+}
+.live-chat-body{
+  background:linear-gradient(180deg,#f8fbff,#ffffff)!important;
+}
+.live-chat-form{
+  border-top:1px solid #e4e7ec!important;
+  background:#fff!important;
+}
+.live-chat-form .live-chat-form-row,
+#manualChatToggle,
+.live-chat-form .chat-mini-note{
+  display:none!important;
+}
+#chatEmail{
+  width:100%!important;
+  border-radius:16px!important;
+  min-height:48px!important;
+  border:1px solid #d0d5dd!important;
+  padding:12px 14px!important;
+  font-size:16px!important;
+}
+#guidedEmailStatus:empty{display:none!important}
+#guidedEmailStatus.guided-ok{
+  display:block;
+  margin-top:8px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:#ecfdf3;
+  color:#027a48;
+  border:1px solid #abefc6;
+  font-weight:900;
+  font-size:12px;
+}
+#guidedEmailStatus.guided-error{
+  display:block;
+  margin-top:8px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:#fef3f2;
+  color:#b42318;
+  border:1px solid #fecdca;
+  font-weight:900;
+  font-size:12px;
+}
+.hr-chat-intro{
+  padding:12px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#eef4ff,#f4ebff);
+  color:#344054;
+  font-weight:850;
+  line-height:1.45;
+  margin-bottom:10px;
+}
+.hr-chat-options{
+  display:grid;
+  gap:9px;
+  margin:10px 0;
+}
+.hr-chat-option{
+  width:100%;
+  border:1px solid #dbe7ff;
+  background:#fff;
+  color:#101828;
+  border-radius:18px;
+  padding:12px 13px;
+  text-align:left;
+  font-weight:950;
+  box-shadow:0 10px 24px rgba(16,24,40,.05);
+}
+.hr-chat-option small{
+  display:block;
+  margin-top:4px;
+  color:#667085;
+  font-size:11px;
+  font-weight:850;
+  line-height:1.35;
+}
+.hr-chat-nav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.hr-chat-nav button{
+  border:1px solid #d0d5dd;
+  background:#fff;
+  color:#344054;
+  border-radius:999px;
+  padding:8px 11px;
+  font-weight:950;
+  font-size:12px;
+}
+.chat-msg{
+  line-height:1.45!important;
+  font-weight:800!important;
+}
+.chat-msg.chat-bot{
+  max-width:94%!important;
+}
+.chat-msg.chat-user{
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed)!important;
+}
+
+/* make repeated system notes less clumsy */
+.chat-error-note,
+.chat-hours-note{
+  border-radius:16px!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+</style>
+
+<script>
+/* =========================================================
+   FINAL UI/UX CLEANUP LOGIC
+   ========================================================= */
+(function(){
+  function $(id){return document.getElementById(id)}
+  function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim())}
+  function chatBody(){return $("liveChatBody")}
+  function chatEmail(){return $("chatEmail") ? $("chatEmail").value.trim() : ""}
+  function setEmailStatus(type,msg){
+    var el=$("guidedEmailStatus");
+    if(!el)return;
+    el.className=type==="ok"?"guided-ok":"guided-error";
+    el.textContent=msg||"";
+  }
+  function addBot(text){
+    var b=chatBody();if(!b)return;
+    var d=document.createElement("div");d.className="chat-msg chat-bot";d.textContent=text;
+    b.appendChild(d);b.scrollTop=b.scrollHeight;
+  }
+  function addUser(text){
+    var b=chatBody();if(!b)return;
+    var d=document.createElement("div");d.className="chat-msg chat-user";d.textContent=text;
+    b.appendChild(d);b.scrollTop=b.scrollHeight;
+  }
+  function clearChat(){
+    var b=chatBody();if(b)b.innerHTML="";
+    try{localStorage.removeItem("hr_guided_only_chat_v1");localStorage.removeItem("hr_guided_chat_v1");localStorage.removeItem("hr_live_chat_v1")}catch(e){}
+  }
+  var MENU={
+    main:{title:"Welcome 👋 Enter your email once, then tap what you need help with.",items:[
+      ["services","✅ What can you review?","Writing, design, books, slides, concepts, and custom requests"],
+      ["pricing","💳 Pricing and plans","Plans, demo, payment and checkout"],
+      ["submit","📤 Submit content","OTP, paste/upload, file types, file limits"],
+      ["delivery","📄 Report delivery","PDF report, less than 1 hour, report not received"],
+      ["privacy","🛡️ Privacy and policy","Confidentiality and feedback-only rules"],
+      ["support","👤 Support help","What to do for payment or delivery issues"]
+    ]},
+    services:{title:"Choose the type of work you want reviewed:",items:[
+      ["writing","✍️ Writing","Essay, report, CV, article, letter, proposal"],
+      ["design","🎨 Design","Logo, flyer, poster, book cover, infographic"],
+      ["slides","📊 Slides","Pitch deck, presentation, training slides"],
+      ["concept","🏗️ Concept","Architecture, product, packaging or creative idea"],
+      ["custom","✨ Custom request","Any reviewable content not listed"]
+    ],back:"main"},
+    pricing:{title:"Pricing and payment help:",items:[
+      ["plans","💵 What are the plans?","Standard, Premium and Enterprise"],
+      ["trial","🎬 Free trial?","Demo is provided instead of free trial"],
+      ["checkout","🔐 Checkout","Secure Paystack checkout"],
+      ["payIssue","⚠️ Payment issue","Paid but not verified or failed payment"]
+    ],back:"main"},
+    submit:{title:"Submission help:",items:[
+      ["otp","📧 Email OTP","Why verification is required"],
+      ["pasteUpload","📝 Paste or upload","Use one clean submission method"],
+      ["files","📎 File types","PDF, DOCX, PPTX, images and more"],
+      ["limits","📦 File limits","Depends on selected plan"]
+    ],back:"main"},
+    delivery:{title:"Report delivery help:",items:[
+      ["time","⏱️ Delivery time","Expected in less than 1 hour"],
+      ["pdf","📄 PDF only","Final report is sent as PDF"],
+      ["missing","📭 Report not received","What to check and how to contact support"],
+      ["contains","📋 Report contents","Score, strengths, weaknesses and checklist"]
+    ],back:"main"},
+    privacy:{title:"Privacy and policy:",items:[
+      ["safe","🔒 Is it private?","Your content is handled carefully"],
+      ["feedbackOnly","⚖️ Feedback only","We do not complete or falsify work"],
+      ["aiHuman","🧠 Human-trained AI","AI-based review guided by expert knowledge"]
+    ],back:"main"},
+    support:{title:"Support guidance:",items:[
+      ["hours","🕒 Support hours","07:00–22:00 GMT"],
+      ["urgent","🚨 Urgent issue","Details to prepare before contacting support"],
+      ["contact","✉️ Contact email","support@humanlyreview.com"]
+    ],back:"main"}
+  };
+  var ANSWERS={
+    writing:"For writing, the report checks clarity, grammar, tone, structure, flow, missing points, weak sections and next-step improvements.",
+    design:"For design, the report checks layout, spacing, alignment, color, hierarchy, brand impression, readability and professional quality.",
+    slides:"For slides, the report checks message flow, slide clarity, design consistency, audience understanding and presentation strength.",
+    concept:"For concepts, the report checks idea clarity, practical impression, missing details, weak areas and improvement direction.",
+    custom:"You can submit any reviewable content. Choose the closest category and add a clear brief so the review knows what feedback you want.",
+    plans:"Choose Standard for smaller reviews, Premium for deeper or larger reviews, and Enterprise for bigger files or special requests.",
+    trial:"There is no free trial. The demo explains how the review works before you submit.",
+    checkout:"Payment is handled securely through Paystack. Your plan price is shown clearly before checkout.",
+    payIssue:"If payment succeeds but the website does not verify it, keep your payment reference. The owner can verify it manually from the admin dashboard.",
+    otp:"OTP confirms that your report is delivered to the correct email. If it expires, request a new code.",
+    pasteUpload:"Use paste OR upload. This keeps the submission clean and prevents duplicate/confusing content.",
+    files:"Accepted file types include PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, JPEG and PNG.",
+    limits:"File limits depend on the selected plan. The plan card shows the allowed file count and size before payment.",
+    time:"Your review report is expected in less than 1 hour after successful submission.",
+    pdf:"Yes. The final feedback report is sent to your verified email as a PDF only.",
+    missing:"First check inbox, spam and promotions. If the report is not received after 1 hour, contact support with your Submission ID.",
+    contains:"The report can include an overall score out of 100, summary, strengths, weak points, risks, improvement checklist and next-step guidance.",
+    safe:"Your content is handled carefully for review. Avoid uploading passwords, bank PINs or unnecessary private secrets.",
+    feedbackOnly:"HumanlyReview provides feedback only. We do not complete, falsify or submit work for users.",
+    aiHuman:"HumanlyReview is AI-based, but the review system is guided by human expert knowledge for practical, clear feedback.",
+    hours:"Support is monitored between 07:00 and 22:00 GMT. Messages outside that time can still be logged for follow-up.",
+    urgent:"For urgent help, keep your email, Submission ID, payment reference and a short explanation ready.",
+    contact:"Support email: support@humanlyreview.com"
+  };
+  function emailReady(){
+    var input=$("chatEmail");
+    if(!input)return false;
+    if(isEmail(input.value)){
+      input.classList.remove("invalid");
+      input.style.display="none";
+      setEmailStatus("ok","Email confirmed. Choose any option below.");
+      return true;
+    }
+    input.style.display="";
+    input.classList.add("invalid");
+    setEmailStatus("error","Enter a valid email first to unlock the support options.");
+    return false;
+  }
+  function option(label,sub,fn){
+    var b=document.createElement("button");
+    b.type="button";b.className="hr-chat-option";
+    b.innerHTML=label+(sub?("<small>"+sub+"</small>"):"");
+    b.onclick=fn;
+    return b;
+  }
+  function renderMenu(key){
+    if(!emailReady())return;
+    var menu=MENU[key]||MENU.main;
+    addBot(menu.title);
+    var wrap=document.createElement("div");wrap.className="hr-chat-options";
+    menu.items.forEach(function(it){
+      wrap.appendChild(option(it[1],it[2],function(){choose(it[0],it[1])}));
+    });
+    chatBody().appendChild(wrap);
+    if(menu.back){
+      var nav=document.createElement("div");nav.className="hr-chat-nav";
+      var back=document.createElement("button");back.type="button";back.textContent="← Back";back.onclick=function(){renderMenu(menu.back)};
+      var home=document.createElement("button");home.type="button";home.textContent="Main menu";home.onclick=function(){renderMenu("main")};
+      nav.appendChild(back);nav.appendChild(home);chatBody().appendChild(nav);
+    }
+    chatBody().scrollTop=chatBody().scrollHeight;
+  }
+  function choose(key,label){
+    if(!emailReady())return;
+    addUser(label.replace(/^[^A-Za-z0-9]+/,""));
+    if(MENU[key]){renderMenu(key);return}
+    var ans=ANSWERS[key]||"This option is available. Please continue with the form or contact support if needed.";
+    addBot(ans);
+    try{
+      if(typeof postBackend==="function"){
+        postBackend({action:"liveChatMessage",email:chatEmail(),message:"Guided option: "+label,page:location.href,clientAnswer:ans});
+      }
+    }catch(e){}
+    var nav=document.createElement("div");nav.className="hr-chat-nav";
+    var home=document.createElement("button");home.type="button";home.textContent="Main menu";home.onclick=function(){renderMenu("main")};
+    nav.appendChild(home);chatBody().appendChild(nav);
+    chatBody().scrollTop=chatBody().scrollHeight;
+  }
+  window.openCleanGuidedChat=function(){
+    var p=$("liveChatPanel");if(p)p.classList.add("open");
+    clearChat();
+    addBot("Welcome to HumanlyReview support. Enter your email once, then tap an option. No long typing is needed.");
+    var input=$("chatEmail");
+    if(input && isEmail(input.value)){renderMenu("main")}
+    else setEmailStatus("error","Enter a valid email first. The email helps support identify your request if follow-up is needed.");
+  };
+  function bindChat(){
+    if($("liveChatLauncher"))$("liveChatLauncher").onclick=window.openCleanGuidedChat;
+    if($("liveChatClose"))$("liveChatClose").onclick=function(){if($("liveChatPanel"))$("liveChatPanel").classList.remove("open")};
+    if($("chatEmail"))$("chatEmail").oninput=function(){
+      if(isEmail(this.value)){
+        emailReady();
+        if(chatBody() && !chatBody().querySelector(".hr-chat-options"))renderMenu("main");
+      }else{
+        this.style.display="";
+        setEmailStatus("error","Enter a valid email to continue.");
+      }
+    };
+  }
+
+  function injectAdminCleanPanel(){
+    var editor=$("adminEditor");
+    if(!editor || $("adminCleanPanel"))return;
+    var panel=document.createElement("div");
+    panel.id="adminCleanPanel";
+    panel.className="admin-clean-card";
+    panel.innerHTML=
+      '<h3>Owner Control Center</h3>'+
+      '<p class="small-muted">Quick business overview and safe cleanup tools. Telegram is now used only for successful submission notifications.</p>'+
+      '<div class="admin-clean-grid">'+
+        '<div class="admin-clean-stat"><strong id="admTotal">0</strong><span>Total submissions</span></div>'+
+        '<div class="admin-clean-stat"><strong id="admActive">0</strong><span>Active</span></div>'+
+        '<div class="admin-clean-stat"><strong id="admPaid">0</strong><span>Paid / verified</span></div>'+
+        '<div class="admin-clean-stat"><strong id="admChats">0</strong><span>Live chat logs</span></div>'+
+      '</div>'+
+      '<div class="admin-clean-actions">'+
+        '<button class="btn primary" type="button" id="adminLoadStatsBtn">Load stats</button>'+
+        '<button class="btn secondary" type="button" id="adminClearChatsBtn">Clear chat logs</button>'+
+        '<button class="btn secondary" type="button" id="adminClearDeletedBtn">Remove deleted rows</button>'+
+      '</div>'+
+      '<div id="adminCleanMessage" class="admin-clean-note"></div>';
+    editor.insertBefore(panel, editor.firstChild);
+    bindAdminCleanPanel();
+  }
+  async function loadAdminStats(){
+    try{
+      if(!window.state || !state.adminToken)throw new Error("Please login first.");
+      var r=await postBackend({action:"adminGetDashboardStats",adminToken:state.adminToken});
+      $("admTotal").textContent=r.totalSubmissions||0;
+      $("admActive").textContent=r.activeSubmissions||0;
+      $("admPaid").textContent=r.paidSubmissions||0;
+      $("admChats").textContent=r.liveChats||0;
+      cleanMsg("Stats loaded.");
+    }catch(e){cleanMsg(e.message||String(e),true)}
+  }
+  async function clearChats(){
+    if(!confirm("Clear all live chat logs from the Live Chats sheet?"))return;
+    try{
+      var r=await postBackend({action:"adminClearLiveChats",adminToken:state.adminToken});
+      cleanMsg(r.message||"Live chat logs cleared.");
+      loadAdminStats();
+    }catch(e){cleanMsg(e.message||String(e),true)}
+  }
+  async function clearDeleted(){
+    if(!confirm("Remove deleted submission rows permanently from the sheet?"))return;
+    try{
+      var r=await postBackend({action:"adminClearDeletedSubmissions",adminToken:state.adminToken});
+      cleanMsg(r.message||"Deleted rows removed.");
+      loadAdminStats();
+    }catch(e){cleanMsg(e.message||String(e),true)}
+  }
+  function cleanMsg(msg,err){
+    var el=$("adminCleanMessage");if(!el)return;
+    el.className="admin-clean-note show";
+    el.style.background=err?"#fef3f2":"#ecfdf3";
+    el.style.color=err?"#b42318":"#027a48";
+    el.style.borderColor=err?"#fecdca":"#abefc6";
+    el.textContent=msg;
+  }
+  function bindAdminCleanPanel(){
+    if($("adminLoadStatsBtn"))$("adminLoadStatsBtn").onclick=loadAdminStats;
+    if($("adminClearChatsBtn"))$("adminClearChatsBtn").onclick=clearChats;
+    if($("adminClearDeletedBtn"))$("adminClearDeletedBtn").onclick=clearDeleted;
+  }
+  function polishAdminText(){
+    var h=document.querySelector("#adminModal h2");
+    if(h)h.textContent="Owner Dashboard";
+    var p=document.querySelector("#adminModal h2 + p");
+    if(p)p.textContent="Manage submissions, report status, pricing, Paystack keys, branding, and safe cleanup tools from one private place.";
+  }
+  function init(){
+    bindChat();
+    injectAdminCleanPanel();
+    polishAdminText();
+    setInterval(function(){injectAdminCleanPanel();polishAdminText();},1500);
+  }
+  document.addEventListener("DOMContentLoaded",init);
+  setTimeout(init,700);
+})();
+</script>
+
 </body>
 </html>
