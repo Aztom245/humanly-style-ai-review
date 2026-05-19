@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>HumanlyReview — File Review</title>
+  <meta name="description" content="Upload a file and receive practical review feedback by email.">
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>
+    :root {
+      --primary:#1d4ed8;
+      --primary-dark:#102a73;
+      --accent:#7c3aed;
+      --ink:#101828;
+      --muted:#667085;
+      --soft:#f6f8fc;
+      --card:#ffffff;
+      --line:#dbe5f5;
+      --good:#047857;
+      --danger:#b42318;
+      --warning:#a15c00;
+      --shadow:0 18px 45px rgba(16,24,40,.10);
+      --radius:24px;
+    }
+    *{box-sizing:border-box;min-width:0}
+    html{scroll-behavior:smooth;overflow-x:hidden}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,#eef3ff 0,#fff 32%,#f8fafc 100%);overflow-x:hidden;line-height:1.55}
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .container{width:min(1160px,100%);margin-inline:auto;padding-inline:clamp(14px,3.5vw,28px)}
+    .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(219,229,245,.92)}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:-.02em}
+    .brand-mark{width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;color:white;font-weight:950;box-shadow:0 8px 20px rgba(29,78,216,.25)}
+    .desktop-links{display:flex;align-items:center;gap:8px}
+    .desktop-links a{padding:10px 14px;border-radius:999px;color:#344054;font-weight:800;font-size:14px}
+    .desktop-links a:hover{background:#f0f5ff;color:var(--primary)}
+    .menu-btn{display:none;border:1px solid var(--line);background:white;border-radius:14px;padding:10px 12px;font-weight:900}
+    .mobile-links{display:none;border-top:1px solid var(--line);padding:10px 0 16px}
+    .mobile-links.open{display:grid;gap:8px}
+    .mobile-links a{padding:12px 14px;border-radius:14px;background:#f8fbff;font-weight:900}
+    .btn{border:0;border-radius:16px;padding:13px 18px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;transition:.18s ease;white-space:normal;text-align:center}
+    .btn.primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:white;box-shadow:0 12px 25px rgba(29,78,216,.22)}
+    .btn.primary:hover{transform:translateY(-1px);box-shadow:0 18px 34px rgba(29,78,216,.28)}
+    .btn.secondary{background:#eef5ff;color:var(--primary);border:1px solid #d9e8ff}
+    .btn.dark{background:#101828;color:white}
+    .btn.ghost{background:white;color:#344054;border:1px solid var(--line)}
+    .btn.full{width:100%}
+    .btn:disabled{opacity:.52;cursor:not-allowed;transform:none;box-shadow:none}
+    .hero{padding:clamp(34px,7vw,78px) 0 36px}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(280px,.92fr);gap:28px;align-items:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef7ff;color:var(--primary);font-weight:950;font-size:13px;border:1px solid #d9e8ff}
+    h1{font-size:clamp(34px,6vw,68px);line-height:.98;letter-spacing:-.055em;margin:18px 0 16px}
+    .hero p{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:650px;margin:0 0 24px;font-weight:650}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .hero-card{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid var(--line);border-radius:32px;padding:22px;box-shadow:var(--shadow)}
+    .status-stack{display:grid;gap:12px}
+    .status-item{display:flex;gap:12px;align-items:flex-start;background:white;border:1px solid var(--line);border-radius:20px;padding:16px}
+    .status-icon{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;background:#eef5ff;flex:0 0 auto;font-size:22px}
+    .status-item strong{display:block;font-size:15px}
+    .status-item span{display:block;color:var(--muted);font-size:13px;font-weight:750}
+    .section{padding:34px 0}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .section-head h2{font-size:clamp(26px,4vw,42px);letter-spacing:-.04em;margin:0}
+    .section-head p{margin:6px 0 0;color:var(--muted);font-weight:700}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(16px,2.5vw,24px);box-shadow:0 10px 30px rgba(16,24,40,.055)}
+    .price-card{position:relative;display:flex;flex-direction:column;gap:14px}
+    .price-card.featured{border-color:#b8c7ff;box-shadow:0 24px 55px rgba(29,78,216,.16)}
+    .price-card.active{outline:3px solid rgba(29,78,216,.18);border-color:var(--primary)}
+    .price-card h3{font-size:23px;margin:0;letter-spacing:-.03em}
+    .price{font-size:42px;font-weight:950;letter-spacing:-.04em}
+    .plan-tag{font-size:13px;font-weight:950;color:var(--primary);background:#eef5ff;border:1px solid #d9e8ff;border-radius:999px;padding:8px 10px;display:inline-flex;width:max-content;max-width:100%}
+    .feature-list{list-style:none;margin:0;padding:0;display:grid;gap:10px;color:#344054;font-weight:760}
+    .feature-list li{display:flex;gap:8px;align-items:flex-start}
+    .feature-list li::before{content:"✓";color:var(--good);font-weight:950;flex:0 0 auto}
+    .submit-shell{background:white;border:1px solid var(--line);border-radius:34px;padding:clamp(14px,3vw,26px);box-shadow:var(--shadow)}
+    .step-card{border:1px solid var(--line);background:#fbfdff;border-radius:24px;padding:clamp(14px,2.5vw,22px);margin-bottom:18px}
+    .step-title{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .step-num{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-weight:950;flex:0 0 auto}
+    .step-title h3{margin:0;font-size:20px;letter-spacing:-.025em}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .form-grid.one{grid-template-columns:1fr}
+    label.field{display:grid;gap:7px;color:#344054;font-weight:900;font-size:14px}
+    input,select,textarea{width:100%;border:1px solid #d5deee;border-radius:16px;padding:13px 14px;background:white;color:#101828;outline:none;min-height:48px;font-weight:650}
+    textarea{min-height:120px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(29,78,216,.10)}
+    .field-note{font-size:13px;color:var(--muted);font-weight:750;margin-top:8px}
+    .success-text{color:var(--good);font-weight:900}
+    .error-text{color:var(--danger);font-weight:900}
+    .info-panel{display:flex;align-items:flex-start;gap:14px;border:1px solid #bbf7d0;background:linear-gradient(180deg,#ecfdf3,#fff);border-radius:22px;padding:16px;margin:12px 0;color:#065f46;font-weight:850}
+    .info-panel .icon{width:46px;height:46px;border-radius:18px;background:#dcfce7;display:grid;place-items:center;flex:0 0 auto;font-size:22px}
+    .upload-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(260px,.95fr);gap:16px;align-items:start}
+    .upload-zone{border:2px dashed #b7c8e8;background:linear-gradient(180deg,#fff,#f8fbff);border-radius:26px;padding:clamp(16px,3vw,26px);display:grid;gap:14px}
+    .upload-zone h4{font-size:23px;letter-spacing:-.03em;margin:0}
+    .upload-zone p{margin:0;color:var(--muted);font-weight:760}
+    .limit-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .limit-badge{border-radius:999px;background:#eef5ff;border:1px solid #d9e8ff;color:var(--primary);font-size:12px;font-weight:950;padding:8px 10px;max-width:100%;overflow-wrap:anywhere}
+    .limit-badge.good{background:#ecfdf3;border-color:#bbf7d0;color:#047857}
+    .limit-badge.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+    .file-picker{position:relative}
+    .file-picker input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .picker-face{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;border-radius:18px;background:#eaf3ff;color:var(--primary);font-weight:950;border:1px solid #d9e8ff;text-align:center;padding:12px}
+    .file-list{display:grid;gap:10px}
+    .file-chip{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--line);background:white;border-radius:18px;padding:12px}
+    .file-chip strong{display:block;overflow-wrap:anywhere;font-size:14px}
+    .file-chip span{display:block;color:var(--muted);font-size:12px;font-weight:800}
+    .file-chip button{border:0;background:#fff1f3;color:#b42318;border-radius:12px;padding:9px 10px;font-weight:950}
+    .payment-box{border:1px solid var(--line);background:white;border-radius:22px;padding:16px;display:grid;gap:12px}
+    .payment-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .payment-tags{display:flex;gap:8px;flex-wrap:wrap}
+    .mini-tag{font-size:12px;font-weight:950;border:1px solid var(--line);background:#f8fbff;border-radius:999px;padding:7px 9px;color:#344054}
+    .warning-box{border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:16px;padding:12px;font-weight:850;margin-top:12px}
+    .success-box{display:none;border:1px solid #bbf7d0;background:#ecfdf3;color:#065f46;border-radius:22px;padding:18px;margin-top:18px;font-weight:850}
+    .report-preview{background:#071120;color:white;border-radius:30px;padding:clamp(18px,3vw,28px);box-shadow:var(--shadow)}
+    .report-preview h3{margin:0 0 12px;font-size:22px}
+    .report-grid{display:grid;gap:10px}
+    .report-item{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px}
+    .report-item strong{display:block}
+    .report-item span{color:#c8d3e7;font-size:13px;font-weight:700}
+    .faq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .faq-card h3{margin:0 0 8px;font-size:18px}
+    .faq-card p{margin:0;color:var(--muted);font-weight:700}
+    footer{padding:36px 0;color:#667085;text-align:center;font-weight:750}
+    .owner-only{display:none}
+    body.owner-mode main > section:not(#ownerSection){display:none}
+    body.owner-mode #ownerSection{display:block}
+    #ownerSection{display:none;padding:30px 0}
+    .admin-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+    .admin-side{position:sticky;top:88px;display:grid;gap:10px}
+    .admin-tab{border:1px solid var(--line);background:white;border-radius:16px;padding:12px;text-align:left;font-weight:950}
+    .admin-tab.active{background:#eef5ff;color:var(--primary);border-color:#cfe1ff}
+    .admin-view{display:none}
+    .admin-view.active{display:block}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .stat-card{background:white;border:1px solid var(--line);border-radius:20px;padding:16px}
+    .stat-card b{font-size:28px;display:block}
+    .stat-card span{font-size:12px;color:#667085;font-weight:900}
+    .submission-list{display:grid;gap:12px}
+    .submission-card{background:white;border:1px solid var(--line);border-radius:22px;padding:16px;display:grid;gap:12px}
+    .submission-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .submission-id{font-weight:950;overflow-wrap:anywhere}
+    .status-pill{border-radius:999px;padding:7px 10px;font-size:12px;font-weight:950;background:#eef5ff;color:var(--primary)}
+    .status-sent{background:#ecfdf3;color:#047857}
+    .status-paid{background:#eef5ff;color:#1d4ed8}
+    .status-issue{background:#fff7ed;color:#9a3412}
+    .submission-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;color:#344054;font-size:13px;font-weight:750}
+    .submission-files{background:#f8fbff;border:1px solid var(--line);border-radius:16px;padding:12px;font-size:13px;overflow-wrap:anywhere}
+    .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .admin-actions .btn{min-height:42px;padding:10px 14px}
+    .hidden{display:none!important}
+    .chat-launch{position:fixed;right:16px;bottom:16px;z-index:80;border:0;border-radius:999px;background:linear-gradient(135deg,#0f1f46,var(--primary));color:white;box-shadow:0 14px 34px rgba(15,31,70,.35);padding:13px 18px;font-weight:950;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 32px)}
+    .chat-panel{position:fixed;right:16px;bottom:78px;width:min(370px,calc(100vw - 32px));max-height:min(620px,calc(100dvh - 110px));background:white;border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 70px rgba(16,24,40,.25);z-index:85;display:none;overflow:hidden}
+    .chat-panel.open{display:grid;grid-template-rows:auto 1fr auto}
+    .chat-head{padding:14px 16px;background:#071120;color:white;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .chat-head button{border:0;background:rgba(255,255,255,.12);color:white;border-radius:10px;padding:7px 10px}
+    .chat-body{padding:14px;overflow:auto;display:grid;gap:10px}
+    .bubble{padding:11px 12px;border-radius:16px;font-size:14px;font-weight:760;max-width:88%;overflow-wrap:anywhere}
+    .bubble.bot{background:#f0f5ff;color:#1f2a44;justify-self:start}
+    .bubble.user{background:var(--primary);color:white;justify-self:end}
+    .chat-form{display:grid;gap:8px;padding:12px;border-top:1px solid var(--line)}
+    .chat-form .row{display:grid;grid-template-columns:1fr auto;gap:8px}
+    .chat-form button{border:0;border-radius:14px;background:var(--primary);color:white;padding:10px 12px;font-weight:950}
+    @media (max-width:900px){
+      .hero-grid,.upload-grid,.admin-layout{grid-template-columns:1fr}
+      .admin-side{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}
+      .grid-3,.stat-grid{grid-template-columns:1fr 1fr}
+      .desktop-links{display:none}
+      .menu-btn{display:inline-flex}
+      .nav{height:64px}
+    }
+    @media (max-width:680px){
+      body{background:#f8fbff}
+      .container{padding-inline:12px}
+      .hero{padding-top:28px}
+      .hero-actions .btn{width:100%}
+      .grid-3,.form-grid,.faq-grid,.stat-grid,.submission-meta{grid-template-columns:1fr}
+      .section-head{display:block}
+      .submit-shell{border-radius:24px;padding:10px}
+      .step-card,.card{border-radius:20px}
+      .upload-zone{border-radius:22px;padding:16px}
+      .payment-top{display:grid}
+      .file-chip{grid-template-columns:1fr}
+      .file-chip button{width:100%}
+      .chat-launch{padding:12px 14px;right:12px;bottom:12px}
+      .chat-panel{right:12px;bottom:70px;width:calc(100vw - 24px)}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <nav class="nav">
+        <a href="#home" class="brand" data-scroll="home"><span class="brand-mark">HR</span><span id="brandName">HumanlyReview</span></a>
+        <div class="desktop-links">
+          <a href="#home" data-scroll="home">Home</a>
+          <a href="#pricing" data-scroll="pricing">Pricing</a>
+          <a href="#submit" data-scroll="submit">Start Review</a>
+          <a href="#faq" data-scroll="faq">FAQ</a>
+        </div>
+        <button class="menu-btn" id="menuBtn" type="button">Menu</button>
+        <a class="btn primary" href="#submit" data-scroll="submit">Start Review</a>
+      </nav>
+      <div class="mobile-links" id="mobileLinks">
+        <a href="#home" data-scroll="home">Home</a>
+        <a href="#pricing" data-scroll="pricing">Pricing</a>
+        <a href="#submit" data-scroll="submit">Start Review</a>
+        <a href="#faq" data-scroll="faq">FAQ</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">✨ Human-trained AI feedback</span>
+          <h1 id="heroTitle">Upload your file. Get clear review feedback.</h1>
+          <p id="heroSubtitle">A simple file-first review system for documents, slides, designs, books, reports, applications, concepts, and custom review requests.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#submit" data-scroll="submit">Start Review</a>
+            <a class="btn secondary" href="#pricing" data-scroll="pricing">View Pricing</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="status-stack">
+            <div class="status-item"><span class="status-icon">📎</span><div><strong>File-only submission</strong><span>The main material is selected as one clean file.</span></div></div>
+            <div class="status-item"><span class="status-icon">📧</span><div><strong>Email verified first</strong><span>Your report goes to the correct email address.</span></div></div>
+            <div class="status-item"><span class="status-icon">📄</span><div><strong>Two PDF outputs</strong><span>Main review report plus action checklist.</span></div></div>
+            <div class="status-item"><span class="status-icon">🔒</span><div><strong>Secure checkout</strong><span>Payment is verified before the request is submitted.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <div><h2>Choose your file review plan</h2><p>Pricing is based on file allowance and review depth.</p></div>
+        </div>
+        <div class="grid-3" id="pricingGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="submit">
+      <div class="container">
+        <div class="section-head">
+          <div><h2>Submit your file</h2><p>Complete the steps below. The layout is clean on phone and desktop.</p></div>
+        </div>
+        <div class="submit-shell">
+          <div class="step-card">
+            <div class="step-title"><span class="step-num">1</span><h3>Email confirmation</h3></div>
+            <div class="form-grid">
+              <label class="field">Email address
+                <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+              </label>
+              <label class="field">Verification code
+                <input id="otp" inputmode="numeric" maxlength="6" placeholder="Enter 6 digits">
+              </label>
+            </div>
+            <div class="admin-actions" style="margin-top:12px">
+              <button class="btn dark" id="sendOtpBtn" type="button">Send code</button>
+              <button class="btn ghost" id="verifyOtpBtn" type="button">Verify email</button>
+            </div>
+            <div id="emailMessage" class="field-note"></div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-title"><span class="step-num">2</span><h3>Review details</h3></div>
+            <div class="form-grid">
+              <label class="field">Plan
+                <select id="planSelect"></select>
+              </label>
+              <label class="field">Material type
+                <select id="contentType">
+                  <option>Writing / document</option>
+                  <option>Book / manuscript</option>
+                  <option>Book cover / visual design</option>
+                  <option>Presentation / slides</option>
+                  <option>Business document</option>
+                  <option>Architecture / spatial concept</option>
+                  <option>Product / packaging concept</option>
+                  <option>Custom review request</option>
+                </select>
+              </label>
+              <label class="field hidden" id="customTypeWrap">Describe the item
+                <input id="customType" maxlength="120" placeholder="Example: restaurant menu, floor plan, landing page">
+              </label>
+              <label class="field">Review purpose
+                <select id="purpose">
+                  <option>Before submission</option>
+                  <option>Before publishing</option>
+                  <option>Before client delivery</option>
+                  <option>Before investor presentation</option>
+                  <option>Before printing</option>
+                  <option>General improvement</option>
+                  <option>Custom purpose</option>
+                </select>
+              </label>
+              <label class="field hidden" id="customPurposeWrap">Describe the purpose
+                <input id="customPurpose" maxlength="160" placeholder="Example: before sending to a client">
+              </label>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-title"><span class="step-num">3</span><h3>File to review</h3></div>
+            <div class="info-panel"><span class="icon">📄</span><div><strong>Delivery includes 2 PDF files</strong><br>Main feedback report plus practical correction/action checklist, sent to your verified email.</div></div>
+            <div class="upload-grid">
+              <div class="upload-zone">
+                <h4>Upload one main file</h4>
+                <p>This is the main material you want reviewed. Keep it clean and easy to understand.</p>
+                <div class="limit-row" id="mainLimitBadges"></div>
+                <label class="file-picker">
+                  <input id="mainFileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png,.webp,.xlsx,.csv">
+                  <span class="picker-face">📎 Choose one main file</span>
+                </label>
+                <div class="file-list" id="mainFileList"></div>
+                <div id="mainFileMessage" class="field-note"></div>
+              </div>
+              <div class="upload-zone">
+                <h4>Supporting file</h4>
+                <p>Optional context such as instruction, sample, reference, or extra background.</p>
+                <div class="limit-row" id="supportLimitBadges"></div>
+                <label class="file-picker">
+                  <input id="supportFileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png,.webp,.xlsx,.csv">
+                  <span class="picker-face">📎 Add supporting file</span>
+                </label>
+                <div class="file-list" id="supportFileList"></div>
+                <div id="supportFileMessage" class="field-note"></div>
+              </div>
+            </div>
+            <div class="form-grid one" style="margin-top:14px">
+              <label class="field">Brief instruction (optional)
+                <textarea id="brief" maxlength="800" placeholder="Tell us what to focus on, the audience, or any special instruction."></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-title"><span class="step-num">4</span><h3>Payment</h3></div>
+            <div class="payment-box">
+              <div class="payment-top">
+                <div><strong id="paymentSummary">Secure checkout</strong><div class="field-note" id="paymentSubtext">Protected payment through Paystack.</div></div>
+                <div class="payment-tags"><span class="mini-tag">🔒 Protected</span><span class="mini-tag">✅ Email verified</span><span class="mini-tag">📄 2 PDFs</span></div>
+              </div>
+              <button class="btn primary full" id="payBtn" type="button">Pay with Paystack</button>
+              <div id="paymentStatus" class="field-note"></div>
+            </div>
+            <div style="height:14px"></div>
+            <button class="btn primary full" id="submitBtn" type="button">Submit for Review</button>
+            <div id="formWarning" class="warning-box">Complete the required steps before submitting.</div>
+            <div id="successBox" class="success-box"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="report-preview">
+          <h3>Your review report includes</h3>
+          <div class="report-grid">
+            <div class="report-item"><strong>Overall quality score /100</strong><span>A clear score with practical meaning.</span></div>
+            <div class="report-item"><strong>Review summary</strong><span>Main feedback in simple language.</span></div>
+            <div class="report-item"><strong>Strengths</strong><span>What is already working well.</span></div>
+            <div class="report-item"><strong>Weak points and risks</strong><span>What may reduce quality, trust, clarity, or impact.</span></div>
+            <div class="report-item"><strong>Improvement checklist</strong><span>Clear next actions to improve the work.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-head"><div><h2>FAQ</h2><p>Simple answers before you submit.</p></div></div>
+        <div class="faq-grid" id="faqGrid"></div>
+      </div>
+    </section>
+
+    <section id="ownerSection">
+      <div class="container">
+        <div class="section-head"><div><h2>Owner dashboard</h2><p>Private controls for submissions, settings, and file delivery.</p></div></div>
+        <div class="card" id="adminLoginCard">
+          <h3>Owner access</h3>
+          <p class="field-note">Enter your admin PIN to continue.</p>
+          <div class="form-grid">
+            <label class="field">Admin PIN <input id="adminPin" type="password" autocomplete="off" placeholder="Enter PIN"></label>
+            <div style="display:flex;align-items:end"><button class="btn primary full" id="adminLoginBtn" type="button">Open dashboard</button></div>
+          </div>
+          <div id="adminLoginMessage" class="field-note"></div>
+        </div>
+        <div class="admin-layout hidden" id="adminDashboard">
+          <aside class="admin-side card">
+            <button class="admin-tab active" data-admin-tab="overview" type="button">Overview</button>
+            <button class="admin-tab" data-admin-tab="submissions" type="button">Submissions</button>
+            <button class="admin-tab" data-admin-tab="settings" type="button">Settings</button>
+            <button class="admin-tab" data-admin-tab="delivery" type="button">Delivery status</button>
+          </aside>
+          <div>
+            <div class="admin-view active" id="adminView-overview">
+              <div class="stat-grid" id="adminStats"></div>
+            </div>
+            <div class="admin-view" id="adminView-submissions">
+              <div class="card">
+                <div class="section-head"><div><h2>Submissions</h2><p>Latest client requests.</p></div><button class="btn secondary" id="refreshSubmissionsBtn" type="button">Refresh</button></div>
+                <div class="submission-list" id="submissionList"></div>
+                <div id="submissionMessage" class="field-note"></div>
+              </div>
+            </div>
+            <div class="admin-view" id="adminView-settings">
+              <div class="card">
+                <h3>Website settings</h3>
+                <div class="form-grid">
+                  <label class="field">Brand name <input id="adminBrandName"></label>
+                  <label class="field">Support email <input id="adminSupportEmail"></label>
+                  <label class="field">Primary color <input id="adminPrimaryColor" type="color"></label>
+                  <label class="field">Accent color <input id="adminAccentColor" type="color"></label>
+                  <label class="field">Standard price $ <input id="adminStandardPrice" type="number" min="0"></label>
+                  <label class="field">Premium price $ <input id="adminPremiumPrice" type="number" min="0"></label>
+                  <label class="field">Enterprise price $ <input id="adminEnterprisePrice" type="number" min="0"></label>
+                  <label class="field">Standard main limit MB <input id="adminStandardMain" type="number" min="0"></label>
+                  <label class="field">Premium main limit MB <input id="adminPremiumMain" type="number" min="0"></label>
+                  <label class="field">Enterprise main limit MB <input id="adminEnterpriseMain" type="number" min="0"></label>
+                  <label class="field">Paystack public key <input id="adminPaystackPublicKey"></label>
+                </div>
+                <div class="admin-actions" style="margin-top:14px"><button class="btn primary" id="saveSettingsBtn" type="button">Save settings</button></div>
+                <div id="settingsMessage" class="field-note"></div>
+              </div>
+            </div>
+            <div class="admin-view" id="adminView-delivery">
+              <div class="card">
+                <h3>Mark report as sent</h3>
+                <div class="form-grid">
+                  <label class="field">Submission ID <input id="markSubmissionId" placeholder="HR-20260519-000000-1234"></label>
+                  <label class="field">Admin note <input id="markNote" placeholder="Report sent to client email"></label>
+                </div>
+                <div class="admin-actions" style="margin-top:14px"><button class="btn primary" id="markSentBtn" type="button">Mark sent</button></div>
+                <div id="markSentMessage" class="field-note"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="chat-launch" id="chatLaunch" type="button">💬 Live Chat</button>
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-head"><strong>HumanlyReview support</strong><button id="chatClose" type="button">Close</button></div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-form">
+      <input id="chatEmail" type="email" placeholder="Email address">
+      <div class="row"><input id="chatInput" placeholder="Type your question"><button id="chatSend" type="button">Send</button></div>
+    </div>
+  </div>
+
+  <footer><div class="container">© <span id="year"></span> <span id="footerBrand">HumanlyReview</span>. Feedback only. Final work remains yours.</div></footer>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6kjiHsPxrYWiZAiGJVCrTtT0Dgf3AJWeX_J25JhfQcu0sOzO8jwPTKDtsZMv6hvJAg/exec";
+    let PAYSTACK_PUBLIC_KEY = "pk_test_cdfaa0f13a49b0597573a5e336405a64dc634e4e";
+
+    const defaultConfig = {
+      brandName:"HumanlyReview",
+      supportEmail:"support@humanlyreview.com",
+      primaryColor:"#1d4ed8",
+      accentColor:"#7c3aed",
+      heroTitle:"Upload your file. Get clear review feedback.",
+      heroSubtitle:"A simple file-first review system for documents, slides, designs, books, reports, applications, concepts, and custom review requests.",
+      plans:[
+        {id:"standard",name:"Standard",priceUSD:9,mainMaxMB:10,supportMaxFiles:1,supportMaxMB:5,totalMaxMB:15,label:"One main file up to 10MB",featured:false},
+        {id:"premium",name:"Premium",priceUSD:29,mainMaxMB:25,supportMaxFiles:3,supportMaxMB:10,totalMaxMB:55,label:"Bigger file with extra context",featured:true},
+        {id:"enterprise",name:"Enterprise",priceUSD:99,mainMaxMB:0,supportMaxFiles:5,supportMaxMB:0,totalMaxMB:0,label:"Unlimited review scope",featured:false}
+      ],
+      faq:[
+        {q:"What do I submit?",a:"Submit one clean main file. You can also add optional support material when needed."},
+        {q:"What file types are accepted?",a:"PDF, DOC, DOCX, PPT, PPTX, TXT, RTF, JPG, PNG, WEBP, XLSX, and CSV are accepted."},
+        {q:"What do I receive?",a:"You receive a main review report and a practical action checklist as PDF files."},
+        {q:"Can you review designs and concepts?",a:"Yes. You can submit book covers, slides, posters, architecture ideas, product concepts, packaging ideas, and more."},
+        {q:"Do you complete the work for me?",a:"No. HumanlyReview gives feedback only. The final work remains yours."},
+        {q:"How fast is delivery?",a:"The expected delivery time is less than 1 hour after a successful submission."}
+      ]
+    };
+
+    const state = {
+      config: JSON.parse(JSON.stringify(defaultConfig)),
+      selectedPlanId: localStorage.getItem("hr_file_plan") || "standard",
+      authToken:"",
+      verifiedEmail:"",
+      paymentVerified:false,
+      paymentReference:"",
+      mainFile:null,
+      supportFiles:[],
+      adminToken:""
+    };
+
+    const $ = id => document.getElementById(id);
+    const esc = text => String(text||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+    const money = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Number(n||0));
+    const isEmail = value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value||""));
+    const sizeMB = file => Number(file && file.size ? file.size/1024/1024 : 0);
+    const plan = () => state.config.plans.find(p=>p.id===state.selectedPlanId) || state.config.plans[0];
+    const unlimited = n => !Number(n);
+    const limitText = mb => unlimited(mb) ? "No fixed size cap" : mb + "MB";
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    async function init(){
+      $("year").textContent = new Date().getFullYear();
+      bindUI();
+      detectOwnerMode();
+      await loadConfig();
+      applyConfig();
+      renderPricing();
+      renderPlanSelect();
+      renderFaq();
+      updateUI();
+    }
+
+    function bindUI(){
+      document.querySelectorAll("[data-scroll]").forEach(a=>a.addEventListener("click", e=>{
+        e.preventDefault();
+        const target = $(a.dataset.scroll);
+        if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
+        $("mobileLinks").classList.remove("open");
+      }));
+      $("menuBtn").onclick = () => $("mobileLinks").classList.toggle("open");
+      $("sendOtpBtn").onclick = requestOtp;
+      $("verifyOtpBtn").onclick = verifyOtp;
+      $("planSelect").onchange = e => selectPlan(e.target.value,true);
+      $("contentType").onchange = updateUI;
+      $("purpose").onchange = updateUI;
+      ["customType","customPurpose","brief","email","otp"].forEach(id=>$(id).addEventListener("input", updateUI));
+      $("mainFileInput").onchange = e => setMainFile(e.target.files);
+      $("supportFileInput").onchange = e => addSupportFiles(e.target.files);
+      $("payBtn").onclick = startPayment;
+      $("submitBtn").onclick = submitReview;
+      $("adminLoginBtn").onclick = adminLogin;
+      $("refreshSubmissionsBtn").onclick = loadSubmissions;
+      $("saveSettingsBtn").onclick = saveSettings;
+      $("markSentBtn").onclick = markSent;
+      document.querySelectorAll("[data-admin-tab]").forEach(btn=>btn.onclick=()=>showAdminTab(btn.dataset.adminTab));
+      $("chatLaunch").onclick = openChat;
+      $("chatClose").onclick = () => $("chatPanel").classList.remove("open");
+      $("chatSend").onclick = sendChat;
+      $("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat();});
+    }
+
+    function detectOwnerMode(){
+      const params = new URLSearchParams(location.search);
+      const hash = String(location.hash||"").replace("#","").toLowerCase();
+      const owner = params.get("owner")==="1" || params.get("admin")==="1" || hash==="owner" || hash==="admin";
+      if(owner) document.body.classList.add("owner-mode");
+    }
+
+    async function postBackend(payload){
+      const res = await fetch(APPS_SCRIPT_URL, {method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+      const text = await res.text();
+      let json;
+      try{json=JSON.parse(text);}catch(e){throw new Error("Backend response error. Check Apps Script deployment.");}
+      if(!json.ok) throw new Error(json.message || "Request failed.");
+      return json;
+    }
+
+    async function loadConfig(){
+      try{
+        const res = await postBackend({action:"getConfig"});
+        if(res.config) state.config = mergeConfig(defaultConfig,res.config);
+        if(res.paystackPublicKey) PAYSTACK_PUBLIC_KEY = res.paystackPublicKey;
+      }catch(e){}
+    }
+
+    function mergeConfig(base, incoming){
+      const out = Object.assign({}, base, incoming||{});
+      out.plans = Array.isArray(incoming && incoming.plans) && incoming.plans.length ? incoming.plans : base.plans;
+      out.faq = Array.isArray(incoming && incoming.faq) && incoming.faq.length ? incoming.faq : base.faq;
+      return out;
+    }
+
+    function applyConfig(){
+      document.documentElement.style.setProperty("--primary", state.config.primaryColor || defaultConfig.primaryColor);
+      document.documentElement.style.setProperty("--accent", state.config.accentColor || defaultConfig.accentColor);
+      $("brandName").textContent = state.config.brandName || "HumanlyReview";
+      $("footerBrand").textContent = state.config.brandName || "HumanlyReview";
+      $("heroTitle").textContent = state.config.heroTitle || defaultConfig.heroTitle;
+      $("heroSubtitle").textContent = state.config.heroSubtitle || defaultConfig.heroSubtitle;
+    }
+
+    function renderPricing(){
+      const grid = $("pricingGrid");
+      grid.innerHTML = "";
+      state.config.plans.forEach(p=>{
+        const active = p.id === state.selectedPlanId;
+        const div = document.createElement("div");
+        div.className = "card price-card" + (p.featured?" featured":"") + (active?" active":"");
+        const main = unlimited(p.mainMaxMB) ? "No fixed main-file cap" : `Main file up to ${p.mainMaxMB}MB`;
+        const support = Number(p.supportMaxFiles||0) ? `${p.supportMaxFiles} support file${Number(p.supportMaxFiles)>1?"s":""}` : "Support file optional";
+        const total = unlimited(p.totalMaxMB) ? "Unlimited review scope" : `Total allowance ${p.totalMaxMB}MB`;
+        div.innerHTML = `<span class="plan-tag">${esc(p.label||main)}</span><h3>${esc(p.name)}</h3><div class="price">${money(p.priceUSD)}</div><ul class="feature-list"><li>${main}</li><li>${support}</li><li>${total}</li><li>2 PDF outputs by email</li></ul><button class="btn ${p.featured?"primary":"secondary"} full" type="button">Choose ${esc(p.name)}</button>`;
+        div.querySelector("button").onclick = () => {selectPlan(p.id,true);$("submit").scrollIntoView({behavior:"smooth"});};
+        grid.appendChild(div);
+      });
+    }
+
+    function renderPlanSelect(){
+      const sel = $("planSelect");
+      sel.innerHTML = "";
+      state.config.plans.forEach(p=>sel.add(new Option(`${p.name} — ${money(p.priceUSD)}`, p.id)));
+      sel.value = state.selectedPlanId;
+    }
+
+    function renderFaq(){
+      $("faqGrid").innerHTML = (state.config.faq||[]).map(item=>`<div class="card faq-card"><h3>${esc(item.q)}</h3><p>${esc(item.a)}</p></div>`).join("");
+    }
+
+    function selectPlan(id, resetPay){
+      if(!state.config.plans.some(p=>p.id===id)) id = state.config.plans[0].id;
+      state.selectedPlanId = id;
+      localStorage.setItem("hr_file_plan", id);
+      if(resetPay){state.paymentVerified=false;state.paymentReference="";$("paymentStatus").textContent="";}
+      renderPricing();
+      renderPlanSelect();
+      updateUI();
+    }
+
+    function requestOtp(){
+      const email = $("email").value.trim();
+      if(!isEmail(email)){$("emailMessage").innerHTML='<span class="error-text">Enter a valid email address.</span>';return;}
+      $("sendOtpBtn").disabled=true;
+      $("emailMessage").innerHTML="Sending code...";
+      postBackend({action:"requestOtp",email}).then(()=>{
+        $("emailMessage").innerHTML='<span class="success-text">Code sent. Check your email.</span>';
+      }).catch(e=>$("emailMessage").innerHTML='<span class="error-text">'+esc(e.message)+'</span>').finally(()=>$("sendOtpBtn").disabled=false);
+    }
+
+    function verifyOtp(){
+      const email = $("email").value.trim();
+      const otp = $("otp").value.trim();
+      if(!isEmail(email)||!otp){$("emailMessage").innerHTML='<span class="error-text">Enter email and code.</span>';return;}
+      $("verifyOtpBtn").disabled=true;
+      postBackend({action:"verifyOtp",email,otp}).then(res=>{
+        state.authToken = res.authToken;
+        state.verifiedEmail = res.email || email;
+        $("emailMessage").innerHTML='<span class="success-text">Email verified successfully.</span>';
+        updateUI();
+      }).catch(e=>$("emailMessage").innerHTML='<span class="error-text">'+esc(e.message)+'</span>').finally(()=>$("verifyOtpBtn").disabled=false);
+    }
+
+    function setMainFile(fileList){
+      const files = Array.from(fileList||[]);
+      state.mainFile = files[0] || null;
+      $("mainFileInput").value = "";
+      $("mainFileMessage").innerHTML = files.length > 1 ? '<span class="error-text">Only one main file is allowed. The first file was selected.</span>' : "";
+      state.paymentVerified=false; state.paymentReference=""; $("paymentStatus").textContent="";
+      updateUI();
+    }
+
+    function addSupportFiles(fileList){
+      const p = plan();
+      const max = Number(p.supportMaxFiles||0);
+      for(const f of Array.from(fileList||[])){
+        if(max && state.supportFiles.length >= max) break;
+        const exists = state.supportFiles.some(x=>x.name===f.name && x.size===f.size && x.lastModified===f.lastModified);
+        if(!exists) state.supportFiles.push(f);
+      }
+      $("supportFileInput").value = "";
+      state.paymentVerified=false; state.paymentReference=""; $("paymentStatus").textContent="";
+      updateUI();
+    }
+
+    window.removeMainFile = function(){state.mainFile=null;state.paymentVerified=false;state.paymentReference="";updateUI();};
+    window.removeSupportFile = function(index){state.supportFiles.splice(index,1);state.paymentVerified=false;state.paymentReference="";updateUI();};
+
+    function renderFiles(){
+      $("mainFileList").innerHTML = state.mainFile ? fileChip(state.mainFile,"removeMainFile()") : "";
+      $("supportFileList").innerHTML = state.supportFiles.map((f,i)=>fileChip(f,`removeSupportFile(${i})`)).join("");
+    }
+
+    function fileChip(f, removeCall){
+      return `<div class="file-chip"><div><strong>${esc(f.name)}</strong><span>${sizeMB(f).toFixed(2)}MB</span></div><button type="button" onclick="${removeCall}">Remove</button></div>`;
+    }
+
+    function updateUI(){
+      const p = plan();
+      $("planSelect").value = state.selectedPlanId;
+      $("customTypeWrap").classList.toggle("hidden", $("contentType").value !== "Custom review request");
+      $("customPurposeWrap").classList.toggle("hidden", $("purpose").value !== "Custom purpose");
+      $("mainLimitBadges").innerHTML = `<span class="limit-badge good">Required: 1 main file</span><span class="limit-badge">${limitText(p.mainMaxMB)}</span><span class="limit-badge warn">${unlimited(p.totalMaxMB)?"No fixed total cap":"Total "+p.totalMaxMB+"MB"}</span>`;
+      $("supportLimitBadges").innerHTML = `<span class="limit-badge good">Optional</span><span class="limit-badge">${p.supportMaxFiles} file${Number(p.supportMaxFiles)>1?"s":""} max</span><span class="limit-badge warn">${unlimited(p.supportMaxMB)?"No fixed size cap":p.supportMaxMB+"MB each"}</span>`;
+      renderFiles();
+      const mainTooBig = state.mainFile && !unlimited(p.mainMaxMB) && sizeMB(state.mainFile) > Number(p.mainMaxMB);
+      const supportTooMany = state.supportFiles.length > Number(p.supportMaxFiles||0);
+      const supportTooBig = state.supportFiles.some(f=>!unlimited(p.supportMaxMB)&&sizeMB(f)>Number(p.supportMaxMB));
+      const total = (state.mainFile?sizeMB(state.mainFile):0) + state.supportFiles.reduce((s,f)=>s+sizeMB(f),0);
+      const totalTooBig = !unlimited(p.totalMaxMB) && total > Number(p.totalMaxMB);
+      $("mainFileMessage").innerHTML = mainTooBig ? '<span class="error-text">Main file is larger than the selected plan allows.</span>' : $("mainFileMessage").innerHTML;
+      $("supportFileMessage").innerHTML = supportTooMany || supportTooBig || totalTooBig ? '<span class="error-text">One or more supporting files exceed the selected plan allowance.</span>' : "";
+      $("paymentSummary").textContent = `Secure checkout — ${p.name} • ${money(p.priceUSD)}`;
+      $("payBtn").textContent = state.paymentVerified ? "Payment verified" : `Pay ${money(p.priceUSD)} with Paystack`;
+      $("payBtn").disabled = state.paymentVerified || !state.verifiedEmail;
+      const issues = [];
+      if(!state.verifiedEmail) issues.push("Verify your email.");
+      if(!state.mainFile) issues.push("Choose one main file.");
+      if($("contentType").value === "Custom review request" && !$("customType").value.trim()) issues.push("Describe the custom item.");
+      if($("purpose").value === "Custom purpose" && !$("customPurpose").value.trim()) issues.push("Describe the custom purpose.");
+      if(mainTooBig || supportTooMany || supportTooBig || totalTooBig) issues.push("Fix the file allowance issue.");
+      if(!state.paymentVerified) issues.push("Complete payment.");
+      $("submitBtn").disabled = issues.length > 0;
+      $("formWarning").style.display = issues.length ? "block" : "none";
+      $("formWarning").textContent = issues.length ? issues.slice(0,3).join(" ") : "Ready to submit.";
+    }
+
+    function startPayment(){
+      if(!state.verifiedEmail){$("paymentStatus").innerHTML='<span class="error-text">Verify your email first.</span>';return;}
+      if(!window.PaystackPop){$("paymentStatus").innerHTML='<span class="error-text">Paystack script is not ready. Refresh and try again.</span>';return;}
+      const p = plan();
+      const ref = "HRPAY-" + Date.now() + "-" + Math.floor(Math.random()*1000000);
+      const handler = PaystackPop.setup({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: state.verifiedEmail,
+        amount: Math.round(Number(p.priceUSD||0) * 100),
+        currency: "USD",
+        ref,
+        metadata: {custom_fields:[{display_name:"Plan",variable_name:"plan",value:p.name}]},
+        callback: function(response){ verifyPayment(response.reference || ref); },
+        onClose: function(){$("paymentStatus").textContent="Checkout closed. You can try again.";}
+      });
+      handler.openIframe();
+    }
+
+    function verifyPayment(reference){
+      const p = plan();
+      $("paymentStatus").textContent = "Verifying payment...";
+      postBackend({action:"verifyPayment",authToken:state.authToken,reference,planId:p.id,expectedAmount:Number(p.priceUSD||0),expectedCurrency:"USD"}).then(res=>{
+        state.paymentVerified = true;
+        state.paymentReference = res.reference || reference;
+        $("paymentStatus").innerHTML='<span class="success-text">Payment verified. You can submit now.</span>';
+        updateUI();
+      }).catch(e=>{$("paymentStatus").innerHTML='<span class="error-text">'+esc(e.message)+'</span>';updateUI();});
+    }
+
+    async function fileToPayload(file){
+      return new Promise((resolve,reject)=>{
+        const reader = new FileReader();
+        reader.onload = () => resolve({name:file.name,mimeType:file.type||"application/octet-stream",size:file.size,base64:String(reader.result).split(",")[1]||""});
+        reader.onerror = () => reject(new Error("Could not read file: "+file.name));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function submitReview(){
+      updateUI();
+      if($("submitBtn").disabled) return;
+      const p = plan();
+      $("submitBtn").disabled = true;
+      $("submitBtn").textContent = "Submitting...";
+      try{
+        const contentType = $("contentType").value === "Custom review request" ? $("customType").value.trim() : $("contentType").value;
+        const purpose = $("purpose").value === "Custom purpose" ? $("customPurpose").value.trim() : $("purpose").value;
+        const submission = {
+          planId:p.id, planName:p.name, amount:Number(p.priceUSD||0), currency:"USD",
+          contentType, purpose, brief:$("brief").value.trim(), paymentReference:state.paymentReference,
+          mainFiles:[await fileToPayload(state.mainFile)], supportFiles:[]
+        };
+        for(const f of state.supportFiles) submission.supportFiles.push(await fileToPayload(f));
+        const res = await postBackend({action:"submitReview",authToken:state.authToken,submission});
+        $("successBox").style.display="block";
+        $("successBox").innerHTML=`✅ Submitted successfully.<br><br><strong>Submission ID:</strong> ${esc(res.submissionId)}<br>Your PDF report and checklist will be sent to your verified email.`;
+        $("successBox").scrollIntoView({behavior:"smooth",block:"center"});
+      }catch(e){
+        $("formWarning").style.display="block";
+        $("formWarning").innerHTML='<span class="error-text">'+esc(e.message)+'</span>';
+      }finally{
+        $("submitBtn").textContent = "Submit for Review";
+        updateUI();
+      }
+    }
+
+    function showAdminTab(tab){
+      document.querySelectorAll(".admin-tab").forEach(b=>b.classList.toggle("active",b.dataset.adminTab===tab));
+      document.querySelectorAll(".admin-view").forEach(v=>v.classList.remove("active"));
+      const view = $("adminView-"+tab); if(view)view.classList.add("active");
+      if(tab==="submissions") loadSubmissions();
+      if(tab==="overview") loadStats();
+      if(tab==="settings") fillSettings();
+    }
+
+    function adminLogin(){
+      const pin = $("adminPin").value.trim();
+      if(!pin){$("adminLoginMessage").innerHTML='<span class="error-text">Enter admin PIN.</span>';return;}
+      $("adminLoginBtn").disabled=true;
+      postBackend({action:"adminLogin",pin}).then(res=>{
+        state.adminToken = res.adminToken;
+        $("adminLoginCard").classList.add("hidden");
+        $("adminDashboard").classList.remove("hidden");
+        loadStats(); fillSettings(); loadSubmissions();
+      }).catch(e=>$("adminLoginMessage").innerHTML='<span class="error-text">'+esc(e.message)+'</span>').finally(()=>$("adminLoginBtn").disabled=false);
+    }
+
+    function loadStats(){
+      if(!state.adminToken)return;
+      postBackend({action:"adminGetDashboardStats",adminToken:state.adminToken}).then(res=>{
+        const stats = [["Total",res.totalSubmissions],["Processing",res.activeSubmissions],["Sent",res.sentReports],["Paid",res.paidSubmissions],["Revenue",money(res.estimatedRevenue||0)],["Chats",res.liveChats||0],["Feedback",res.feedbackCount||0]];
+        $("adminStats").innerHTML = stats.map(s=>`<div class="stat-card"><b>${esc(s[1])}</b><span>${esc(s[0])}</span></div>`).join("");
+      }).catch(()=>{});
+    }
+
+    function loadSubmissions(){
+      if(!state.adminToken)return;
+      $("submissionList").innerHTML = '<div class="card">Loading submissions...</div>';
+      postBackend({action:"adminListSubmissions",adminToken:state.adminToken}).then(res=>{
+        const rows = res.submissions || [];
+        if(!rows.length){$("submissionList").innerHTML='<div class="card">No submissions yet.</div>';return;}
+        $("submissionList").innerHTML = rows.map(row=>submissionCard(row)).join("");
+      }).catch(e=>$("submissionMessage").innerHTML='<span class="error-text">'+esc(e.message)+'</span>');
+    }
+
+    function submissionCard(row){
+      const cls = String(row.status||"").toLowerCase().includes("sent") ? "status-sent" : (String(row.paymentVerified||"").toLowerCase()==="yes" ? "status-paid" : "status-issue");
+      return `<div class="submission-card"><div class="submission-head"><div><div class="submission-id">${esc(row.submissionId)}</div><div class="field-note">${esc(row.timestamp)}</div></div><span class="status-pill ${cls}">${esc(row.status||"Processing")} • Payment: ${esc(row.paymentVerified||"No")}</span></div><div class="submission-meta"><div><b>Email:</b> ${esc(row.email)}</div><div><b>Plan:</b> ${esc(row.planName)} ${esc(row.currency)} ${esc(row.amount)}</div><div><b>Type:</b> ${esc(row.contentType)}</div><div><b>Purpose:</b> ${esc(row.purpose)}</div><div><b>Reference:</b> ${esc(row.paymentReference)}</div><div><b>Total size:</b> ${esc(row.totalUploadMB||"")}MB</div></div>${row.mainFileLinks?`<div class="submission-files"><b>Main file:</b><br>${esc(row.mainFileLinks).replace(/\n/g,"<br>")}</div>`:""}${row.supportFileLinks?`<div class="submission-files"><b>Supporting file:</b><br>${esc(row.supportFileLinks).replace(/\n/g,"<br>")}</div>`:""}<div class="admin-actions"><button class="btn secondary" type="button" onclick="quickFillSent('${esc(row.submissionId)}')">Use ID</button><button class="btn primary" type="button" onclick="markSentDirect('${esc(row.submissionId)}')">Mark sent</button></div></div>`;
+    }
+
+    window.quickFillSent = function(id){$("markSubmissionId").value=id;showAdminTab("delivery");};
+    window.markSentDirect = function(id){$("markSubmissionId").value=id;$("markNote").value="Report sent to client email";markSent();};
+
+    function fillSettings(){
+      const c=state.config;
+      $("adminBrandName").value=c.brandName||"";
+      $("adminSupportEmail").value=c.supportEmail||"";
+      $("adminPrimaryColor").value=c.primaryColor||"#1d4ed8";
+      $("adminAccentColor").value=c.accentColor||"#7c3aed";
+      const get=id=>c.plans.find(p=>p.id===id)||{};
+      $("adminStandardPrice").value=get("standard").priceUSD||0;
+      $("adminPremiumPrice").value=get("premium").priceUSD||0;
+      $("adminEnterprisePrice").value=get("enterprise").priceUSD||0;
+      $("adminStandardMain").value=get("standard").mainMaxMB||0;
+      $("adminPremiumMain").value=get("premium").mainMaxMB||0;
+      $("adminEnterpriseMain").value=get("enterprise").mainMaxMB||0;
+      $("adminPaystackPublicKey").value=PAYSTACK_PUBLIC_KEY||"";
+    }
+
+    function saveSettings(){
+      const c=JSON.parse(JSON.stringify(state.config));
+      c.brandName=$("adminBrandName").value.trim()||"HumanlyReview";
+      c.supportEmail=$("adminSupportEmail").value.trim()||"support@humanlyreview.com";
+      c.primaryColor=$("adminPrimaryColor").value||"#1d4ed8";
+      c.accentColor=$("adminAccentColor").value||"#7c3aed";
+      const patch=(id,price,main)=>{const p=c.plans.find(x=>x.id===id);if(p){p.priceUSD=Number($(price).value||0);p.mainMaxMB=Number($(main).value||0);}};
+      patch("standard","adminStandardPrice","adminStandardMain");
+      patch("premium","adminPremiumPrice","adminPremiumMain");
+      patch("enterprise","adminEnterprisePrice","adminEnterpriseMain");
+      const publicKey=$("adminPaystackPublicKey").value.trim();
+      postBackend({action:"adminUpdateConfig",adminToken:state.adminToken,config:c,paystackPublicKey:publicKey}).then(()=>{
+        state.config=c; PAYSTACK_PUBLIC_KEY=publicKey || PAYSTACK_PUBLIC_KEY;
+        applyConfig(); renderPricing(); renderPlanSelect(); renderFaq(); updateUI();
+        $("settingsMessage").innerHTML='<span class="success-text">Settings saved.</span>';
+      }).catch(e=>$("settingsMessage").innerHTML='<span class="error-text">'+esc(e.message)+'</span>');
+    }
+
+    function markSent(){
+      const submissionId=$("markSubmissionId").value.trim();
+      const note=$("markNote").value.trim();
+      if(!submissionId){$("markSentMessage").innerHTML='<span class="error-text">Enter Submission ID.</span>';return;}
+      postBackend({action:"adminMarkReportSent",adminToken:state.adminToken,submissionId,note}).then(()=>{
+        $("markSentMessage").innerHTML='<span class="success-text">Marked as sent.</span>';
+        loadSubmissions(); loadStats();
+      }).catch(e=>$("markSentMessage").innerHTML='<span class="error-text">'+esc(e.message)+'</span>');
+    }
+
+    function openChat(){
+      $("chatPanel").classList.add("open");
+      if(!$("chatBody").children.length) addBot("Hello. Enter your email and type your question. Support will follow up when needed.");
+    }
+    function addBot(text){const b=document.createElement("div");b.className="bubble bot";b.textContent=text;$("chatBody").appendChild(b);$("chatBody").scrollTop=$("chatBody").scrollHeight;}
+    function addUser(text){const b=document.createElement("div");b.className="bubble user";b.textContent=text;$("chatBody").appendChild(b);$("chatBody").scrollTop=$("chatBody").scrollHeight;}
+    function sendChat(){
+      const email=$("chatEmail").value.trim();
+      const message=$("chatInput").value.trim();
+      if(!isEmail(email)){addBot("Enter a valid email first.");return;}
+      if(!message)return;
+      addUser(message); $("chatInput").value="";
+      const fallback="Thanks. Your message has been recorded. Support will reply through your email if extra help is needed.";
+      postBackend({action:"liveChatMessage",email,message,page:location.href}).then(res=>addBot(res.reply||fallback)).catch(()=>addBot(fallback));
+    }
+  </script>
+</body>
+</html>
