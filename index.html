@@ -6772,5 +6772,198 @@ document.addEventListener("DOMContentLoaded",function(){
 })();
 </script>
 
+
+<style>
+/* =========================================================
+   PREMIUM ADMIN + UPLOAD + LIVECHAT V5
+   ========================================================= */
+:root{
+  --hr-v5-ink:#111827;
+  --hr-v5-muted:#667085;
+  --hr-v5-border:#e5e7eb;
+  --hr-v5-soft:#f8fafc;
+  --hr-v5-blue:#2563eb;
+  --hr-v5-sky:#eff6ff;
+  --hr-v5-green:#059669;
+  --hr-v5-shadow:0 16px 40px rgba(15,23,42,.08);
+}
+.upload-box,
+.file-drop,
+.drop-zone,
+label[for="fileInput"],
+label[for="briefFileInput"]{
+  border:1.5px dashed #b9c8e8!important;
+  border-radius:26px!important;
+  background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)!important;
+  box-shadow:var(--hr-v5-shadow)!important;
+}
+.upload-box{padding:18px!important}
+.upload-box strong{font-size:18px!important;letter-spacing:-.02em!important;color:var(--hr-v5-ink)!important}
+.upload-box .muted,.upload-box small,.upload-box p{color:var(--hr-v5-muted)!important;line-height:1.45!important}
+.upload-box .click-hint{
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  padding:10px 13px!important;border-radius:999px!important;background:#eff6ff!important;
+  border:1px solid #dbeafe!important;color:#1d4ed8!important;font-weight:950!important;margin-top:10px!important;
+}
+.upload-box .click-hint::before{content:"📎"}
+.upload-premium-note{
+  margin-top:12px;border-radius:20px;padding:13px;border:1px solid #dbeafe;background:#f8fbff;
+  color:#334155;font-size:13px;line-height:1.5;font-weight:850;
+}
+.upload-premium-note b{color:#1d4ed8}
+.two-pdf-note{
+  display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:flex-start;margin:14px 0;
+  padding:14px;border-radius:22px;border:1px solid #bbf7d0;
+  background:linear-gradient(180deg,#f0fdf4,#ffffff);color:#14532d;
+  box-shadow:0 12px 28px rgba(5,150,105,.08);
+}
+.two-pdf-note .icon{
+  width:38px;height:38px;border-radius:14px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:21px;
+}
+.two-pdf-note strong{display:block;color:#065f46;margin-bottom:4px}
+.two-pdf-note span{font-size:13px;font-weight:850;line-height:1.45}
+.file-chip,.selected-file,.file-row,.uploaded-file{
+  border-radius:16px!important;border:1px solid #e5e7eb!important;background:#fff!important;box-shadow:0 8px 18px rgba(15,23,42,.05)!important;
+}
+.custom-highlight-strip,.payment-shield{
+  background:linear-gradient(135deg,#f8fbff,#eef4ff)!important;color:#1f2937!important;border:1px solid #dbeafe!important;
+  box-shadow:0 14px 34px rgba(15,23,42,.07)!important;
+}
+.custom-highlight-strip small,.payment-shield p{color:#475467!important}
+.payment-shield h3{color:#111827!important}
+.payment-shield-grid span{background:#fff!important;border:1px solid #e5e7eb!important;color:#344054!important}
+.custom-field{background:linear-gradient(180deg,#fff,#f8fbff)!important;border-color:#bfdbfe!important}
+.custom-field::before{background:#eff6ff!important;color:#1d4ed8!important;border:1px solid #dbeafe!important}
+.admin-premium-settings-card{
+  border:1px solid #dbeafe;background:linear-gradient(180deg,#ffffff,#f8fbff);border-radius:28px;padding:18px;
+  box-shadow:var(--hr-v5-shadow);margin:18px 0;
+}
+.admin-premium-settings-card h3{margin:0 0 6px;font-size:23px;letter-spacing:-.035em;color:#111827}
+.admin-premium-settings-card p{color:#667085;font-size:13px;line-height:1.5;font-weight:850}
+.admin-premium-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.admin-premium-grid label{font-size:12px;color:#475467;font-weight:950}
+.admin-premium-grid input,.admin-premium-grid textarea,.admin-premium-grid select{
+  margin-top:6px;width:100%;border-radius:16px!important;border:1px solid #d0d5dd!important;min-height:46px!important;background:#fff!important;
+}
+.admin-premium-grid textarea{min-height:92px!important;padding:12px!important}
+.admin-full{grid-column:1/-1}
+.admin-action-loading{pointer-events:none!important;opacity:.78!important;position:relative!important}
+.admin-action-loading::after{
+  content:"";display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-top-color:transparent;
+  margin-left:8px;vertical-align:-2px;animation:hrSpin .75s linear infinite;
+}
+@keyframes hrSpin{to{transform:rotate(360deg)}}
+.hr-chat-card{background:#fff!important;border:1px solid #e5e7eb!important;box-shadow:0 14px 35px rgba(15,23,42,.07)!important}
+.hr-chat-choice{background:linear-gradient(180deg,#fff,#f8fafc)!important;border:1px solid #e5e7eb!important}
+.hr-chat-choice:hover{border-color:#bfdbfe!important;background:#f8fbff!important}
+.hr-chat-nav .primary-mini{background:#eff6ff!important;border-color:#dbeafe!important;color:#1d4ed8!important}
+@media(max-width:900px){.admin-premium-grid{grid-template-columns:1fr}}
+</style>
+
+<script>
+/* =========================================================
+   PREMIUM ADMIN + UPLOAD + LIVECHAT V5 LOGIC
+   ========================================================= */
+(function(){
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s||"").replace(/[&<>"']/g,function(m){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])})}
+  function adminToken(){try{if(window.state&&state.adminToken)return state.adminToken}catch(e){} try{return sessionStorage.getItem("hr_admin_token")||localStorage.getItem("hr_admin_token")||""}catch(e){} return ""}
+  function setLoading(btn,on,text){
+    if(!btn)return;
+    if(on){btn.dataset.oldText=btn.textContent;btn.textContent=text||"Working";btn.classList.add("admin-action-loading");btn.disabled=true;}
+    else{btn.textContent=btn.dataset.oldText||btn.textContent;btn.classList.remove("admin-action-loading");btn.disabled=false;}
+  }
+  function toast(id,msg,err){
+    var el=$(id)||$("adminMessage")||$("adminCleanMessage"); if(!el)return;
+    el.className="admin-clean-note show";el.style.background=err?"#fef3f2":"#ecfdf3";el.style.color=err?"#b42318":"#027a48";el.style.borderColor=err?"#fecdca":"#abefc6";el.textContent=msg;
+  }
+  function addUploadNotes(){
+    var fi=$("fileInput"), mainBox=fi&&fi.closest(".upload-box");
+    if(fi){fi.multiple=false;fi.removeAttribute("multiple")}
+    if(mainBox && !mainBox.querySelector(".upload-premium-note")){
+      var note=document.createElement("div"); note.className="upload-premium-note";
+      note.innerHTML="📌 <b>Main content:</b> upload only one clean file for review. This keeps your feedback focused and prevents confusion.";
+      mainBox.appendChild(note);
+    }
+    var brief=$("briefFileInput"), briefBox=brief&&brief.closest(".upload-box");
+    if(briefBox && !briefBox.querySelector(".upload-premium-note")){
+      var n=document.createElement("div"); n.className="upload-premium-note";
+      n.innerHTML="🧾 <b>Supporting brief:</b> add extra instructions, references, samples, or context only when needed.";
+      briefBox.appendChild(n);
+    }
+    if(mainBox && !document.querySelector(".two-pdf-note")){
+      var pdf=document.createElement("div"); pdf.className="two-pdf-note";
+      pdf.innerHTML='<div class="icon">📄</div><div><strong>Delivery includes 2 PDF files</strong><span>You receive a main review report plus a practical correction/action checklist PDF. Both are sent to your verified email.</span></div>';
+      mainBox.insertAdjacentElement("beforebegin",pdf);
+    }
+  }
+  function enforcePlanLabels(){
+    document.querySelectorAll(".plan-card,.pricing-card,.plan-option,[id*='plan']").forEach(function(card){
+      if(!card || !card.innerHTML)return;
+      card.innerHTML=card.innerHTML.replace(/word[s]?\s*limit[:\s]*[\d,]+/gi,"file allowance")
+        .replace(/[\d,]+\s*words/gi,"file allowance").replace(/Word Count/gi,"File allowance");
+    });
+    var wc=$("wordCount"); if(wc && wc.closest("label"))wc.closest("label").style.display="none";
+  }
+  function injectOperationalSettings(){
+    var admin=$("adminEditor"); if(!admin || $("adminOperationalSettingsCard"))return;
+    var card=document.createElement("div"); card.id="adminOperationalSettingsCard"; card.className="admin-premium-settings-card";
+    card.innerHTML='<h3>⚙️ Website control settings</h3><p>Control file limits, support hours, and report delivery wording from admin without editing code.</p><div class="admin-premium-grid"><label>Main content max files<input id="opMainFileMaxCount" type="number" min="1" max="1" value="1" disabled></label><label>Standard support files<input id="opStandardBriefFileMaxCount" type="number" min="0" max="5"></label><label>Premium support files<input id="opPremiumBriefFileMaxCount" type="number" min="0" max="10"></label><label>Enterprise support files<input id="opEnterpriseBriefFileMaxCount" type="number" min="0" max="20"></label><label>Standard max MB/file<input id="opStandardFileMaxMB" type="number" min="1" max="100"></label><label>Premium max MB/file<input id="opPremiumFileMaxMB" type="number" min="1" max="100"></label><label>Enterprise max MB/file<input id="opEnterpriseFileMaxMB" type="number" min="1" max="200"></label><label>Standard total MB<input id="opStandardTotalMaxMB" type="number" min="1" max="200"></label><label>Premium total MB<input id="opPremiumTotalMaxMB" type="number" min="1" max="300"></label><label>Enterprise total MB<input id="opEnterpriseTotalMaxMB" type="number" min="1" max="500"></label><label>Support start GMT<input id="opSupportStartGMT" type="number" min="0" max="23"></label><label>Support end GMT<input id="opSupportEndGMT" type="number" min="1" max="24"></label><label class="admin-full">Two-PDF delivery message<textarea id="opTwoPdfMessage"></textarea></label></div><div class="admin-clean-actions"><button class="btn primary" id="saveOperationalSettingsBtn" type="button">Save website control settings</button><button class="btn secondary" id="loadOperationalSettingsBtn" type="button">Reload settings</button></div><div id="operationalSettingsMessage" class="admin-clean-note"></div>';
+    var before=$("adminStoragePanel")||$("adminReviewSettingsCard")||admin.querySelector(".admin-grid");
+    if(before)admin.insertBefore(card,before); else admin.appendChild(card);
+    bindOperationalSettings(); loadOperationalSettings(false);
+  }
+  async function loadOperationalSettings(show){
+    var btn=$("loadOperationalSettingsBtn");
+    try{
+      setLoading(btn,true,"Loading");
+      var r=await postBackend({action:"adminGetOperationalSettings",adminToken:adminToken()});
+      var s=r.settings||{}, map={opStandardBriefFileMaxCount:"standardBriefFileMaxCount",opPremiumBriefFileMaxCount:"premiumBriefFileMaxCount",opEnterpriseBriefFileMaxCount:"enterpriseBriefFileMaxCount",opStandardFileMaxMB:"standardFileMaxMB",opPremiumFileMaxMB:"premiumFileMaxMB",opEnterpriseFileMaxMB:"enterpriseFileMaxMB",opStandardTotalMaxMB:"standardTotalMaxMB",opPremiumTotalMaxMB:"premiumTotalMaxMB",opEnterpriseTotalMaxMB:"enterpriseTotalMaxMB",opSupportStartGMT:"supportStartGMT",opSupportEndGMT:"supportEndGMT"};
+      Object.keys(map).forEach(function(id){if($(id))$(id).value=s[map[id]]});
+      if($("opTwoPdfMessage"))$("opTwoPdfMessage").value=s.sendTwoPdfMessage||"";
+      if(show)toast("operationalSettingsMessage","Settings loaded.");
+    }catch(e){toast("operationalSettingsMessage",e.message||String(e),true)}
+    finally{setLoading(btn,false)}
+  }
+  async function saveOperationalSettings(){
+    var btn=$("saveOperationalSettingsBtn");
+    try{
+      setLoading(btn,true,"Saving");
+      var settings={mainFileMaxCount:1,standardBriefFileMaxCount:Number($("opStandardBriefFileMaxCount").value||1),premiumBriefFileMaxCount:Number($("opPremiumBriefFileMaxCount").value||3),enterpriseBriefFileMaxCount:Number($("opEnterpriseBriefFileMaxCount").value||8),standardFileMaxMB:Number($("opStandardFileMaxMB").value||10),premiumFileMaxMB:Number($("opPremiumFileMaxMB").value||20),enterpriseFileMaxMB:Number($("opEnterpriseFileMaxMB").value||20),standardTotalMaxMB:Number($("opStandardTotalMaxMB").value||10),premiumTotalMaxMB:Number($("opPremiumTotalMaxMB").value||50),enterpriseTotalMaxMB:Number($("opEnterpriseTotalMaxMB").value||80),supportStartGMT:Number($("opSupportStartGMT").value||7),supportEndGMT:Number($("opSupportEndGMT").value||22),sendTwoPdfMessage:$("opTwoPdfMessage").value||""};
+      var r=await postBackend({action:"adminUpdateOperationalSettings",adminToken:adminToken(),settings:settings});
+      toast("operationalSettingsMessage",r.message||"Settings saved.");
+    }catch(e){toast("operationalSettingsMessage",e.message||String(e),true)}
+    finally{setLoading(btn,false)}
+  }
+  function bindOperationalSettings(){
+    if($("saveOperationalSettingsBtn"))$("saveOperationalSettingsBtn").onclick=saveOperationalSettings;
+    if($("loadOperationalSettingsBtn"))$("loadOperationalSettingsBtn").onclick=function(){loadOperationalSettings(true)};
+  }
+  function strengthenLoadingStates(){
+    document.querySelectorAll("#adminModal button").forEach(function(btn){
+      if(btn.dataset.loadingBound)return; btn.dataset.loadingBound="1";
+      btn.addEventListener("click",function(){
+        var text=(btn.textContent||"").toLowerCase();
+        if(text.match(/load|save|clear|delete|verify|sent|reload/)){
+          if(!btn.disabled){setLoading(btn,true,text.indexOf("load")!==-1||text.indexOf("reload")!==-1?"Loading":text.indexOf("save")!==-1?"Saving":"Working");setTimeout(function(){setLoading(btn,false)},3500);}
+        }
+      }, true);
+    });
+  }
+  function premiumPaymentUI(){
+    var box=$("paymentSummary"); if(!box)return;
+    var planText="";
+    try{var p=state.config.plans.find(function(x){return x.id===$("planSelect").value})||state.config.plans[0];planText=p.name+" • "+new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(p.priceUSD);}catch(e){}
+    box.innerHTML='<div class="payment-shield"><h3>🔐 Secure review checkout</h3><p><strong>'+esc(planText)+'</strong> is protected with verified email, unique payment reference, and double-payment guard. Once payment is verified, you will not need to pay again for the same request.</p><div class="payment-shield-grid"><span>🛡️ Double-payment guard</span><span>✅ Verified email</span><span>🧾 Unique reference</span><span>📄 2 PDF delivery</span></div></div>';
+  }
+  function init(){
+    addUploadNotes(); enforcePlanLabels(); injectOperationalSettings(); bindOperationalSettings(); strengthenLoadingStates(); premiumPaymentUI();
+  }
+  document.addEventListener("DOMContentLoaded",init);
+  setTimeout(init,800);
+  setInterval(init,1500);
+})();
+</script>
+
 </body>
 </html>
