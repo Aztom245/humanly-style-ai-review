@@ -2829,7 +2829,7 @@ body.owner-unlocked #adminModal.open{
     <div class="process-card card">
       <div class="section-head" style="margin-bottom:20px;"><span class="page-kicker">What users should expect</span><h2>From upload to review report</h2><p>Every step is designed to be simple, clear, and reassuring.</p></div>
       <div class="process-steps">
-        <div><span>01</span><strong>Submit material</strong><p>Paste content or upload files for review.</p></div>
+        <div><span>01</span><strong>Submit material</strong><p>Upload file or upload files for review.</p></div>
         <div><span>02</span><strong>Secure payment</strong><p>Choose a plan and complete payment.</p></div>
         <div><span>03</span><strong>Review processing</strong><p>Your submission enters the review queue immediately.</p></div>
         <div><span>04</span><strong>Report delivery</strong><p>Your feedback report is sent to your email as a PDF, usually in less than 1 hour.</p></div>
@@ -2879,7 +2879,7 @@ body.owner-unlocked #adminModal.open{
       </div>
 
       <div class="form-section"><div class="form-title"><span class="num">3</span><h3>Content to review *</h3></div><p class="field-note">Choose one method: paste content OR upload file(s). This keeps your submission clean and avoids confusion.</p>
-        <label>Paste content <span class="small-muted">(if you are not uploading files)</span><textarea id="contentText" placeholder="Paste text, notes, description, or review brief here..."></textarea><span id="pasteLockNote" class="required-help"></span></label><div class="word-box" id="wordStatus">0 words counted.</div>
+        <label>Upload file <span class="small-muted">(if you are not uploading files)</span><textarea id="contentText" placeholder="Paste text, notes, description, or review brief here..."></textarea><span id="pasteLockNote" class="required-help"></span></label><div class="word-box" id="wordStatus">0 words counted.</div>
         <label class="upload-box"><span class="upload-icon">📎</span><span><strong>Upload one main file to review *</strong><br><span class="field-note" id="uploadLimitText"></span><span class="click-hint">Click here to choose one file</span></span><input id="fileInput" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png"></label><div class="file-list" id="mainFileList"></div><div class="file-info" id="fileInfo" style="display:none;"></div>
         <div class="brief-grid" style="margin-top:18px;"><label>Brief <span class="small-muted">(optional)</span><textarea id="brief" maxlength="800" placeholder="Optional instruction for the review."></textarea><div class="field-note">Maximum 800 characters.</div></label><label class="upload-box"><span class="upload-icon">📝</span><span><strong>Supporting file</strong><br><span class="field-note" id="briefUploadLimitText"></span><span class="click-hint">Click here to choose file</span></span><input id="briefFileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png"></label></div><div class="file-list" id="briefFileList"></div><div class="file-info" id="briefFileInfo" style="display:none;"></div>
       </div>
@@ -6962,6 +6962,94 @@ label[for="briefFileInput"]{
   document.addEventListener("DOMContentLoaded",init);
   setTimeout(init,800);
   setInterval(init,1500);
+})();
+</script>
+
+
+<style>
+/* =========================================================
+   MOBILE + DESKTOP + UPLOAD-ONLY + FILE PLAN UX V6
+   ========================================================= */
+html,body{max-width:100%;overflow-x:hidden!important}
+*{box-sizing:border-box}
+img,video,iframe{max-width:100%;height:auto}
+.container,.page-shell,.section,.card,.form-card,.pricing-grid,.admin-grid{max-width:100%!important}
+@media(max-width:760px){
+  body{font-size:15px!important}
+  h1{font-size:clamp(32px,9vw,48px)!important;line-height:1.02!important}
+  h2{font-size:clamp(24px,7vw,34px)!important;line-height:1.1!important}
+  h3{font-size:clamp(19px,5.4vw,25px)!important}
+  .hero,.section,.card,.form-card,.modal-panel{padding-left:16px!important;padding-right:16px!important}
+  .grid,.pricing-grid,.admin-grid,.admin-premium-grid,.admin-storage-grid,.admin-clean-grid,.review-grid,.form-grid{grid-template-columns:1fr!important}
+  .btn,button,input,select,textarea{min-height:48px!important;font-size:16px!important}
+  .btn,button{width:100%;justify-content:center!important}
+  #adminModal .modal-panel,.modal-panel{width:calc(100vw - 18px)!important;max-height:92vh!important;overflow:auto!important;border-radius:22px!important;margin:9px!important}
+  #liveChatPanel{width:calc(100vw - 16px)!important;right:8px!important;left:8px!important;bottom:8px!important;max-height:88vh!important}
+}
+@media(min-width:761px){
+  .container,.page-shell{max-width:1180px!important;margin-left:auto!important;margin-right:auto!important}
+  .pricing-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:20px!important}
+}
+#contentText,#contentTextWrap,#pasteContentWrap,textarea[name="contentText"],label:has(#contentText){display:none!important}
+.upload-only-banner{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:flex-start;margin:14px 0;padding:16px;border-radius:24px;border:1px solid #dbeafe;background:linear-gradient(180deg,#f8fbff,#ffffff);box-shadow:0 14px 34px rgba(15,23,42,.06)}
+.upload-only-banner .icon{width:42px;height:42px;border-radius:16px;background:#eff6ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-size:22px}
+.upload-only-banner strong{display:block;color:#111827;font-size:16px;margin-bottom:5px}
+.upload-only-banner span{display:block;color:#667085;font-size:13px;font-weight:850;line-height:1.45}
+.upload-box{display:block!important;width:100%!important;padding:20px!important;border-radius:28px!important;border:1.5px dashed #b7c7e8!important;background:linear-gradient(180deg,#fff,#f8fbff)!important}
+.upload-box>*{max-width:100%}
+.upload-box strong{display:block!important;font-size:18px!important;color:#111827!important;margin-bottom:7px!important}
+.upload-box .muted,.upload-box p,.upload-box small{display:block!important;max-width:680px!important;margin:6px 0!important}
+.upload-box .click-hint{width:auto!important;max-width:100%;white-space:normal!important;text-align:center!important}
+.file-allowance-card{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:flex-start;margin-top:12px;border-radius:20px;padding:13px;background:#f8fafc;border:1px solid #e5e7eb;color:#334155}
+.file-allowance-card .icon{width:34px;height:34px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#ecfdf3;color:#047857}
+.file-allowance-card strong{font-size:13px!important;margin:0!important;color:#111827!important}
+.file-allowance-card span{font-size:12px;font-weight:850;color:#667085;line-height:1.4}
+.file-plan-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 11px;background:#eff6ff;color:#1d4ed8;border:1px solid #dbeafe;font-size:12px;font-weight:950;margin:8px 0}
+.plan-card .word-limit,.plan-card [data-word-limit],.word-limit,#wordCount,label:has(#wordCount){display:none!important}
+.payment-shield,.checkout-trust-box{border-radius:22px!important;padding:14px!important;background:#ffffff!important;border:1px solid #e5e7eb!important;box-shadow:0 10px 24px rgba(15,23,42,.05)!important;color:#111827!important}
+.payment-shield h3,.checkout-trust-title{font-size:16px!important;margin:0!important;color:#111827!important}
+.payment-shield p{display:none!important}
+.payment-shield-grid,.checkout-trust-grid{display:flex!important;gap:7px!important;flex-wrap:wrap!important;margin-top:10px!important}
+.payment-shield-grid span,.checkout-trust-grid span{padding:7px 10px!important;border-radius:999px!important;background:#f8fafc!important;border:1px solid #e5e7eb!important;color:#344054!important;font-size:12px!important;font-weight:900!important}
+.admin-action-loading{pointer-events:none!important;opacity:.75!important}
+.admin-action-loading::after{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-top-color:transparent;margin-left:8px;vertical-align:-2px;animation:hrSpin .75s linear infinite}
+@keyframes hrSpin{to{transform:rotate(360deg)}}
+.admin-session-note{border:1px solid #dbeafe;background:#eff6ff;color:#1d4ed8;border-radius:16px;padding:10px 12px;font-weight:900;font-size:13px;line-height:1.45}
+</style>
+
+<script>
+/* =========================================================
+   MOBILE + DESKTOP + UPLOAD-ONLY + FILE PLAN UX V6 LOGIC
+   ========================================================= */
+(function(){
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s||"").replace(/[&<>"']/g,function(m){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])})}
+  function cfg(){try{return state.config||{}}catch(e){return {}}}
+  function planId(){var s=$("planSelect");return s?s.value:((cfg().plans&&cfg().plans[0]&&cfg().plans[0].id)||"standard")}
+  function op(){return Object.assign({standardFileMaxMB:10,premiumFileMaxMB:20,enterpriseFileMaxMB:0,standardTotalMaxMB:10,premiumTotalMaxMB:50,enterpriseTotalMaxMB:0},window.hrOperationalSettings||{})}
+  function planLimit(pid){var s=op();if(String(pid).indexOf("enterprise")!==-1)return{label:"Unlimited file size",maxMB:0};if(String(pid).indexOf("premium")!==-1)return{label:"Up to "+s.premiumFileMaxMB+"MB file",maxMB:s.premiumFileMaxMB};return{label:"Up to "+s.standardFileMaxMB+"MB file",maxMB:s.standardFileMaxMB}}
+  async function fetchOp(){try{if(typeof postBackend==="function"){var r=await postBackend({action:"adminGetOperationalSettings",adminToken:(state&&state.adminToken)||""});if(r&&r.settings)window.hrOperationalSettings=r.settings}}catch(e){}}
+  function setLoading(btn,on,text){if(!btn)return;if(on){btn.dataset.oldText=btn.textContent;btn.textContent=text||"Working";btn.classList.add("admin-action-loading");btn.disabled=true}else{btn.textContent=btn.dataset.oldText||btn.textContent;btn.classList.remove("admin-action-loading");btn.disabled=false}}
+  function uploadOnlyUI(){
+    var txt=$("contentText");if(txt){txt.value="";txt.removeAttribute("required")}var wrap=txt&&txt.closest("label");if(wrap)wrap.style.display="none";
+    var fi=$("fileInput"), box=fi&&fi.closest(".upload-box");if(fi){fi.multiple=false;fi.removeAttribute("multiple")}
+    if(box&&!document.querySelector(".upload-only-banner")){var b=document.createElement("div");b.className="upload-only-banner";b.innerHTML='<div class="icon">📤</div><div><strong>Upload-only review</strong><span>Please upload one main file for review. Text pasting is disabled so every submission stays clean and easy to review.</span></div>';box.insertAdjacentElement("beforebegin",b)}
+    if(box&&!box.querySelector(".file-allowance-card")){var note=document.createElement("div");note.className="file-allowance-card";note.innerHTML='<div class="icon">📎</div><div><strong>One main file only</strong><span id="mainFileAllowanceText">Choose a plan to see file allowance.</span></div>';box.appendChild(note)}
+    updateAllowance();
+  }
+  function updateAllowance(){var lim=planLimit(planId());var t=$("mainFileAllowanceText");if(t)t.textContent="Main content: 1 file • "+lim.label+". Supporting brief files depend on your selected plan."}
+  function okSize(files){var lim=planLimit(planId());if(!files||!files.length)return true;if(lim.maxMB&&files[0].size>lim.maxMB*1024*1024){alert("This file is larger than the selected plan allows. Current allowance: "+lim.maxMB+"MB. Please choose a higher plan or upload a smaller file.");return false}return true}
+  function overrideUpload(){if(window.__uploadOnlyV6)return;window.__uploadOnlyV6=true;var old=window.addFiles;window.addFiles=function(kind,fileList){var files=Array.from(fileList||[]);if(kind==="main"){if(!files.length)return;if(!okSize(files))return;try{state.mainFiles=[files[0]];if($("fileInput"))$("fileInput").value="";if(typeof updateUI==="function")updateUI();return}catch(e){}}return old?old(kind,fileList):undefined};if($("fileInput"))$("fileInput").onchange=function(){window.addFiles("main",this.files)}}
+  function fixPlan(){var sel=$("planSelect");if(!sel)return;if(!sel.dataset.fixedV6){sel.dataset.fixedV6="1";sel.addEventListener("change",function(){try{state.selectedPlanId=this.value;state.planId=this.value;localStorage.setItem("hr_selected_plan_id",this.value)}catch(e){}updateAllowance();setTimeout(function(){var saved=localStorage.getItem("hr_selected_plan_id");if(saved&&$("planSelect"))$("planSelect").value=saved;updateAllowance()},80)})}try{var saved=localStorage.getItem("hr_selected_plan_id");if(saved)sel.value=saved}catch(e){}}
+  function patchPlans(){var plans=(cfg().plans||[]);document.querySelectorAll(".plan-card,.pricing-card,.plan-option").forEach(function(card,idx){var pid=(plans[idx]&&plans[idx].id)||(idx===2?"enterprise":idx===1?"premium":"standard"),lim=planLimit(pid);card.innerHTML=card.innerHTML.replace(/word[s]?\s*limit[:\s]*[\d,]+/gi,"file allowance").replace(/[\d,]+\s*words/gi,lim.label).replace(/Word Count/gi,"File allowance");if(!card.querySelector(".file-plan-badge")){var badge=document.createElement("div");badge.className="file-plan-badge";badge.innerHTML="📁 "+(idx===2?"Enterprise: unlimited file size":"Main file: "+lim.label);card.appendChild(badge)}});var wc=$("wordCount");if(wc&&wc.closest("label"))wc.closest("label").style.display="none"}
+  function payment(){var box=$("paymentSummary");if(!box)return;var ptxt="";try{var p=(cfg().plans||[]).find(function(x){return x.id===planId()})||(cfg().plans||[])[0];ptxt=p?p.name+" • "+new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(p.priceUSD):""}catch(e){}box.innerHTML='<div class="payment-shield"><h3>🔐 Secure checkout <span style="color:#667085;font-weight:800">— '+esc(ptxt)+'</span></h3><div class="payment-shield-grid"><span>🛡️ Protected</span><span>✅ Email verified</span><span>🧾 Unique reference</span><span>📄 2 PDFs</span></div></div>'}
+  function submitGuard(){if(window.__submitUploadOnlyV6)return;window.__submitUploadOnlyV6=true;var old=window.submitReview;if(typeof old==="function"){window.submitReview=function(){try{if(!state.mainFiles||!state.mainFiles.length){alert("Please upload one main file for review before submitting.");return}if($("contentText"))$("contentText").value=""}catch(e){}return old.apply(this,arguments)}}}
+  function adminLoading(){document.body.addEventListener("click",function(ev){var btn=ev.target.closest&&ev.target.closest("#adminModal button");if(!btn)return;var t=(btn.textContent||"").toLowerCase();if(t.match(/load|save|clear|delete|verify|sent|reload|update/)){setLoading(btn,true,t.indexOf("load")!==-1||t.indexOf("reload")!==-1?"Loading":t.indexOf("save")!==-1?"Saving":"Working");setTimeout(function(){setLoading(btn,false)},4500)}},true)}
+  function sessionText(){document.querySelectorAll("#adminModal,.modal-panel,.admin-clean-note,#adminMessage").forEach(function(el){if(el&&el.innerHTML&&el.innerHTML.indexOf("Admin session expired. Login again.")!==-1){el.innerHTML=el.innerHTML.replace(/Admin session expired\. Login again\./g,"Please unlock the owner dashboard again to continue.")}})}
+  function init(){uploadOnlyUI();overrideUpload();fixPlan();patchPlans();payment();submitGuard();sessionText()}
+  document.addEventListener("DOMContentLoaded",function(){fetchOp().finally(function(){init();adminLoading()})});
+  setTimeout(init,700);
+  setInterval(init,1200);
 })();
 </script>
 
