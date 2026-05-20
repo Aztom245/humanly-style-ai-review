@@ -83,6 +83,13 @@
     .btn:active{transform:translateY(1px)}
     .btn-primary{background:var(--brand);color:#fff;box-shadow:0 14px 24px rgba(20,33,61,.18)}
     .btn-primary:hover{background:#0c172d}
+
+    .btn-hero{min-height:58px;padding:0 24px;font-size:1.04rem;box-shadow:0 18px 34px rgba(20,33,61,.24)}
+    .btn-sample{background:#fff7ed;border:1px solid rgba(245,158,11,.30);color:#7c2d12;box-shadow:0 12px 24px rgba(245,158,11,.10)}
+    .proof-note{border:1px solid rgba(245,158,11,.26);background:#fffbeb;border-radius:18px;padding:14px;color:#78350f}
+    .proof-note strong{display:block;margin-bottom:4px;color:#78350f}
+    .proof-note p{margin:0;color:#92400e;font-weight:700}
+    .otp-timer{margin-top:8px;display:inline-flex;align-items:center;gap:8px;font-weight:900;color:#7c2d12;background:#fff7ed;border:1px solid rgba(245,158,11,.30);border-radius:999px;padding:7px 10px}
     .btn-soft{background:var(--surface);border:1px solid var(--soft);color:var(--ink)}
     .btn-soft:hover{box-shadow:var(--shadow-sm)}
     .btn-green{background:var(--brand-2);color:#fff}
@@ -333,7 +340,7 @@
           <a href="#pricing">Pricing</a>
           <a href="#submit">Submit</a>
           <a href="#faq">FAQ</a>
-          <a href="#submit" class="btn btn-primary">Start Review</a>
+          <a href="#submit" class="btn btn-primary">Start Paid Review</a>
         </nav>
       </div>
     </header>
@@ -344,14 +351,14 @@
           <div>
             <div class="eyebrow">File upload → secure checkout → PDF feedback by email</div>
             <h1>Premium review feedback without the messy process.</h1>
-            <p class="lead">Upload one main file, choose the plan that fits the file size, complete secure payment, and receive a clear PDF feedback report with issues, scores, and practical improvement guidance.</p>
+            <p class="lead">Preview the sample report structure first, then upload one main file, choose the plan that fits the file size, complete secure payment, and receive a clear PDF feedback report with issues, scores, and practical improvement guidance.</p>
             <div class="hero-actions">
-              <a href="#submit" class="btn btn-primary">Start Free Assessment</a>
-              <a href="#sample" class="btn btn-soft">See report structure</a>
+              <a href="#submit" class="btn btn-primary btn-hero">Start Paid Review</a>
+              <a href="#sample" class="btn btn-sample btn-hero">View Sample Report First</a>
             </div>
             <div class="trust-row" aria-label="Trust highlights">
               <span class="chip">Feedback only</span>
-              <span class="chip">Secure Paystack checkout</span>
+              <span class="chip">Secure local-currency checkout</span>
               <span class="chip">Copyable Submission ID</span>
               <span class="chip">Mobile-friendly upload flow</span>
             </div>
@@ -373,6 +380,10 @@
               <div class="issue-card">
                 <span class="issue-dot" aria-hidden="true"></span>
                 <div><strong>Action checklist</strong><p class="help">Clear next steps so the user can make improvements without confusion.</p></div>
+              </div>
+              <div class="proof-note">
+                <strong>Sample-first confidence</strong>
+                <p>See the report structure before checkout. HumanlyReview uses clear paid review plans, so there is no confusing free-plan promise or hidden trial expectation.</p>
               </div>
             </div>
           </div>
@@ -412,7 +423,7 @@
         <div class="wrap">
           <div class="section-head">
             <h2>Choose by file size and review depth.</h2>
-            <p>Prices are displayed in USD. Checkout may process the supported local currency equivalent through Paystack.</p>
+            <p>Prices are shown in USD as the service value reference. Secure Paystack checkout will display the final payable amount in the supported local currency before you confirm payment.</p>
           </div>
           <div class="plans" id="plans" aria-live="polite"></div>
         </div>
@@ -451,7 +462,8 @@
                   <div class="field" style="margin:0">
                     <label class="sr-only" for="otp">Verification code</label>
                     <input id="otp" inputmode="numeric" maxlength="6" placeholder="6-digit code" aria-describedby="otpHelp">
-                    <div class="help" id="otpHelp">Check inbox and spam/junk folder.</div>
+                    <div class="help" id="otpHelp">Check inbox and spam/junk folder. The code lasts for 1 minute.</div>
+                    <div class="otp-timer hide" id="otpTimer" role="status" aria-live="polite"></div>
                   </div>
                 </div>
                 <button type="button" class="btn btn-green btn-full" id="verifyOtpBtn" style="margin-top:10px">Verify email</button>
@@ -493,7 +505,7 @@
                 <h3><span class="num">4</span> Secure payment</h3>
                 <div class="pay-card">
                   <p class="help" id="paymentNote">Your checkout amount will appear here after loading plan settings.</p>
-                  <button type="button" class="btn btn-primary btn-full" id="payBtn" disabled>Pay securely with Paystack</button>
+                  <button type="button" class="btn btn-primary btn-full" id="payBtn" disabled>Continue to secure checkout</button>
                   <div class="status" id="paymentStatus" role="status" aria-live="polite"></div>
                   <div id="paymentRefWrap" class="hide" style="margin-top:10px">
                     <div class="help">Verified payment reference</div>
@@ -542,7 +554,7 @@
           <div class="policy">
             <article class="card"><h3>Feedback-only boundary</h3><p>We review and advise. We do not complete, falsify, submit, or guarantee outcomes for users.</p></article>
             <article class="card"><h3>Privacy care</h3><p>Remove unnecessary confidential details before upload. Files are used for review handling and support only.</p></article>
-            <article class="card"><h3>Correction support</h3><p>If payment succeeds but submission fails, contact support with your email, plan, and Paystack reference.</p></article>
+            <article class="card"><h3>Correction support</h3><p>If payment succeeds but submission fails, contact hello@humanlyreview.com with your email, plan, and Paystack reference.</p></article>
           </div>
         </div>
       </section>
@@ -551,7 +563,7 @@
     <footer class="footer">
       <div class="wrap footer-grid">
         <div><strong>HumanlyReview</strong><div>Structured PDF feedback for uploaded files.</div></div>
-        <div>Support: <a id="supportEmailLink" href="mailto:support@humanlyreview.com">support@humanlyreview.com</a></div>
+        <div>Support: <a id="supportEmailLink" href="mailto:hello@humanlyreview.com">hello@humanlyreview.com</a></div>
       </div>
     </footer>
 
@@ -572,8 +584,8 @@
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6kjiHsPxrYWiZAiGJVCrTtT0Dgf3AJWeX_J25JhfQcu0sOzO8jwPTKDtsZMv6hvJAg/exec";
     const DEFAULT_PUBLIC_CONFIG = {
-      version:"2026-05-20-file-only-v1",
-      supportEmail:"support@humanlyreview.com",
+      version:"2026-05-20-file-only-v3-email-currency",
+      supportEmail:"hello@humanlyreview.com",
       paystackPublicKey:"",
       currency:"NGN",
       fxRate:1500,
@@ -589,9 +601,10 @@
         ["What do I upload?","Upload one main file for review. Add supporting files only when they provide useful context."],
         ["When can I pay?","Payment opens after your email is verified, a plan is selected, and your file passes size/type validation."],
         ["What happens after payment?","You submit the paid review once, receive a Submission ID, and get the PDF feedback report by email."],
-        ["What if payment succeeds but upload fails?","Use payment recovery on this page or contact support with your email, plan, and Paystack reference."],
+        ["What if payment succeeds but upload fails?","Use payment recovery on this page or contact hello@humanlyreview.com with your email, plan, and Paystack reference."],
         ["Do you complete work for users?","No. HumanlyReview provides feedback and improvement guidance only."],
-        ["Can I upload sensitive files?","Remove unnecessary confidential details before upload. Do not upload secret codes, private keys, or account access details."]
+        ["Can I upload sensitive files?","Remove unnecessary confidential details before upload. Do not upload secret codes, private keys, or account access details."],
+        ["Is there a free plan?","No free plan is advertised. You can view the sample report structure first, then choose a paid review plan only when you are ready."]
       ]
     };
 
@@ -605,7 +618,9 @@
       mainFile:null,
       supportFiles:[],
       submitting:false,
-      publicLoaded:false
+      publicLoaded:false,
+      otpTimerId:null,
+      otpExpiresAt:0
     };
 
     const $ = id => document.getElementById(id);
@@ -723,9 +738,8 @@
         payBtn.disabled = true;
         return;
       }
-      const ngn = Math.round(plan.priceUsd * Number(state.config.fxRate || 1500));
-      note.textContent = `${plan.name}: ${money(plan.priceUsd)}. Checkout may show about ₦${ngn.toLocaleString()} depending on the configured rate.`;
-      payBtn.textContent = `Pay ${money(plan.priceUsd)} for ${plan.name}`;
+      note.textContent = `${plan.name}: ${money(plan.priceUsd)} service value. You will pay through Paystack in the supported local checkout currency; the final amount appears before you confirm.`;
+      payBtn.textContent = `Continue to secure checkout — ${plan.name}`;
       payBtn.disabled = !canPay();
       if(state.paymentVerified){
         $("paymentRefWrap").classList.remove("hide");
@@ -866,6 +880,51 @@
       }
     }
 
+    function stopOtpCountdown(message){
+      if(state.otpTimerId) clearInterval(state.otpTimerId);
+      state.otpTimerId = null;
+      state.otpExpiresAt = 0;
+      const el = $("otpTimer");
+      if(!el) return;
+      if(message){
+        el.textContent = message;
+        el.classList.remove("hide");
+      }else{
+        el.textContent = "";
+        el.classList.add("hide");
+      }
+    }
+
+    function startOtpCountdown(seconds){
+      stopOtpCountdown();
+      const total = Number(seconds || 60);
+      state.otpExpiresAt = Date.now() + total * 1000;
+      const el = $("otpTimer");
+      const verifyBtn = $("verifyOtpBtn");
+      el.classList.remove("hide");
+      const tick = () => {
+        const left = Math.max(0, Math.ceil((state.otpExpiresAt - Date.now()) / 1000));
+        const mm = Math.floor(left / 60);
+        const ss = String(left % 60).padStart(2,"0");
+        if(left > 0){
+          el.textContent = `Code expires in ${mm}:${ss}`;
+          verifyBtn.disabled = false;
+        }else{
+          clearInterval(state.otpTimerId);
+          state.otpTimerId = null;
+          el.textContent = "Code expired. Request a new code.";
+          verifyBtn.disabled = true;
+          state.emailVerified = false;
+          state.authToken = "";
+          state.paymentVerified = false;
+          state.paymentReference = "";
+          renderControls();
+        }
+      };
+      tick();
+      state.otpTimerId = setInterval(tick, 1000);
+    }
+
     async function sendOtp(){
       const email = $("email").value.trim().toLowerCase();
       if(!email || !email.includes("@")){
@@ -875,8 +934,14 @@
       const btn = $("sendOtpBtn");
       try{
         setBusy(btn,true,"Sending code...");
+        state.emailVerified = false;
+        state.authToken = "";
+        state.paymentVerified = false;
+        state.paymentReference = "";
+        renderControls();
         const data = await callApi("sendOtp",{email});
-        setStatus($("emailStatus"), "ok", data.message || "Verification code sent. Check inbox and spam/junk folder.");
+        startOtpCountdown(data.expiresInSeconds || 60);
+        setStatus($("emailStatus"), "ok", data.message || "Verification code sent. It expires in 1 minute. Check inbox and spam/junk folder.");
       }catch(err){
         setStatus($("emailStatus"), "err", err.message);
       }finally{
@@ -900,6 +965,7 @@
         state.paymentVerified = false;
         state.paymentReference = "";
         localStorage.setItem("hr_email", email);
+        stopOtpCountdown("Email verified. You can continue to upload and payment.");
         setStatus($("emailStatus"), "ok", "Email verified successfully.");
         renderControls();
       }catch(err){
@@ -1032,7 +1098,7 @@
         state.paymentVerified = false;
         renderControls();
       }catch(err){
-        setStatus($("submitStatus"), "err", err.message + " If payment was successful, use recovery or contact support with your reference.");
+        setStatus($("submitStatus"), "err", err.message + " If payment was successful, use recovery or contact hello@humanlyreview.com with your reference.");
       }finally{
         state.submitting = false;
         setBusy(btn,false);
@@ -1115,6 +1181,8 @@
         state.paymentVerified = false;
         state.paymentReference = "";
         clearStatus($("emailStatus"));
+        stopOtpCountdown();
+        $("verifyOtpBtn").disabled = false;
         renderControls();
       });
       $("copySubmissionBtn").addEventListener("click", async () => {
@@ -1142,6 +1210,7 @@
                 <h2>Unlock dashboard</h2>
                 <div class="field"><label for="ownerPin">Owner PIN</label><input id="ownerPin" type="text" class="masked-pin" inputmode="numeric" autocomplete="off" placeholder="Enter owner PIN"></div>
                 <button class="btn btn-primary btn-full" id="ownerLoginBtn">Unlock</button>
+                <button class="btn btn-danger btn-full hide" id="ownerLogoutBtn" type="button" style="margin-top:10px">Logout</button>
                 <div class="status" id="ownerStatus" role="status" aria-live="polite"></div>
                 <div class="admin-tabs hide" id="adminTabs">
                   <button data-tab="submissions" class="active">Submissions</button>
@@ -1158,6 +1227,18 @@
       async function ownerApi(action,payload={}){
         return callApi(action,{ownerToken:admin.token,...payload});
       }
+      function showOwnerDashboard(active){
+        $("adminTabs").classList.toggle("hide", !active);
+        $("ownerLogoutBtn").classList.toggle("hide", !active);
+      }
+      function logout(){
+        admin.token = "";
+        admin.data = null;
+        sessionStorage.removeItem("hr_owner_token");
+        showOwnerDashboard(false);
+        $("adminMain").innerHTML = '<p class="help">Owner tools are locked. Enter your PIN to continue.</p>';
+        setStatus($("ownerStatus"),"info","Logged out safely.");
+      }
       async function login(){
         try{
           setStatus($("ownerStatus"),"info","Checking access...");
@@ -1165,7 +1246,7 @@
           admin.token = data.ownerToken;
           sessionStorage.setItem("hr_owner_token", admin.token);
           setStatus($("ownerStatus"),"ok","Dashboard unlocked.");
-          $("adminTabs").classList.remove("hide");
+          showOwnerDashboard(true);
           await load();
         }catch(err){ setStatus($("ownerStatus"),"err",err.message); }
       }
@@ -1175,7 +1256,7 @@
         renderAdmin();
       }
       function renderAdmin(){
-        $("adminTabs").classList.remove("hide");
+        showOwnerDashboard(true);
         document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("active",b.dataset.tab===admin.tab));
         if(admin.tab === "submissions") renderSubmissions();
         if(admin.tab === "payments") renderPayments();
@@ -1250,16 +1331,16 @@
           <h2>Public settings</h2>
           <p class="help">Secrets belong in Apps Script Properties, not in public HTML.</p>
           <div class="grid-3">
-            <div class="field"><label>Support email</label><input id="setSupportEmail" value="${escapeHtml(cfg.supportEmail || "")}"></div>
+            <div class="field"><label>Official support / OTP reply email</label><input id="setSupportEmail" value="${escapeHtml(cfg.supportEmail || "")}"></div>
             <div class="field"><label>Paystack public key</label><input id="setPublicKey" value="${escapeHtml(cfg.paystackPublicKey || "")}"></div>
-            <div class="field"><label>USD to NGN rate</label><input id="setFxRate" type="number" value="${escapeHtml(cfg.fxRate || 1500)}"></div>
+            <div class="field"><label>USD value → local checkout rate</label><input id="setFxRate" type="number" value="${escapeHtml(cfg.fxRate || 1500)}"></div>
           </div>
           <h3>Plan limits</h3>
           <div class="admin-cards">${(cfg.plans || []).map(p => `
             <div class="admin-card">
               <strong>${escapeHtml(p.name)}</strong>
               <div class="row" style="margin-top:10px">
-                <input data-plan-price="${escapeHtml(p.id)}" type="number" placeholder="USD price" value="${p.priceUsd === null ? "" : escapeHtml(p.priceUsd)}" ${p.payOnline ? "" : "disabled"}>
+                <input data-plan-price="${escapeHtml(p.id)}" type="number" placeholder="USD value" value="${p.priceUsd === null ? "" : escapeHtml(p.priceUsd)}" ${p.payOnline ? "" : "disabled"}>
                 <input data-plan-main="${escapeHtml(p.id)}" type="number" placeholder="Main MB" value="${p.maxMainMb === null ? "" : escapeHtml(p.maxMainMb)}" ${p.payOnline ? "" : "disabled"}>
               </div>
               <div class="row">
@@ -1297,8 +1378,9 @@
         };
       }
       $("ownerLoginBtn").addEventListener("click", login);
+      $("ownerLogoutBtn").addEventListener("click", logout);
       document.querySelectorAll("[data-tab]").forEach(btn => btn.addEventListener("click", () => { admin.tab = btn.dataset.tab; renderAdmin(); }));
-      if(admin.token){ $("adminTabs").classList.remove("hide"); load().catch(()=>{}); }
+      if(admin.token){ showOwnerDashboard(true); load().catch(()=>logout()); }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
