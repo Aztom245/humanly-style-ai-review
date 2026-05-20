@@ -98,6 +98,40 @@
       border:2px solid rgba(255,255,255,.75);
     }
 
+
+    .cta-main{
+      background:linear-gradient(135deg,#ffd166 0%,#f59e0b 42%,#0f766e 100%)!important;
+      color:#061018!important;
+      border:2px solid rgba(255,255,255,.92)!important;
+      box-shadow:0 18px 44px rgba(245,158,11,.42),0 10px 26px rgba(15,118,110,.24)!important;
+      font-weight:1000!important;
+      letter-spacing:-.02em!important;
+      transform:translateZ(0);
+    }
+    .cta-main:hover{transform:translateY(-1px);filter:saturate(1.05)}
+    .password-wrap{position:relative;display:flex;align-items:center}
+    .password-wrap input{padding-right:58px}
+    .eye-btn{
+      position:absolute;right:8px;top:50%;transform:translateY(-50%);
+      width:42px;height:38px;border-radius:13px;border:1px solid var(--soft);
+      background:#fff;display:grid;place-items:center;font-weight:950;color:var(--brand)
+    }
+    .health-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+    .health-card{position:relative;overflow:hidden}
+    .health-title{display:flex;align-items:center;gap:10px;margin-bottom:5px}
+    .health-running{background:linear-gradient(90deg,#fff,#f8fafc,#fff);background-size:240% 100%;animation:healthShimmer 1.15s ease-in-out infinite}
+    .spinner{
+      width:18px;height:18px;border-radius:50%;border:3px solid #e2e8f0;border-top-color:var(--accent);
+      display:inline-block;animation:spin .75s linear infinite;flex:0 0 auto
+    }
+    .health-ok{border-color:rgba(6,118,71,.20);background:rgba(6,118,71,.045)}
+    .health-bad{border-color:rgba(180,35,24,.20);background:rgba(180,35,24,.045)}
+    .health-mini{font-size:.82rem;font-weight:950;border-radius:999px;padding:5px 8px;display:inline-flex;align-items:center;gap:6px}
+    .health-mini.ok{background:rgba(6,118,71,.10);color:var(--ok)}
+    .health-mini.bad{background:rgba(180,35,24,.10);color:var(--danger)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes healthShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
     .btn-hero{min-height:60px;padding:0 26px;font-size:1.07rem;box-shadow:0 20px 40px rgba(245,158,11,.28),0 10px 26px rgba(15,118,110,.16)}
     .btn-sample{background:#fff7ed;border:1px solid rgba(245,158,11,.30);color:#7c2d12;box-shadow:0 12px 24px rgba(245,158,11,.10)}
     .proof-note{
@@ -376,7 +410,7 @@
           <a href="#pricing">Pricing</a>
           <a href="#submit">Submit</a>
           <a href="#faq">FAQ</a>
-          <a href="#submit" class="btn btn-primary">Start Paid Review</a>
+          <a href="#submit" class="btn btn-primary cta-main">Start Paid Review</a>
         </nav>
       </div>
     </header>
@@ -389,7 +423,7 @@
             <h1>Premium review feedback without the messy process.</h1>
             <p class="lead">Preview the sample report structure first, then upload one main file, choose the plan that fits the file size, complete secure payment, and receive a clear PDF feedback report with issues, scores, and practical improvement guidance.</p>
             <div class="hero-actions">
-              <a href="#submit" class="btn btn-primary btn-hero">Start Paid Review</a>
+              <a href="#submit" class="btn btn-primary btn-hero cta-main">Start Paid Review</a>
               <a href="#sample" class="btn btn-sample btn-hero">View Sample Report First</a>
             </div>
             <div class="trust-row" aria-label="Trust highlights">
@@ -561,7 +595,7 @@
               <div class="step-panel">
                 <h3><span class="num">5</span> Final submission</h3>
                 <p class="help">After payment verification, submit the paid review once. Keep the page open during upload.</p>
-                <button type="submit" class="btn btn-green btn-full" id="submitBtn" disabled>Submit paid review now</button>
+                <button type="submit" class="btn btn-green btn-full" id="submitBtn" disabled>Submit now</button>
                 <div class="status" id="submitStatus" role="status" aria-live="polite"></div>
                 <div id="successPanel" class="hide card" style="margin-top:14px;background:rgba(6,118,71,.06)">
                   <h3>Submission received</h3>
@@ -627,9 +661,9 @@
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6kjiHsPxrYWiZAiGJVCrTtT0Dgf3AJWeX_J25JhfQcu0sOzO8jwPTKDtsZMv6hvJAg/exec";
     const DEFAULT_PUBLIC_CONFIG = {
-      version:"2026-05-20-file-only-v4-chat-otp10-cta",
+      version:"2026-05-20-file-only-v5-health-pin-paystack",
       supportEmail:"hello@humanlyreview.com",
-      paystackPublicKey:"",
+      paystackPublicKey:"pk_test_cdfaa0f13a49b0597573a5e336405a64dc634e4e",
       currency:"NGN",
       fxRate:1500,
       acceptedExtensions:["pdf","docx","pptx","xlsx","jpg","jpeg","png","txt"],
@@ -912,6 +946,7 @@
       try{
         const data = await callApi("getPublicConfig");
         state.config = {...DEFAULT_PUBLIC_CONFIG, ...data.config};
+        if(!state.config.paystackPublicKey) state.config.paystackPublicKey = DEFAULT_PUBLIC_CONFIG.paystackPublicKey;
         if(!state.config.plans?.some(p => p.id === state.selectedPlanId)){
           state.selectedPlanId = state.config.plans[0].id;
         }
@@ -1265,7 +1300,14 @@
             <div class="admin-grid" style="margin-top:22px">
               <aside class="admin-side">
                 <h2>Unlock dashboard</h2>
-                <div class="field"><label for="ownerPin">Owner PIN</label><input id="ownerPin" type="text" class="masked-pin" inputmode="numeric" autocomplete="off" placeholder="Enter owner PIN"></div>
+                <div class="field">
+                  <label for="ownerPin">Owner PIN</label>
+                  <div class="password-wrap">
+                    <input id="ownerPin" type="password" inputmode="numeric" autocomplete="off" placeholder="Enter owner PIN">
+                    <button class="eye-btn" id="toggleOwnerPin" type="button" aria-label="Show owner PIN" title="Show / hide PIN">👁</button>
+                  </div>
+                  <div class="help">Tap the eye icon to view or hide the PIN while typing.</div>
+                </div>
                 <button class="btn btn-primary btn-full" id="ownerLoginBtn">Unlock</button>
                 <button class="btn btn-danger btn-full hide" id="ownerLogoutBtn" type="button" style="margin-top:10px">Logout</button>
                 <div class="status" id="ownerStatus" role="status" aria-live="polite"></div>
@@ -1389,7 +1431,7 @@
           <p class="help">Secrets belong in Apps Script Properties, not in public HTML.</p>
           <div class="grid-3">
             <div class="field"><label>Official support / OTP reply email</label><input id="setSupportEmail" value="${escapeHtml(cfg.supportEmail || "")}"></div>
-            <div class="field"><label>Paystack public key</label><input id="setPublicKey" value="${escapeHtml(cfg.paystackPublicKey || "")}"></div>
+            <div class="field"><label>Paystack public key only</label><input id="setPublicKey" value="${escapeHtml(cfg.paystackPublicKey || "")}"><div class="help">Use pk_test for testing or pk_live for launch. Secret key stays only in Apps Script Properties.</div></div>
             <div class="field"><label>USD value → local checkout rate</label><input id="setFxRate" type="number" value="${escapeHtml(cfg.fxRate || 1500)}"></div>
           </div>
           <h3>Plan limits</h3>
@@ -1426,14 +1468,57 @@
         };
       }
       async function renderHealth(){
-        $("adminMain").innerHTML = `<h2>Health check</h2><button class="btn btn-primary" id="runHealth">Run health check</button><div id="healthResult" class="admin-cards" style="margin-top:14px"></div>`;
+        $("adminMain").innerHTML = `
+          <h2>Health check</h2>
+          <p class="help">Run this after every deployment. The cards roll while the system checks Sheets, Drive, Paystack, owner PIN, email, and sender alias.</p>
+          <div class="health-toolbar">
+            <button class="btn btn-primary" id="runHealth">Run health check</button>
+            <span class="help" id="healthHint">No check has been run yet.</span>
+          </div>
+          <div id="healthResult" class="admin-cards"></div>`;
+        const renderRunning = names => {
+          $("healthResult").innerHTML = names.map(name => `
+            <div class="admin-card health-card health-running">
+              <div class="health-title"><span class="spinner" aria-hidden="true"></span><strong>${escapeHtml(name)}</strong></div>
+              <p class="help">Checking now…</p>
+            </div>`).join("");
+        };
+        const renderChecks = checks => {
+          $("healthResult").innerHTML = checks.map(c => `
+            <div class="admin-card health-card ${c.ok ? "health-ok" : "health-bad"}">
+              <div class="health-title">
+                <span class="health-mini ${c.ok ? "ok" : "bad"}">${c.ok ? "✓ OK" : "! Fix"}</span>
+                <strong>${escapeHtml(c.name)}</strong>
+              </div>
+              <p class="help">${escapeHtml(c.detail)}</p>
+            </div>`).join("");
+        };
         $("runHealth").onclick = async () => {
+          const expected = ["Google Sheet","Drive folder","Paystack secret key","Paystack public key","Paystack mode match","Owner PIN","Email sending","Sender address"];
           try{
+            setBusy($("runHealth"), true, "Running checks…");
+            $("healthHint").textContent = "Rolling through system checks. Do not close this tab.";
+            renderRunning(expected);
             const h = await ownerApi("adminHealth");
-            $("healthResult").innerHTML = h.checks.map(c => `<div class="admin-card"><strong>${escapeHtml(c.name)}</strong><p class="help">${escapeHtml(c.ok ? "OK" : "Needs attention")} — ${escapeHtml(c.detail)}</p></div>`).join("");
-          }catch(err){ alert(err.message); }
+            renderChecks(h.checks || []);
+            const failed = (h.checks || []).filter(c => !c.ok).length;
+            $("healthHint").textContent = failed ? `${failed} item(s) need attention before launch.` : "All visible health checks passed.";
+          }catch(err){
+            $("healthHint").textContent = "Health check failed.";
+            $("healthResult").innerHTML = `<div class="admin-card health-bad"><strong>Could not complete health check</strong><p class="help">${escapeHtml(err.message)}</p></div>`;
+          }finally{
+            setBusy($("runHealth"), false);
+          }
         };
       }
+      $("toggleOwnerPin").addEventListener("click", () => {
+        const input = $("ownerPin");
+        const showing = input.type === "text";
+        input.type = showing ? "password" : "text";
+        $("toggleOwnerPin").setAttribute("aria-label", showing ? "Show owner PIN" : "Hide owner PIN");
+        $("toggleOwnerPin").textContent = showing ? "👁" : "🙈";
+        input.focus();
+      });
       $("ownerLoginBtn").addEventListener("click", login);
       $("ownerLogoutBtn").addEventListener("click", logout);
       document.querySelectorAll("[data-tab]").forEach(btn => btn.addEventListener("click", () => { admin.tab = btn.dataset.tab; renderAdmin(); }));
