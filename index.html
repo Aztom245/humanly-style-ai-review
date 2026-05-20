@@ -6,7 +6,7 @@
   <meta name="description" content="HumanlyReview helps you upload a file, pay securely, and receive a structured PDF feedback report by email.">
   <title>HumanlyReview — Expert-style file review reports</title>
   <link rel="preconnect" href="https://js.paystack.co">
-  <script src="https://js.paystack.co/v1/inline.js" defer></script>
+  <script id="paystackInlineScript" src="https://js.paystack.co/v1/inline.js" defer></script>
   <style>
     :root{
       --bg:#f7f8fb;
@@ -81,6 +81,13 @@
       font-weight:900;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease,background .15s ease
     }
     .btn:active{transform:translateY(1px)}
+    .btn.is-busy{pointer-events:none;opacity:.96;position:relative}
+    .btn-spinner{
+      width:17px;height:17px;border-radius:50%;border:3px solid rgba(255,255,255,.55);
+      border-top-color:currentColor;display:inline-block;animation:spin .75s linear infinite;flex:0 0 auto
+    }
+    .btn-soft .btn-spinner{border-color:#dbe3ee;border-top-color:var(--brand)}
+    .btn-green .btn-spinner,.btn-primary .btn-spinner{border-top-color:#061018}
     .btn-primary{
       background:linear-gradient(135deg,#f59e0b 0%,#fbbf24 46%,#0f766e 100%);
       color:#08111f;
@@ -125,9 +132,11 @@
       display:inline-block;animation:spin .75s linear infinite;flex:0 0 auto
     }
     .health-ok{border-color:rgba(6,118,71,.20);background:rgba(6,118,71,.045)}
+    .health-warn{border-color:rgba(245,158,11,.30);background:rgba(245,158,11,.075)}
     .health-bad{border-color:rgba(180,35,24,.20);background:rgba(180,35,24,.045)}
     .health-mini{font-size:.82rem;font-weight:950;border-radius:999px;padding:5px 8px;display:inline-flex;align-items:center;gap:6px}
     .health-mini.ok{background:rgba(6,118,71,.10);color:var(--ok)}
+    .health-mini.warn{background:rgba(245,158,11,.16);color:#92400e}
     .health-mini.bad{background:rgba(180,35,24,.10);color:var(--danger)}
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes healthShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -293,6 +302,11 @@
     .status.ok{background:rgba(6,118,71,.08);border-color:rgba(6,118,71,.18);color:var(--ok)}
     .status.err{background:rgba(180,35,24,.08);border-color:rgba(180,35,24,.18);color:var(--danger)}
     .status.info{background:rgba(20,33,61,.07);border-color:rgba(20,33,61,.14);color:var(--brand)}
+    .status.rolling{display:flex;align-items:center;gap:10px}
+    .status.rolling::before{
+      content:"";width:16px;height:16px;border-radius:50%;border:3px solid rgba(20,33,61,.16);
+      border-top-color:var(--accent);animation:spin .75s linear infinite;flex:0 0 auto
+    }
     .upload-box{
       border:2px dashed #cbd5e1;border-radius:22px;background:#f8fafc;
       padding:18px;display:grid;gap:12px;transition:.15s ease
@@ -661,7 +675,7 @@
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6kjiHsPxrYWiZAiGJVCrTtT0Dgf3AJWeX_J25JhfQcu0sOzO8jwPTKDtsZMv6hvJAg/exec";
     const DEFAULT_PUBLIC_CONFIG = {
-      version:"2026-05-20-file-only-v5-health-pin-paystack",
+      version:"2026-05-20-file-only-v6-rolling-paystack",
       supportEmail:"hello@humanlyreview.com",
       paystackPublicKey:"pk_test_cdfaa0f13a49b0597573a5e336405a64dc634e4e",
       currency:"NGN",
@@ -677,6 +691,7 @@
       faqs:[
         ["What do I upload?","Upload one main file for review. Add supporting files only when they provide useful context."],
         ["When can I pay?","Payment opens after your email is verified, a plan is selected, and your file passes size/type validation."],
+        ["Why is checkout not opening?","Open the page in Chrome or Safari, check your internet, and disable ad blockers. The button will show a rolling state while Paystack loads."],
         ["What happens after payment?","You submit the paid review once, receive a Submission ID, and get the PDF feedback report by email."],
         ["What if payment succeeds but upload fails?","Use payment recovery on this page or contact hello@humanlyreview.com with your email, plan, and Paystack reference."],
         ["Do you complete work for users?","No. HumanlyReview provides feedback and improvement guidance only."],
@@ -696,6 +711,8 @@
       supportFiles:[],
       submitting:false,
       publicLoaded:false,
+      paymentInProgress:false,
+      paystackLoadPromise:null,
       otpTimerId:null,
       otpExpiresAt:0
     };
@@ -713,14 +730,21 @@
       el.textContent = msg;
     }
     function clearStatus(el){ el.className = "status"; el.textContent = ""; }
+    function setRollingStatus(el, msg){
+      el.className = "status show info rolling";
+      el.textContent = msg;
+    }
     function setBusy(btn, busy, text){
       if(!btn) return;
       if(busy){
-        btn.dataset.oldText = btn.textContent;
-        btn.textContent = text || "Working...";
+        if(!btn.classList.contains("is-busy")) btn.dataset.oldHtml = btn.innerHTML;
+        btn.classList.add("is-busy");
+        btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span>${escapeHtml(text || "Working...")}</span>`;
         btn.disabled = true;
       }else{
-        btn.textContent = btn.dataset.oldText || btn.textContent;
+        btn.classList.remove("is-busy");
+        btn.innerHTML = btn.dataset.oldHtml || btn.textContent;
+        delete btn.dataset.oldHtml;
         btn.disabled = false;
       }
     }
@@ -738,6 +762,44 @@
       try{ data = JSON.parse(text); }catch(e){ throw new Error("Backend response was not valid JSON. Check Apps Script deployment and access setting."); }
       if(!data.ok) throw new Error(data.error || "Request failed.");
       return data;
+    }
+
+    function loadPaystackInline(){
+      if(window.PaystackPop && typeof window.PaystackPop.setup === "function") return Promise.resolve(true);
+      if(state.paystackLoadPromise) return state.paystackLoadPromise;
+      state.paystackLoadPromise = new Promise((resolve, reject) => {
+        const existing = document.getElementById("paystackInlineScript");
+        let settled = false;
+        const done = () => {
+          if(settled) return;
+          settled = true;
+          if(window.PaystackPop && typeof window.PaystackPop.setup === "function") resolve(true);
+          else reject(new Error("Paystack checkout library loaded but did not initialize. Refresh the page or open it in Chrome/Safari."));
+        };
+        const fail = () => {
+          if(settled) return;
+          settled = true;
+          state.paystackLoadPromise = null;
+          reject(new Error("Paystack checkout could not load. Check your internet connection, disable ad blockers, or open the page in Chrome/Safari."));
+        };
+        if(existing){
+          existing.addEventListener("load", done, {once:true});
+          existing.addEventListener("error", fail, {once:true});
+        }
+        const script = document.createElement("script");
+        script.src = "https://js.paystack.co/v1/inline.js";
+        script.async = true;
+        script.onload = done;
+        script.onerror = fail;
+        document.head.appendChild(script);
+        setTimeout(() => {
+          if(!settled){
+            if(window.PaystackPop && typeof window.PaystackPop.setup === "function") done();
+            else fail();
+          }
+        }, 15000);
+      });
+      return state.paystackLoadPromise;
     }
 
     function renderPlans(){
@@ -816,7 +878,7 @@
         return;
       }
       note.textContent = `${plan.name}: ${money(plan.priceUsd)} service value. You will pay through Paystack in the supported local checkout currency; the final amount appears before you confirm.`;
-      payBtn.textContent = `Continue to secure checkout — ${plan.name}`;
+      if(!payBtn.classList.contains("is-busy")) payBtn.textContent = `Continue to secure checkout — ${plan.name}`;
       payBtn.disabled = !canPay();
       if(state.paymentVerified){
         $("paymentRefWrap").classList.remove("hide");
@@ -834,7 +896,7 @@
 
     function canPay(){
       const plan = selectedPlan();
-      return !!(plan && plan.payOnline && state.emailVerified && state.mainFile && validateFile(false) && !state.paymentVerified);
+      return !!(plan && plan.payOnline && state.emailVerified && state.mainFile && validateFile(false) && !state.paymentVerified && !state.paymentInProgress);
     }
     function canSubmit(){
       const plan = selectedPlan();
@@ -1012,6 +1074,7 @@
       const btn = $("sendOtpBtn");
       try{
         setBusy(btn,true,"Sending code...");
+        setRollingStatus($("emailStatus"), "Sending your verification code. Please wait...");
         state.emailVerified = false;
         state.authToken = "";
         state.paymentVerified = false;
@@ -1037,6 +1100,7 @@
       const btn = $("verifyOtpBtn");
       try{
         setBusy(btn,true,"Verifying...");
+        setRollingStatus($("emailStatus"), "Checking your verification code...");
         const data = await callApi("verifyOtp",{email,code});
         state.emailVerified = true;
         state.authToken = data.authToken;
@@ -1056,51 +1120,75 @@
       }
     }
 
-    function startPayment(){
+    async function startPayment(){
       const plan = selectedPlan();
+      const btn = $("payBtn");
+      if(state.paymentInProgress) return;
       if(!canPay()){
         setStatus($("paymentStatus"), "err", "Complete email verification and select a valid file before payment.");
         return;
       }
-      if(!window.PaystackPop){
-        setStatus($("paymentStatus"), "err", "Paystack could not load. Open this page in Chrome/Safari and try again.");
-        return;
-      }
-      const publicKey = state.config.paystackPublicKey;
-      if(!publicKey){
-        setStatus($("paymentStatus"), "err", "Paystack public key is not configured in backend settings.");
+      const publicKey = String(state.config.paystackPublicKey || "").trim();
+      if(!/^pk_(test|live)_/.test(publicKey)){
+        setStatus($("paymentStatus"), "err", "Paystack public key is missing or invalid. Use a pk_test_ key for testing or pk_live_ key for launch.");
         return;
       }
       const email = $("email").value.trim().toLowerCase();
       const amount = Math.round(plan.priceUsd * Number(state.config.fxRate || 1500) * 100);
+      if(!Number.isFinite(amount) || amount < 100){
+        setStatus($("paymentStatus"), "err", "Checkout amount is invalid. Check your plan price and local checkout rate in admin settings.");
+        return;
+      }
       const ref = "HR-" + plan.id.toUpperCase() + "-" + Date.now() + "-" + Math.random().toString(36).slice(2,8).toUpperCase();
-      $("payBtn").disabled = true;
-      clearStatus($("paymentStatus"));
-      const handler = PaystackPop.setup({
-        key: publicKey,
-        email,
-        amount,
-        currency: state.config.currency || "NGN",
-        ref,
-        metadata:{
-          custom_fields:[
-            {display_name:"Plan",variable_name:"plan",value:plan.name},
-            {display_name:"Main file",variable_name:"main_file",value:state.mainFile.name}
-          ]
-        },
-        callback: async function(response){
-          await verifyPaymentReference(response.reference || ref);
-        },
-        onClose: function(){
-          if(!state.paymentVerified){
-            setStatus($("paymentStatus"), "info", "Payment was not completed. No review will start yet.");
+      state.paymentInProgress = true;
+      setBusy(btn,true,"Opening checkout...");
+      setRollingStatus($("paymentStatus"), "Opening secure Paystack checkout. Please wait...");
+      try{
+        await loadPaystackInline();
+        if(!window.PaystackPop || typeof window.PaystackPop.setup !== "function"){
+          throw new Error("Paystack checkout is not available yet. Refresh this page and try again in Chrome/Safari.");
+        }
+        const handler = window.PaystackPop.setup({
+          key: publicKey,
+          email,
+          amount,
+          currency: String(state.config.currency || "NGN").toUpperCase(),
+          ref,
+          metadata:{
+            custom_fields:[
+              {display_name:"Plan",variable_name:"plan",value:plan.name},
+              {display_name:"Main file",variable_name:"main_file",value:state.mainFile.name}
+            ]
+          },
+          callback: async function(response){
+            setRollingStatus($("paymentStatus"), "Payment returned. Verifying securely now...");
+            try{
+              await verifyPaymentReference(response.reference || ref);
+            }finally{
+              state.paymentInProgress = false;
+              setBusy(btn,false);
+              renderControls();
+            }
+          },
+          onClose: function(){
+            state.paymentInProgress = false;
+            setBusy(btn,false);
+            if(!state.paymentVerified){
+              setStatus($("paymentStatus"), "info", "Payment was not completed. No review will start yet. Click checkout again when you are ready.");
+            }
             renderControls();
           }
-        }
-      });
-      try{ handler.openIframe(); }
-      catch(err){
-        setStatus($("paymentStatus"), "err", "Checkout did not open. Open this page in Chrome/Safari and try again.");
+        });
+        handler.openIframe();
+        setTimeout(() => {
+          if(state.paymentInProgress && !state.paymentVerified){
+            setStatus($("paymentStatus"), "info", "Checkout should be opening. If you do not see it, open this page in Chrome/Safari, disable ad blockers, and try again.");
+          }
+        }, 4500);
+      }catch(err){
+        state.paymentInProgress = false;
+        setBusy(btn,false);
+        setStatus($("paymentStatus"), "err", err.message || "Checkout did not open. Open this page in Chrome/Safari and try again.");
         renderControls();
       }
     }
@@ -1109,7 +1197,7 @@
       const plan = selectedPlan();
       const email = $("email").value.trim().toLowerCase();
       try{
-        setStatus($("paymentStatus"), "info", "Checking payment...");
+        setRollingStatus($("paymentStatus"), "Checking payment securely...");
         const data = await callApi("verifyPayment",{
           authToken:state.authToken,
           email,
@@ -1152,13 +1240,13 @@
       const btn = $("submitBtn");
       try{
         setBusy(btn,true,"Preparing file...");
-        setStatus($("submitStatus"), "info", "Preparing file. Keep this tab open.");
+        setRollingStatus($("submitStatus"), "Preparing your file. Keep this tab open...");
         const mainFile = await readFile(state.mainFile);
         setBusy(btn,true,"Preparing supporting files...");
         const supportFiles = [];
         for(const f of state.supportFiles){ supportFiles.push(await readFile(f)); }
         setBusy(btn,true,"Uploading...");
-        setStatus($("submitStatus"), "info", "Uploading and saving your paid review...");
+        setRollingStatus($("submitStatus"), "Uploading and saving your paid review. Please wait...");
         const data = await callApi("submitReview",{
           authToken:state.authToken,
           email:$("email").value.trim().toLowerCase(),
@@ -1222,6 +1310,7 @@
       addChatMessage("user", message);
       try{
         setBusy(btn,true,"Sending...");
+        setRollingStatus($("chatStatus"), "Sending your support message...");
         if(!apiReady()){
           setStatus($("chatStatus"), "info", "Backend is not connected yet. Send your message to hello@humanlyreview.com.");
           return;
@@ -1241,9 +1330,13 @@
       $("sendOtpBtn").addEventListener("click", sendOtp);
       $("verifyOtpBtn").addEventListener("click", verifyOtp);
       $("payBtn").addEventListener("click", startPayment);
-      $("recoverBtn").addEventListener("click", () => {
+      $("recoverBtn").addEventListener("click", async () => {
         const ref = $("recoverRef").value.trim();
-        if(ref) verifyPaymentReference(ref);
+        if(ref){
+          const btn = $("recoverBtn");
+          try{ setBusy(btn,true,"Recovering..."); await verifyPaymentReference(ref); }
+          finally{ setBusy(btn,false); renderControls(); }
+        }
         else setStatus($("paymentStatus"), "err", "Enter your Paystack reference first.");
       });
       $("reviewForm").addEventListener("submit", submitReview);
@@ -1484,14 +1577,20 @@
             </div>`).join("");
         };
         const renderChecks = checks => {
-          $("healthResult").innerHTML = checks.map(c => `
-            <div class="admin-card health-card ${c.ok ? "health-ok" : "health-bad"}">
+          $("healthResult").innerHTML = checks.map(c => {
+            const level = c.level || (c.ok ? "ok" : "fail");
+            const cls = level === "ok" ? "health-ok" : (level === "warn" ? "health-warn" : "health-bad");
+            const badgeClass = level === "ok" ? "ok" : (level === "warn" ? "warn" : "bad");
+            const badgeText = level === "ok" ? "✓ OK" : (level === "warn" ? "! Setup" : "! Fix");
+            return `
+            <div class="admin-card health-card ${cls}">
               <div class="health-title">
-                <span class="health-mini ${c.ok ? "ok" : "bad"}">${c.ok ? "✓ OK" : "! Fix"}</span>
+                <span class="health-mini ${badgeClass}">${badgeText}</span>
                 <strong>${escapeHtml(c.name)}</strong>
               </div>
               <p class="help">${escapeHtml(c.detail)}</p>
-            </div>`).join("");
+            </div>`;
+          }).join("");
         };
         $("runHealth").onclick = async () => {
           const expected = ["Google Sheet","Drive folder","Paystack secret key","Paystack public key","Paystack mode match","Owner PIN","Email sending","Sender address"];
@@ -1501,8 +1600,9 @@
             renderRunning(expected);
             const h = await ownerApi("adminHealth");
             renderChecks(h.checks || []);
-            const failed = (h.checks || []).filter(c => !c.ok).length;
-            $("healthHint").textContent = failed ? `${failed} item(s) need attention before launch.` : "All visible health checks passed.";
+            const failed = (h.checks || []).filter(c => (c.level || (c.ok ? "ok" : "fail")) === "fail").length;
+            const warn = (h.checks || []).filter(c => (c.level || (c.ok ? "ok" : "fail")) === "warn").length;
+            $("healthHint").textContent = failed ? `${failed} item(s) must be fixed before launch.` : (warn ? `${warn} setup notice(s). The site can still run, but finish them for polish.` : "All visible health checks passed.");
           }catch(err){
             $("healthHint").textContent = "Health check failed.";
             $("healthResult").innerHTML = `<div class="admin-card health-bad"><strong>Could not complete health check</strong><p class="help">${escapeHtml(err.message)}</p></div>`;
